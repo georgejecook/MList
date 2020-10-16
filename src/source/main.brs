@@ -1,9 +1,5 @@
 sub Main(args as dynamic)
-  ? "Launching with args "
-  ? args
-  m.args = args
-  
-  if (type(Rooibos_init) = "Function") then Rooibos_init(invalid, invalid, invalid, m)
+
   InitScreen()
 end sub
 

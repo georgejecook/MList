@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='TestScreen'
+    extends='BaseScreen'>
+  <interface>
+  </interface>
+  <children>
+    <ImageFader
+        id='imageFader'
+        width='1920'
+        height='1080' />
+    <Rectangle
+        color='#ffffff'
+        opacity='0.4'
+        width='1000'
+        height='500'
+        translation='[100, 50]' />
+    <SmartLabel
+        id='smartLabel'
+        translation='[120, 70]'
+        width='900' />
+    <Label
+        text='Test screen'
+        translation='[50, 1000]' />
+    <poster uri='http://192.168.8.140:8000/s.png' />
+  </children>
+
+
+</component>

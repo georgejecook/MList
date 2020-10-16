@@ -1,0 +1,61 @@
+function init()
+  m.images = ["pkg:/images/s.png"
+    "https://homepages.cae.wisc.edu/~ece533/images/airplane.png"
+    "https://homepages.cae.wisc.edu/~ece533/images/arctichare.png"
+    "https://homepages.cae.wisc.edu/~ece533/images/baboon.png"
+  ]
+  m.imageIndex = 0
+
+  m.imageFader = m.top.findNode("imageFader")
+  m.imageFader@.changeImage(m.images[m.imageIndex])
+  m.smartLabel = m.top.findNode("smartLabel")
+
+  configureLabel()
+
+end function
+
+function configureLabel()
+  m.smartLabel@.updateFontSetting("header1Font", "font:MediumBoldSystemFont", 50)
+  m.smartLabel@.updateFontSetting("header2Font", "font:MediumBoldSystemFont", 40)
+  m.smartLabel@.updateFontSetting("header3Font", "font:MediumBoldSystemFont", 30)
+  m.smartLabel@.updateFontSetting("font", "font:MediumSystemFont", 30)
+  m.smartLabel@.updateFontSetting("italicFont", "font:MediumBoldSystemFont", 32)
+  m.smartLabel@.updateFontSetting("boldFont", "font:MediumSystemFont", 34)
+
+  m.smartLabel.values = {
+    name: "Jurassic Park"
+    description: "Dinosaur antics and jolly good fun"
+    time: "1h30m"
+    icon: "https:"
+    rating: "pg"
+    so1: makePoster("so1.png")
+    so2: makePoster("so2.png")
+    so3: makePoster("so3.png")
+  }
+  text = "#Video ${name}#"
+  text += "\n##Description:##"
+  text += "\n###${description}###"
+  text += "\n\n_runningtime_: *${time}* _rating_: *${rating}*"
+  text += "\nhere is some more text"
+  text += "\nposter ${so1} test here ${so2} more text"
+  text += "\n${so3}"
+  m.smartLabel.text = text
+end function
+
+function makePoster(name)
+  poster = createObject("roSGNode", "Poster")
+  poster.width = 40
+  poster.height = 40
+  poster.uri = "pkg:/images/" + name
+  return poster
+end function
+
+function onKeyPressUp() as boolean
+  ? "UP"
+  m.imageIndex++
+  if m.imageIndex = m.images.count()
+    m.imageIndex = 0
+  end if
+  m.imageFader@.changeImage(m.images[m.imageIndex])
+  return false
+end function
