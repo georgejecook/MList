@@ -53,9 +53,10 @@ function onSetInitialTimerFire()
   logMethod(">>onSetInitialTimerFire")
   layoutLists()
   for each row in m.visibleLists
-    row.viewState = "partial"
+    ' row.viewState = "partial"
+    row.viewState = "hidden"
   end for
-  ' updateRowStates(0, 0, 5, 10)
+  updateRowStates(0, 0, 5, 10)
 end function
 
 function layoutLists()
@@ -234,7 +235,7 @@ function onCurrTargetChange(evt)
 end function
 
 function moveYFocus(offset, isAnimated = true)
-  logMethod(">>moveYFocus")
+  ' logMethod(">>moveYFocus")
   newIndex = m.top.rowFocused + offset
 
   'TODO - I have no need for vertical wrapping; if someone wants it

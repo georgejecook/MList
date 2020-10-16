@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8' ?>
+<?xml version='1.0' encoding='utf-8'?>
 <component
     name='MList'
     extends='BaseView'>
@@ -23,8 +23,9 @@
     <!-- indicates what to set a row to when it's considered hidden (hidden|partial) -->
     <field
         id='rowHidingMode'
-        value='partial'
+        value='hidden'
         type='string' />
+    <!-- value='partial' -->
     <field
         id='animateToRow'
         type='integer'

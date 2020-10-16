@@ -49,7 +49,7 @@ function updateCell() as void
 end function
 
 function onViewStateChange(evt) 
-  ? "onViewStateChange"; evt.getData()
+  ' ? "onViewStateChange"; evt.getData()
   m.viewState = evt.getData()
   if m.viewState = "show"
     updateCell()

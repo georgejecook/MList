@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import { series } from "gulp";
 import { RooibosProcessor, createProcessorConfig } from 'rooibos-cli';
-import { BurpConfig, BurpProcessor, FileProcessor } from "burp-brightscript";
 import { inspect } from 'util';
 import { ProgramBuilder, BsConfig } from 'brighterscript';
 
@@ -13,7 +12,6 @@ const outDir = './build';
 const rokuDeploy = require('roku-deploy');
 const util = require('util');
 const sleep = util.promisify(setTimeout);
-let burpFileProcessor: FileProcessor;
 
 let args = {
   host: process.env.ROKU_HOST || '192.168.16.3',
@@ -45,8 +43,6 @@ export async function compile(cb) {
   // copy all sources to tmp folder
   // so we can add the line numbers to them prior to transpiling
   let builder = new ProgramBuilder();
-  burpFileProcessor = createBurpProcessor();
-  builder.addFileResolver(projectFileResolver);
 
 
   let configFiles: any[] = [
@@ -79,10 +75,6 @@ export async function compile(cb) {
     ],
     "showDiagnosticsInConsole": true
   });
-}
-
-function projectFileResolver(pathAbsolute: string): string | undefined | Thenable<string | undefined> {
-  return burpFileProcessor.processFileWithPath(pathAbsolute, pathAbsolute.toLowerCase().endsWith('.brs'));
 }
 
 async function prepareTests(cb) {
@@ -128,38 +120,6 @@ async function prepareTests(cb) {
 
   cb();
 }
-export function createBurpProcessor(): FileProcessor {
-  let replacements = null;
-  if (process.env.buildType === 'prod') {
-    replacements = [{
-      regex: '(^\\s*(m\\.)*(registerLogger)\\((\\s*"))',
-      replacement: '\'$1'
-    },
-    {
-      regex: '(^\\s*(m\\.)*(logMethod|logInfo|logError|logVerbose|logDebug|logWarn)\\()',
-      replacement: '\'$1'
-    },
-
-    ];
-  } else {
-    replacements = [
-      {
-        regex: '(^\\s*(m\\.)*(logInfo|logError|logVerbose|logDebug|logWarn|logMethod)\\((\\s*"))',
-        replacement: '$1" + source_location, " '
-      }
-    ];
-  }
-
-  // add crash resilience to tests
-  if (process.env.buildType === 'test') {
-    replacements.push({
-      regex: '(^(\\s*)m\\.assert)',
-      replacement: '  if not m.currentResult.isFail then $1'
-    });
-  }
-  return new FileProcessor({ replacements: replacements });
-}
-
 
 exports.build = series(clean, createDirectories, compile);
 exports.prePublish = series(exports.build)

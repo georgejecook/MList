@@ -174,7 +174,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onViewStateChange()
-  logInfo("onViewStateChange", m.top.index, m.top.viewState)
+  ' logInfo("onViewStateChange", m.top.index, m.top.viewState)
   if m.top.viewState <> m.previousViewState 
     m.previousViewState = m.top.viewState
     updateListVisibility(m.top.viewState)
@@ -234,7 +234,7 @@ end function
 function applyViewStateForCell(id, viewState)
   index = id.toInt()
   isOnScreen = m.top.isOnScreen
-  ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
+  ' ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
   item = m.content.getChild(index)
   if item <> invalid
     if viewState = "show"
