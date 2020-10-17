@@ -7,9 +7,9 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "SAMPLES",
+      "name": "LIST RIG",
       "stopOnEntry": false,
-      "preLaunchTask": "build-samples",
+      "preLaunchTask": "build-list-sample",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",

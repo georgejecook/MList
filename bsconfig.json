@@ -4,16 +4,18 @@
     "manifest",
     "source/**/*.*",
     "components/**/*.*",
-    "files/**/*.*"
+    "images/**/*.*"
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
-  "stagingFolderPath": "dist",
+  "stagingFolderPath": "build",
   "diagnosticFilters": [
     {
       "src": "**/roku_modules/**/*.*",
       "codes": [
-        1107
+        1107,
+        1009,
+        1001
       ]
     }
   ]

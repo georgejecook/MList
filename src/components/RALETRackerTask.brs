@@ -2276,7 +2276,7 @@ Function FW_ValidAA(obj As Object, keys as Object, delim = "." as String) as Boo
         return false
     end if
     for each key in Keys
-        subKeys = FW_Split(key, delim)
+        subKeys = key.split(delim)
         aa_check = obj
         'go down the hierarchy key.subkey.subsubkey...
         for each subkey in subKeys
@@ -2285,7 +2285,7 @@ Function FW_ValidAA(obj As Object, keys as Object, delim = "." as String) as Boo
             else
                 print "Key::"; key
                 print "subkey::"; subkey
-                printAA(obj)
+                'printAA(obj)
                 return false
 
             end if
@@ -2311,7 +2311,7 @@ function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim =
     result = element
 
     if FW_IsNotEmptyString(subElementTree) and FW_IsNotEmptyString(delim) then
-       subElementTreeArray = FW_Split(subElementTree, delim)
+       subElementTreeArray = subElementTree.split(delim)
     else if FW_IsArray(subElementTree) then
        subElementTreeArray = subElementTree
     else

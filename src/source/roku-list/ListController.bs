@@ -56,7 +56,7 @@ class ListController
   ' end function
 
   ' function onSetInitialTimerFire()
-  '   logMethod(">>onSetInitialTimerFire")
+  '   m.logMethod(">>onSetInitialTimerFire")
   '   layoutLists()
   '   for each row in m.visibleLists
   '     ' row.viewState = "partial"
@@ -182,7 +182,7 @@ class ListController
   ' end function
 
   ' function onAnimationFractionChange()
-  '   ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
+  '   ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction)
   '   y = m.rowsGroup.translation[1]
   '   index = getListAtY(y)
 
@@ -192,7 +192,7 @@ class ListController
   '     end if
   '     updateRowFocus(index)
   '   else
-  '     ' logInfo(">>>", y, index, m.top.rowFocused)
+  '     ' m.logInfo(">>>", y, index, m.top.rowFocused)
   '     if index <> -1 and index <> m.top.rowFocused and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() - 10)
   '       updateRowStates(m.currentDirection, index)
   '     end if
@@ -241,7 +241,7 @@ class ListController
   ' end function
 
   ' function moveYFocus(offset, isAnimated = true)
-  '   ' logMethod(">>moveYFocus")
+  '   ' m.logMethod(">>moveYFocus")
   '   newIndex = m.top.rowFocused + offset
 
   '   'TODO - I have no need for vertical wrapping; if someone wants it
@@ -282,11 +282,11 @@ class ListController
   ' end function
 
   ' function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
-  '   logMethod("animateToIndex from", oldIndex, "to", index)
+  '   m.logMethod("animateToIndex from", oldIndex, "to", index)
   '   nextList = m.visibleLists[index]
 
   '   if nextList = invalid
-  '     logError("could not idenitfy next list with index", index)
+  '     m.logError("could not idenitfy next list with index", index)
   '     return invalid
   '   end if
 
@@ -316,14 +316,14 @@ class ListController
   '     y = list.translation[1]
   '     if list.content <> invalid and list.content.yOffset <> invalid
   '       y -= list.content.yOffset
-  '       ' logInfo("list", index, "has a yoffset", list.content.yOffset)
+  '       ' m.logInfo("list", index, "has a yoffset", list.content.yOffset)
   '     end if
   '   end if
   '   return y
   ' end function
 
   ' function updateRowFocus(index)
-  '   logMethod("updateRowFocus", index)
+  '   m.logMethod("updateRowFocus", index)
   '   m.currentList = m.visibleLists[index]
 
   '   if m.currentList <> invalid
@@ -337,7 +337,7 @@ class ListController
   '       else
   '         m.top._focusedRenderer = invalid
   '       end if
-  '       logWarn("focusing on list ", m.currentList.content.title)
+  '       m.logWarn("focusing on list ", m.currentList.content.title)
   '       m.currentList.setFocus(true)
 
   '     end if
@@ -349,7 +349,7 @@ class ListController
   ' end function
 
   ' function updateRowVisibilities(newIndex, oldIndex, numberOfRowsToShowBefore = 1, numberOfRowsToShowAfter = 3) as void
-  '   ' logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
+  '   ' m.logMethod("updateRowVisibilities newIndex", newIndex, "old", oldIndex)
   '   states = {}
   '   if m.content = invalid or newIndex = oldIndex
   '     return 
@@ -445,20 +445,20 @@ class ListController
   ' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   ' function onKeyPressUp() as boolean
-  '   logMethod("onKeyPressUp")
+  '   m.logMethod("onKeyPressUp")
   '   moveYFocus(-1)
   '   return true
   ' end function
 
   ' function onKeyPressDown() as boolean
-  '   logMethod("onKeyPressDown")
+  '   m.logMethod("onKeyPressDown")
   '   moveYFocus(1)
   '   return true
   ' end function
 
 
   ' function getLongPressIntervalForKey(key) as float
-  '   logMethod("getLongPressIntervalForKey", key)
+  '   m.logMethod("getLongPressIntervalForKey", key)
   '   if key = "up" or key = "down"
   '     return 0.5
   '   else
@@ -467,10 +467,10 @@ class ListController
   ' end function
 
   ' function onLongPressStart(key) as boolean
-  '   logMethod(">>>>onLongPressStart", key)
+  '   m.logMethod(">>>>onLongPressStart", key)
 
   '   if key = "up" or key = "down"
-  '     logVerbose("long press finished on key", key, "going to animate to final scroll position")
+  '     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
   '     if key = "up"
   '       targetIndex = 0 
   '     else
@@ -487,7 +487,7 @@ class ListController
   ' function onLongPressFinish(key) as boolean
   '   if key = "up" or key = "down"
   '     'fixed focus 
-  '     logVerbose("long press finished on key", key, "going to animate to final scroll position")
+  '     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
   '     index = getListAtY(m.rowsGroup.translation[1])
   '     if m.currentDirection = -1
   '       nextIndex = index - 1

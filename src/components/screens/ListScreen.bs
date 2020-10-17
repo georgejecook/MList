@@ -94,7 +94,7 @@ function itemSelcetedChanged()
   print "itemFocused changed to: "; m.list.itemFocused
   newScreen = createObject("roSGNode", "ListScreen")
   push(newScreen)
-  setFocus(newScreen)
+  mv_setFocus(newScreen)
 end function
 
 function itemUnfocusedChanged()
@@ -256,7 +256,7 @@ end function
 
 function onShow()
   m.list.isHidden = false
-  setFocus(m.list)
+  mv_setFocus(m.list)
 end function
 
 function onHide()
@@ -264,8 +264,8 @@ function onHide()
 end function
 
 function onGainedFocus(isSelfFocused)
-  logInfo("onGainedFocus", isSelfFocused)
+  m.logInfo("onGainedFocus", isSelfFocused)
   if isSelfFocused
-    setFocus(m.list)
+    mv_setFocus(m.list)
   end if
 end function

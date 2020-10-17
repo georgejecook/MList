@@ -1,16 +1,14 @@
-import "pkg:/source/rLog/rLogMixin.bs" 
-import "pkg:/source/maestro/ioc/IOCMixin.bs" 
-import "pkg:/components/maestro/view/mixin/FocusMixin.bs" 
+import "pkg:/source/roku_modules/log/LogMixin.brs"
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku_modules/mc/Utils.brs"
 
 function Init() as void
+  m.top._rLog = log_initializeLogManager(["log_PrintTransport", "log_ScreenTransport"], 5)
+
+  log_registerLogger("MainScene")
   CreateObject("roSGNode", "TrackerTask")
   m.top._global = m.global
-  m.top.rLog = initializeRlog(false, true)
-  m.top.rLog.logLevel = 5
-  registerLogger("MainScene")
-  MIOC.init()
-  initializeFocusManager(m.global)
-  logInfo("init")
+  m.logInfo("init")
 end function
 
 ' /**
@@ -22,9 +20,8 @@ end function
 '  * @returns {returnType} returnDescription
 '  */
 function begin(args = invalid)
-  logInfo("begin")
-  MIOC.setInstance("launchArgs", args)
-  logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
+  m.logInfo("begin")
+  m.logInfo("starting the bootstrap task to orchestrate our app init/loading tasks")
   ' my apps have a task here that manages the various app initialization activities
   ' m.bootstrapSequence = crateObject("roSGNode", "bootstrapTasks")
   ' m.loadingSequence.observeField("isComplete", "onIsBootstrapTasksComplete")
@@ -33,10 +30,9 @@ function begin(args = invalid)
 end function
 
 function onIsBootstrapTasksComplete()
-  logInfo("boot strap is complete - showing main screen")
-  
+  m.logInfo("boot strap is complete - showing main screen")
+
   m.top.appController = createObject("roSGNode", "AppController")
-  MIOC.setInstance("appController", m.top.appController)
   m.top.appendChild(m.top.appController)
-  setFocus(m.top.appController)
+  m.top.appController.setFocus(true)
 end function

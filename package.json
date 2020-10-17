@@ -44,8 +44,7 @@
   },
   "ropm": {
     "rootDir": "src",
-    "packageRootDir": "dist",
-    "prefixMatching": "expanded"
+    "packageRootDir": "dist"
   },
   "scripts": {
     "build": "npx bsc",

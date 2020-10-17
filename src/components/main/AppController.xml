@@ -28,9 +28,9 @@
         width='1920'
         height='1080' />
 
-    <NavController id='navController' />
+    <mv_NavController id='navController' />
 
-    <!-- <Rectangle
+    <Rectangle
         color='#ff0000'
         width='1920'
         height='100'
@@ -38,36 +38,7 @@
     <Label
         id='infoLabel'
         translation='[50, 1000]'
-        color='#ffffff' /> -->
-<!-- 
-        image-fader
-    <ImageFader
-        duration=''
-        currentImage='blah' />
-
-        smart-label
-    <MarkdownLabel
-        id='infoLabel2'
-        translation='[50, 1000]'
-        color='#ffffff'
-        font='foo'
-        boldFont='foo'
-        italicFont='foo'
-        width=''
-        wrap=''
-        maxLines='0'
-        text='my ${name} *bold* _text_ \n ${img1} here is more text ${img2}'
-        values='{"name":"george", img1:"img:pkg:/"}'>
-
-    </MarkdownLabel>
-
-    animated-poster
-    <AnimatedPoster
-        spriteSheet='pkg:/mySheet.png'
-        spriteRects='[[0,0, 0,200, 0,400, 200,0, 200,0]]'
-        size='[200,200]'
-        speed='0.1'
-        loop='true' /> -->
+        color='#ffffff' />
   </children>
 
 </component>

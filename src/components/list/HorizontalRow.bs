@@ -1,5 +1,5 @@
 function init()
-  registerLogger("List")
+  log_registerLogger("List")
   m.cellHolder = m.top.findNode("cellHolder")
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation") 
@@ -19,7 +19,7 @@ function onContentIsHiddenChange()
 end function
 
 function onContentChange(evt)
-  ' logInfo("onContentChange", evt.getField())
+  ' m.logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     toggleContentListener(false)
     m.content = m.top.content
@@ -89,11 +89,11 @@ function layoutCells()
 end function
 
 function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
-  logMethod("animateToIndex from", oldIndex, "to", index)
+  m.logMethod("animateToIndex from", oldIndex, "to", index)
   nextCell = m.rects[index]
 
   if nextCell = invalid
-    logError("could not idenitfy next cell with index", index)
+    m.logError("could not idenitfy next cell with index", index)
     return invalid
   end if
 
@@ -121,7 +121,7 @@ end function
 
 function onAnimateToItemChange()
   if m.content <> invalid
-    ' logInfo("onAnimateToItemChange", m.top.animateToItem)
+    ' m.logInfo("onAnimateToItemChange", m.top.animateToItem)
     animateToIndex(m.top.itemFocused, m.top.animateToItem, m.top.fastAnimationSpeed)
   end if
 end function
@@ -148,7 +148,7 @@ end function
 function onAnimationFractionChange()
   x = m.cellHolder.translation[0]
   index = getIndexAtX(x)
-  ' logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
+  ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
 
   if m.moveAnimationInterpolator.fraction = 1
     if index = -1
@@ -174,7 +174,7 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onViewStateChange()
-  ' logInfo("onViewStateChange", m.top.index, m.top.viewState)
+  ' m.logInfo("onViewStateChange", m.top.index, m.top.viewState)
   if m.top.viewState <> m.previousViewState 
     m.previousViewState = m.top.viewState
     updateListVisibility(m.top.viewState)
@@ -183,7 +183,7 @@ end function
 
 function updateListVisibility(state)
   if m.content <> invalid
-    ' logMethod("updateListVisibility", m.top.index, state)
+    ' m.logMethod("updateListVisibility", m.top.index, state)
     states = {}
 
     if state = "hidden" or state = "partial"
@@ -203,7 +203,7 @@ function updateListVisibility(state)
 end function
 
 function setListStateMap(states, startIndex, endIndex, state)
-  ' logMethod("setListStateMap", startIndex, endIndex, state)
+  ' m.logMethod("setListStateMap", startIndex, endIndex, state)
   for i = startIndex to endIndex
 
     if i >= 0 and i < m.content.getChildCount()
@@ -220,7 +220,7 @@ function toggleCellStates(states)
 end function
 
 function onIsOnScreenChange()
-  ' logMethod("onIsOnScreenChange")
+  ' m.logMethod("onIsOnScreenChange")
   isOnScreen = m.top.isOnScreen
   for each id in m.cellsById
     cell = m.cellsById[id]
@@ -293,20 +293,20 @@ end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onKeyPressLeft() as boolean
-  logMethod("onKeyPressLeft")
+  m.logMethod("onKeyPressLeft")
   moveXFocus(-1)
   return true
 end function
 
 function onKeyPressRight() as boolean
-  logMethod("onKeyPressRight")
+  m.logMethod("onKeyPressRight")
   moveXFocus(1)
   return true
 end function
 
 
 function getLongPressIntervalForKey(key) as float
-  logMethod("getLongPressIntervalForKey", key)
+  m.logMethod("getLongPressIntervalForKey", key)
   if key = "left" or key = "right"
     return 0.5
   else
@@ -315,10 +315,10 @@ function getLongPressIntervalForKey(key) as float
 end function
 
 function onLongPressStart(key) as boolean
-  logMethod(">>>>onLongPressStart", key)
+  m.logMethod(">>>>onLongPressStart", key)
 
   if key = "left" or key = "right"
-    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
     if key = "left"
       targetIndex = 0 
     else
@@ -334,7 +334,7 @@ end function
 function onLongPressFinish(key) as boolean
   if key = "left" or key = "right"
     'fixed focus 
-    logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
     index = getIndexAtX(m.cellHolder.translation[0])
     if m.currentDirection = -1
       nextIndex = index - 1

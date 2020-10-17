@@ -1,38 +1,38 @@
-import "pkg:/source/rLog/rLogMixin.bs" 
-import "pkg:/source/maestro/ioc/IOCMixin.bs" 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ Initialization
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function Init()
-  registerLogger("AppController")
-  logInfo("in appcontroller init")
+  log_registerLogger("AppController")
+  m.logInfo("in appcontroller init")
+  mv_initializeFocusManager(m.global)
 
-  ' m.cellProvider = createObject("roSGNode", "CellProvider") 
-  ' m.top._cellProvider = m.cellProvider
-  ' m.global.addFields({ "cellProvider": m.cellProvider })
-
-
-  ' m.cellTracker = createObject("roSGNode", "CellTracker") 
-  ' m.top._cellTracker = m.cellTracker
-  ' m.global.addFields({ "cellTracker": m.cellTracker })
-  ' m.top.addFields({ "_global": m.global })
+  m.cellProvider = createObject("roSGNode", "CellProvider") 
+  m.top._cellProvider = m.cellProvider
+  m.global.addFields({ "cellProvider": m.cellProvider })
 
 
-  ' m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
-  ' m.cellTracker.observeField("numberOfCells", "onInfoChange")
-  ' m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
-  ' m.cellProvider.observeField("numberOfCells", "onInfoChange")
+  m.cellTracker = createObject("roSGNode", "CellTracker") 
+  m.top._cellTracker = m.cellTracker
+  m.global.addFields({ "cellTracker": m.cellTracker })
+  m.top.addFields({ "_global": m.global })
 
-  ' m.infoLabel = m.top.findNode("infoLabel")
-  ' reset() 
+
+  m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellTracker.observeField("numberOfCells", "onInfoChange")
+  m.cellProvider.observeField("numberOfCellsInUse", "onInfoChange")
+  m.cellProvider.observeField("numberOfCells", "onInfoChange")
+
+  m.infoLabel = m.top.findNode("infoLabel")
+  reset() 
   m.navController = m.top.findNode("navController")
   m.navController@._initialize()
-  m.rootScreen = createObject("roSGNode", "TestScreen")
-  ' m.rootScreen = createObject("roSGNode", "ListScreen")
+  ' m.rootScreen = createObject("roSGNode", "TestScreen")
+  m.rootScreen = createObject("roSGNode", "ListScreen")
   m.rootScreen.isRoot = true
   m.navController@.push(m.rootScreen)
+  mv_setFocus(m.rootScreen)
 end function
 
 
@@ -40,11 +40,10 @@ function onInfoChange()
   m.infoLabel.text = " Light cells (" + str(m.cellTracker.numberOfCellsInUse) + "/" + str(m.cellTracker.numberOfCells) + ") - Real cells (" + str(m.cellProvider.numberOfCellsInUse) + "/" + str(m.cellProvider.numberOfCells) + ")"
 end function
 
-
 function onGainedFocus(isSelfFocused)
   if isSelfFocused
-    setFocus(m.navController)
-    logInfo("Focused on main content")
+    mv_setFocus(m.navController)
+    m.logInfo("Focused on main content")
   end if
 end function
 
