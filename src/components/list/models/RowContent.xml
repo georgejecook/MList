@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component
+    name='RowContent'
+    extends='ContentNode'>
+
+  <interface>
+    <field
+        id='trackingId'
+        type='string' />
+    <field
+        id='index'
+        type='integer' />
+    <field
+        id='rowSettings'
+        type='assocarray' />
+    <field
+        id='isHidden'
+        type='boolean' />
+    <field
+        id='isFocusable'
+        type='boolean'
+        value='true' />
+    <!-- instance of GroupedRowContent -->
+    <field
+        id='group'
+        type='node' />
+    <field
+        id='groupIndex'
+        type='integer' />
+
+  </interface>
+
+</component>

@@ -1,5 +1,5 @@
 function init()
-  m.images = ["pkg:/images/s.png"
+  m.images = [
     "https://homepages.cae.wisc.edu/~ece533/images/airplane.png"
     "https://homepages.cae.wisc.edu/~ece533/images/arctichare.png"
     "https://homepages.cae.wisc.edu/~ece533/images/baboon.png"
@@ -9,8 +9,49 @@ function init()
   m.imageFader = m.top.findNode("imageFader")
   m.imageFader@.changeImage(m.images[m.imageIndex])
   m.smartLabel = m.top.findNode("smartLabel")
-
+  m.animatedPosters = []
   configureLabel()
+  configureAnimatedPoster()
+
+end function
+
+function configureAnimatedPoster()
+  'crazy mode
+  ' m.animatedPosters = []
+  ' x =1
+  '   for i = 0 to 1
+  '     for j = 0 to 10
+  '       p = m.top.createChild("AnimatedPoster")
+  '       p.translation = [(x* 900) + (i * 200) + (j * 20), j * 100]
+  '       p.width = 240
+  '       p.height = 240
+  '       p.spriteSheetUri = "pkg:/images/s.png"
+
+  '       p.frameOffsets = [
+  '         [0, 0]
+  '         [240, 0]
+  '         [480, 0]
+  '         [720, 0]
+  '         [960, 0]
+  '         [1200, 0]
+  '       ]
+  '       m.animatedPosters.push(p)
+  '       p.duration = (rnd(0) / 2.0) + 0.1
+  '       p.control = "start"
+  '     end for 
+  '   end for
+  for each i in ["a1", "a2", "a3"]
+    p = m.top.findNode(i)
+    p.frameOffsets = [
+      [0, 0]
+      [240, 0]
+      [480, 0]
+      [720, 0]
+      [960, 0]
+      [1200, 0]
+    ]
+    p.control = "start"
+  end for
 
 end function
 
@@ -58,4 +99,37 @@ function onKeyPressUp() as boolean
   end if
   m.imageFader@.changeImage(m.images[m.imageIndex])
   return false
+end function
+
+function onKeyPressLeft() as boolean
+  ' m.animatedPoster.translation = [m.animatedPoster.translation[0] - 5, m.animatedPoster.translation[1]]
+end function
+
+function onKeyPressRight() as boolean
+  ' m.animatedPoster.translation = [m.animatedPoster.translation[0] + 5, m.animatedPoster.translation[1]]
+end function
+
+function getLongPressIntervalForKey(key) as float
+  return 0.01
+end function
+
+function onLongPressStart(key) as boolean
+  return key = "left" or key = "right"
+end function
+
+function onLongPressUpdate(key) as boolean
+  if key = "left"
+    amount = -5
+  else
+    amount = 5
+  end if
+  for each p in m.animatedPosters
+    p.translation = [p.translation[0] + amount, p.translation[1]]
+  end for
+
+  return true
+end function
+
+function onLongPressFinish(key) as boolean
+  return true
 end function

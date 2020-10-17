@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <component
     name='ListScreen'
-    extends='BaseScreen'>
+    extends='mv_BaseScreen'>
   <interface>
     <field
         id='isRoot'

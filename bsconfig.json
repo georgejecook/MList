@@ -1,13 +1,20 @@
 {
-    "rootDir": "src",
-    "files": [
-      "manifest",
-      "source/**/*.*",
-      "components/**/*.*",
-      "images/**/*.*"
-    ],
-    "autoImportComponentScript": true,
-    "diagnosticFilters": [{
-      "src": "components/RALETRackerTask.brs"
-    }]
+  "rootDir": "src",
+  "files": [
+    "manifest",
+    "source/**/*.*",
+    "components/**/*.*",
+    "files/**/*.*"
+  ],
+  "autoImportComponentScript": true,
+  "createPackage": false,
+  "stagingFolderPath": "dist",
+  "diagnosticFilters": [
+    {
+      "src": "**/roku_modules/**/*.*",
+      "codes": [
+        1107
+      ]
+    }
+  ]
 }

@@ -17,7 +17,7 @@ function init()
   '   m.list.numRows = 3
   '   m.list.itemComponentName = "ImageCell"
 
-  m.list = listHolder.createChild("MList")
+  m.list = listHolder.createChild("List")
   m.list.translation = [0, 0]
   m.cellProvider = m.global.cellProvider
   m.top._cellProvider = m.global.cellProvider
@@ -76,7 +76,7 @@ function createData()
       cellType = "RectComp"
       row.addFields({
         "cellType": cellType
-      })      
+      }) 
     end if
 
 
