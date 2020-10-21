@@ -7,16 +7,13 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "LIST RIG",
+      "name": "module",
+      "preLaunchTask": "build",
       "stopOnEntry": false,
-      "preLaunchTask": "build-list-sample",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
       "rootDir": "${workspaceFolder}/build",
-      "sourceDirs": [
-        "${workspaceFolder}/src"
-      ],
       "files": [
         "manifest",
         "source/**/*.*",

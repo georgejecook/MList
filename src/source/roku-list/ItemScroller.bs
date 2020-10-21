@@ -1,0 +1,299 @@
+import "pkg:/source/roku_modules/mc/Tasks.brs"
+
+class ItemScroller
+
+  public itemRects = []
+  public index = 0
+  public focusedIndex = 0
+  public nextIndex = 0
+  public targetIndex = 0
+  public group = invalid
+  public direction = 0
+  public axes = 0 'x = 0, y =1
+  public minPos = 0
+  public maxPos = 1080
+  public animSpeed = 0.3
+  public rowHidingMode = "hidden"
+
+  function new(group, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+    m.group = group
+    m.axes = axes
+    m.minPos = minPos
+    m.maxPos = maxPos
+    m.moveAnimation = moveAnimation
+    m.moveAnimationInterpolator = moveAnimationInterpolator
+    m.observeNodeField = mc_Tasks_observeNodeField
+    m.observeNodeField(m.timer, "fire", m.onTimerFire, "none", false, m)
+    m.timer.control = "start"
+    m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+  end function
+
+  public function updateItemRects(itemRects)
+    m.itemRects = itemRects
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ collection movement
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function move(offset, isAnimated = true)
+    ' m.logMethod(">>moveYFocus")
+    newIndex = m.index + offset
+
+    'TODO - I have no need for vertical wrapping; if someone wants it
+    'they are free to submit a pr :)
+
+    if newIndex > m.index
+      m.direction = 1
+    else 
+      m.direction = -1
+    end if
+
+    newIndex = m.getValidTargetIndex(newIndex, m.direction)
+
+    if m.focusedItem <> invalid
+      m.focusedItem.isFocused = false
+    end if
+
+    if m.focusedItem = invalid or not m.focusedItem.isSameNode(item)
+      m.focusedItem = nextList 
+
+      if m.focusedItem <> invalid
+        if isAnimated
+          m.itemScroller.animatetoIndex(m.top.rowFocused, newIndex)
+        else
+          m.rowsGroup.translation = [0, - m.focusedItem.translation[1]]
+          m.updateItem(newIndex)
+        end if
+      end if
+    end if
+  end function
+
+  function getValidTargetIndex(index, direction)
+    if index < 0
+      return 0
+    end if
+
+    if index > m.itemRects.count() - 1
+      return m.getValidTargetIndex(m.itemRects.count() - 1, -1)
+    end if
+
+    'ensure we dont' move to a non-focusable rowlist
+    item = m.itemRects[index]
+    while item <> invalid and not item.isFocusable and index < m.itemRects.count() - 1 and index > -1
+      index += direction
+      item = m.itemRects[index]
+    end while
+
+    return index
+  end function
+
+  function animateToIndex(index, fastAnimationSpeed = 1, screenPos = invalid)
+    m.fastAnimationSpeed = fastAnimationSpeed
+    m.targetIndex = index
+    if m.targetIndex > m.index
+      m.direction = 1
+    else
+      m.direction = -1
+    end if
+
+    item = m.itemRects[index]
+    if item = invalid
+      return false
+    end if
+
+    screenPos = m.getScreenPositionForItem(item, m.direction)
+    targetPos = m.getOffsetForScreenPosition(item, screenPos)
+    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; item.translation[m.axes]
+    m.nextIndex = m.index + m.direction
+    'TODO count visible rows between oldIndex and newIndex
+    steps = abs(m.index - index)
+    if steps = 0
+      steps = 1
+    end if
+
+    if m.moveAnimation.state = "play"
+      m.moveAnimation.control = "pause"
+    end if
+    if m.axes = 0
+      x = - targetPos
+      y = m.group.translation[1]
+    else
+      x = m.group.translation[0]
+      y = - targetPos
+    end if
+
+    m.moveAnimationInterpolator.keyValue = [m.group.translation, [x, y]]
+    m.moveAnimation.duration = (steps * m.animSpeed) / fastAnimationSpeed
+
+    if m.moveAnimation.state = "pause"
+      m.moveAnimation.control = "resume"
+    else
+      m.moveAnimation.control = "start"
+    end if
+
+  end function
+
+  function finishAnimating()
+    ? "stop ci " ; m.index ; " ni " ; m.nextIndex
+    if m.direction = -1
+      nextIndex = m.nextIndex + 1
+    else
+      nextIndex = m.nextIndex
+    end if
+    m.animateToIndex(nextIndex, m.fastAnimationSpeed)
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ item positions
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function getScreenPositionForItem(item, direction = 0, screenPos = invalid)
+    if item <> invalid
+      if screenPos <> invalid
+        return screenPos
+      else if item.screenPos <> invalid
+        return item.screenPos
+      else if m.direction = -1
+        return m.minPos
+        'TODO this logic is broken
+      else if m.direction = 1
+        return m.minPos ' fixed focus
+        ' return m.maxPos - item.width
+      end if
+    end if
+    return m.minPos
+  end function
+
+  function getOffsetForScreenPosition(item, screenPos)
+    if item <> invalid
+      return item.translation[m.axes] + screenPos
+    else
+      return m.minPos
+    end if
+  end function
+
+  function getIndexAtPosition(position, direction)
+    for i = 0 to m.itemRects.count() - 1
+      item = m.itemRects[i]
+      screenPos = m.getScreenPositionForItem(item, direction)
+      itemPos = m.getOffsetForScreenPosition(item, screenPos)
+      ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
+      if itemPos > abs(position)
+        return i - 1
+      end if
+    end for
+
+    return -1
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ animation callbacks
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function onAnimationFractionChange(fraction)
+    ' m.logInfo("onAnimationFractionChange", fraction)
+    position = m.group.translation[m.axes]
+    index = m.getIndexAtPosition(position)
+
+    if fraction = 1
+      if index = -1
+        index = 0
+      end if
+      ' updateItemFocus(index)
+    else
+      ' m.logInfo(">>>", y, index, m.top.index)
+      if index <> -1 and index <> m.top.index and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() - 10)
+        m.updateItemStates(m.direction, index)
+      end if
+      ' nextIndex = getListAtY(y - 1400)
+      'TODO - actually run this propertly
+      m.itemRects[nextIndex].isOnScreen = true
+    end if
+
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ visibility state management
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function updateItemStates(direction, newIndex, beforeCount = 5, afterCount = 10)
+    ' ? "new Index" ; newIndex; " direction "; direction
+    if direction < 0
+      numberOfItemsToShowBefore = beforeCount
+      numberOfItemsToShowAfter = afterCount
+    else
+      numberOfItemsToShowBefore = beforeCount
+      numberOfItemsToShowAfter = afterCount
+    end if
+    m.updateItemVisibilities(newIndex, m.index, numberOfItemsToShowBefore, numberOfItemsToShowAfter)
+  end function
+
+  function updateItemVisibilities(newIndex, oldIndex, numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3) as void
+    ' m.logMethod("updateItemVisibilities newIndex", newIndex, "old", oldIndex)
+    states = {}
+    if m.content = invalid or newIndex = oldIndex
+      return 
+    end if
+
+    m.setListStateMap(states, 0, m.content.getChildCount(), m.rowHidingMode)
+    m.setListStateMap(states, newIndex - numberOfItemsToShowBefore, newIndex + numberOfItemsToShowAfter, "partial")
+
+    ' ? "updating states: " ; formatJson(states)
+    for each rowId in states
+      list = m.itemRects[rowId.toInt()]
+      if list <> invalid and list.hasField("viewState")
+        list.viewState = states[rowId]
+      else
+        ' ? "ERROR could not find visible list for "; rowId
+      end if
+    end for
+
+    m.lastStates = states
+  end function
+
+  function setListStateMap(states, startIndex, endIndex, state)
+    for i = startIndex to endIndex
+
+      if i >= 0 and i < m.itemRects.count()
+        row = m.itemRects[i]
+
+        if row <> invalid
+          states[row.id] = state
+        end if
+      end if
+    end for
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ focus management
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function updateItemFocus(index)
+    m.logMethod("updateItemFocus", index)
+    m.focusedItem = m.itemRects[index]
+
+    if m.focusedItem <> invalid
+      m.focusedIndex = index
+      m.focusedItem.isFocused = m.focusedItem.isFocusable
+
+      if m.focusedItem.content <> invalid and m.focusedItem.subType() = "HorizontalRow"
+        focusedItem = m.focusedItem.content.getChild(m.focusedItem.itemFocused)
+
+        if focusedItem <> invalid
+          m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
+        else
+          m.top._focusedRenderer = invalid
+        end if
+        m.logWarn("focusing on list ", m.focusedItem.content.title)
+        m.focusedItem.setFocus(true)
+
+      end if
+    else
+      m.top.rowFocused = -1
+    end if
+
+    m.itemScroller.updateItemStates(0, m.index)
+  end function
+
+end class

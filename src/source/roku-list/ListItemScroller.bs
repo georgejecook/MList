@@ -1,0 +1,4 @@
+import "pkg:/source/roku-list/ItemScroller.bs"
+
+class ListItemScroller extends ItemScroller
+end class

@@ -143,7 +143,6 @@ function makeItems(cellType, number)
     child.id = str(m.contentId).trim()
     child.description = "some really long " + child.id + "text in here " + child.id
     child.HDGRIDPOSTERURL = "https://picsum.photos/id/" + str(m.contentId mod 1000).trim() + "/360/300?n=" + nonce
-    ' child.HDGRIDPOSTERURL = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
     child.title = "Item " + child.id.tostr()
 
     if m.contentId mod 5 = 0

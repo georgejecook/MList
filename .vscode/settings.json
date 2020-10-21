@@ -1,13 +1,4 @@
 {
-  "cSpell.ignorePaths": [
-    "**/package-lock.json",
-    "**/node_modules/**",
-    "**/vscode-extension/**",
-    "**/.git/objects/**",
-    ".vscode",
-    "dist",
-    "build",
-  ],
   "files.exclude": {
     "build": true,
     ".history": true,
@@ -49,9 +40,8 @@
     "statusBar.background": "#551A8B",
     "statusBar.debuggingBackground": "#551A8B",
     "panelTitle.activeBorder": "#ff0000",
-    "activityBar.background": "#26226F",
-    "titleBar.activeBackground": "#352F9B",
+    "activityBar.background": "#272071",
+    "titleBar.activeBackground": "#362D9F",
     "titleBar.activeForeground": "#FAFAFD"
   },
-
 }

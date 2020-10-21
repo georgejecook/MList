@@ -4,21 +4,16 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-list-sample",
+      "label": "build",
       "type": "shell",
       "command": "npm run build",
-      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "silent",
         "focus": false,
         "panel": "shared",
         "showReuseMessage": false,
-        "clear": true
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
+        "clear": true,
       },
     },
   ]

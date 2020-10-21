@@ -54,7 +54,6 @@ function toggleContentListener(isActive)
   end if
 end function
 
-
 function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
   w = sx
   y = csh
