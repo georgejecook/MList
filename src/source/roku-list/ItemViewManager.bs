@@ -1,0 +1,17 @@
+class ItemViewManager
+  public container = invalid
+  public owner = invalid
+  
+  function new(owner, container)
+    m.container = container
+    m.owner = owner
+  end function
+
+
+  function getRenderer(item)
+    return invalid
+  end function
+
+  function createRenderers(items)
+  end function
+end class

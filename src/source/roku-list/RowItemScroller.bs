@@ -1,4 +1,7 @@
 import "pkg:/source/roku-list/ItemScroller.bs"
 
 class RowItemScroller extends ItemScroller
+  function new(group, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+    super(group, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+  end function
 end class

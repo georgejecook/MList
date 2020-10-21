@@ -1,0 +1,98 @@
+import "pkg:/source/roku-list/ItemViewManager.bs"
+
+class ListItemViewManager extends ItemViewManager
+  public visibleViews = []
+  public hiddenViews = []
+
+  public visibleContent = []
+  public itemRects = []
+
+  function new(owner, container)
+    super(owner, container)
+  end function
+
+
+  override function getRenderer(item)
+    return invalid
+  end function
+
+  override function createRenderers(items)
+    m.container.removeChildren(m.container.getChildren(-1, 0))
+  
+    m.lists = []
+    if m.content <> invalid
+      for each item in m.content.getChildren(-1, 0)
+        if item.cellType <> invalid and item.cellType = "RectComp"
+          list = m.makeRectComp(item)
+        else
+          list = m.makeList(item)
+        end if
+        m.lists.push(list)
+      end for
+    end if
+  end function
+
+  function layoutLists()
+    y = 0
+
+    w = m.owner.width
+    for each list in m.lists
+      list.visible = not list.isHidden
+      if list.visible
+        list.translation = [0, y]
+        'TODO get rect for item..
+        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
+
+        if list.subType() = "Rectangle"
+          y += list.height + 40
+        else
+          y += m.owner.cellSize[1] + m.owner.cellSpacing[1] + 40
+        end if
+        m.visibleViews.push(list)
+        m.visibleContent.push(list.content)
+      else
+        m.hiddenViews.push(list)
+      end if
+    end for
+
+    for each item in m.visibleViews
+      item.viewState = "hidden"
+    end for
+  
+    m.itemScroller.updateItems()
+  end function
+
+  function makeList(rowContent)
+    list = m.rowsGroup.createChild("HorizontalRow")
+    list.id = str(m.listIndex).trim()
+    list.cellSize = m.top.cellSize
+    list.cellSpacing = m.top.cellSpacing
+    list.numCols = m.top.numCols
+    list.unfocusCellScale = m.top.unfocusCellScale
+    list.unfocusCount = m.top.unfocusCount
+    list.viewState = "hidden"
+    list.content = rowContent
+    list.isOnScreen = m.listIndex < 5
+    m.listIndex++
+
+    return list
+  end function
+
+  function makeRectComp(rowContent)
+    list = m.rowsGroup.createChild("Rectangle")
+    list.id = str(m.listIndex).trim()
+    list.color = "#aaffaa"
+    list.addFields({ "content": rowContent })
+    list.addFields({ "isFocusable": true })
+    list.addFields({ "isHidden": false })
+    list.addFields({ "isFocused": false })
+    list.width = 1920
+    list.height = 300
+    list.content = rowContent
+    m.listIndex++
+
+    return list
+  end function
+
+
+end class

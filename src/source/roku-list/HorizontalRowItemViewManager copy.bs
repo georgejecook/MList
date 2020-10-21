@@ -1,0 +1,71 @@
+import "pkg:/source/roku-list/ItemViewManager.bs"
+
+class HorizontalRowItemViewManager extends ItemViewManager
+  public visibleViews = []
+  public hiddenViews = []
+
+  public visibleContent = []
+  public itemRects = []
+
+  function new(owner, container)
+    super(owner, container)
+  end function
+
+
+  override function getRenderer(item)
+    return invalid
+  end function
+
+  override function createRenderers(items)
+  end function
+
+
+  function layoutLists()
+    y = 0
+
+    w = m.owner.width
+    for each list in m.lists
+      list.visible = not list.isHidden
+      if list.visible
+        list.translation = [0, y]
+        'TODO get rect for item..
+        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
+
+        if list.subType() = "Rectangle"
+          y += list.height + 40
+        else
+          y += m.owner.cellSize[1] + m.owner.cellSpacing[1] + 40
+        end if
+        m.visibleViews.push(list)
+        m.visibleContent.push(list.content)
+      else
+        m.hiddenViews.push(list)
+      end if
+    end for
+
+    m.itemScroller.updateItems(m.visibleContent, m.itemRects)
+  end function
+
+  function layoutCells()
+    cw = m.owner.cellSize[0]
+    ch = m.owner.cellSize[1]
+    csw = m.owner.cellSpacing[0]
+    csh = m.owner.cellSpacing[1]
+    m.rects = []
+    'rects.push({ x: - cw, y: 0, width: cw, height: ch })
+    content = m.owner.content
+    numCells = content.getChildCount()
+    m.createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
+  end function
+
+  function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
+    w = sx
+    y = csh
+    for i = 0 to numberOfCols
+      rects.push({ x: w, y: y, width: cw, height: ch })
+      w += cw + csw
+    end for
+  end function
+
+
+end class

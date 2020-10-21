@@ -3,6 +3,7 @@ import "pkg:/source/roku_modules/mc/Tasks.brs"
 class ItemScroller
 
   public itemRects = []
+  public items = []
   public index = 0
   public focusedIndex = 0
   public nextIndex = 0
@@ -13,59 +14,46 @@ class ItemScroller
   public minPos = 0
   public maxPos = 1080
   public animSpeed = 0.3
+  public regularAnimSpeed = 0.3
+  public fastAnimSpeed = 2
   public rowHidingMode = "hidden"
 
-  function new(group, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
     m.group = group
+    m.viewManager = viewManager
+    m.group = m.viewManager.group
     m.axes = axes
     m.minPos = minPos
     m.maxPos = maxPos
     m.moveAnimation = moveAnimation
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField = mc_Tasks_observeNodeField
-    m.observeNodeField(m.timer, "fire", m.onTimerFire, "none", false, m)
-    m.timer.control = "start"
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
   end function
 
-  public function updateItemRects(itemRects)
-    m.itemRects = itemRects
+  public function updateItems()
+    m.items = m.viewManager.visibleItems ' content items 
+    m.itemRects = m.viewManager.itemRects ' calculated views for the items
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ collection movement
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function move(offset, isAnimated = true)
-    ' m.logMethod(">>moveYFocus")
-    newIndex = m.index + offset
+  function move(offset, animated = true, screenPos = invalid, fast = false)
+    index = m.index + offset
 
-    'TODO - I have no need for vertical wrapping; if someone wants it
-    'they are free to submit a pr :)
-
-    if newIndex > m.index
-      m.direction = 1
+    if offset > 0
+      direction = 1
     else 
-      m.direction = -1
+      direction = -1
     end if
 
-    newIndex = m.getValidTargetIndex(newIndex, m.direction)
+    index = m.getValidTargetIndex(index, direction)
 
     if m.focusedItem <> invalid
-      m.focusedItem.isFocused = false
-    end if
-
-    if m.focusedItem = invalid or not m.focusedItem.isSameNode(item)
-      m.focusedItem = nextList 
-
-      if m.focusedItem <> invalid
-        if isAnimated
-          m.itemScroller.animatetoIndex(m.top.rowFocused, newIndex)
-        else
-          m.rowsGroup.translation = [0, - m.focusedItem.translation[1]]
-          m.updateItem(newIndex)
-        end if
-      end if
+      m.itemScroller.moveToIndex(index, screenPos, animated, fast)
+      m.rowsGroup.translation = [0, - m.focusedItem.translation[1]]
     end if
   end function
 
@@ -79,17 +67,29 @@ class ItemScroller
     end if
 
     'ensure we dont' move to a non-focusable rowlist
-    item = m.itemRects[index]
-    while item <> invalid and not item.isFocusable and index < m.itemRects.count() - 1 and index > -1
+    itemRect = m.itemRects[index]
+    itemRect = m.items[index]
+    while itemRect <> invalid and not itemRect.isFocusable and index < m.itemRects.count() - 1 and index > -1
       index += direction
-      item = m.itemRects[index]
+      itemRect = m.itemRects[index]
     end while
 
     return index
   end function
 
-  function animateToIndex(index, fastAnimationSpeed = 1, screenPos = invalid)
-    m.fastAnimationSpeed = fastAnimationSpeed
+  function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
+
+    itemRect = m.itemRects[index]
+    if itemRect = invalid
+      return false
+    end if
+
+    if fast
+      m.animSpeed = m.regularAnimSpeed / m.fastAnimSpeed
+    else 
+      m.animSpeed = m.regularAnimSpeed
+    end if
+
     m.targetIndex = index
     if m.targetIndex > m.index
       m.direction = 1
@@ -97,14 +97,9 @@ class ItemScroller
       m.direction = -1
     end if
 
-    item = m.itemRects[index]
-    if item = invalid
-      return false
-    end if
-
-    screenPos = m.getScreenPositionForItem(item, m.direction)
-    targetPos = m.getOffsetForScreenPosition(item, screenPos)
-    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; item.translation[m.axes]
+    screenPos = m.getScreenPositionForItem(itemRect, m.direction)
+    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
     m.nextIndex = m.index + m.direction
     'TODO count visible rows between oldIndex and newIndex
     steps = abs(m.index - index)
@@ -124,7 +119,7 @@ class ItemScroller
     end if
 
     m.moveAnimationInterpolator.keyValue = [m.group.translation, [x, y]]
-    m.moveAnimation.duration = (steps * m.animSpeed) / fastAnimationSpeed
+    m.moveAnimation.duration = steps * m.animSpeed
 
     if m.moveAnimation.state = "pause"
       m.moveAnimation.control = "resume"
@@ -141,33 +136,33 @@ class ItemScroller
     else
       nextIndex = m.nextIndex
     end if
-    m.animateToIndex(nextIndex, m.fastAnimationSpeed)
+    m.moveToIndex(nextIndex, invalid, true, m.fastAnimSpeed)
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ item positions
+  '++ itemRect positions
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function getScreenPositionForItem(item, direction = 0, screenPos = invalid)
-    if item <> invalid
+  function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
+    if itemRect <> invalid
       if screenPos <> invalid
         return screenPos
-      else if item.screenPos <> invalid
-        return item.screenPos
+      else if itemRect.screenPos <> invalid
+        return itemRect.screenPos
       else if m.direction = -1
         return m.minPos
         'TODO this logic is broken
       else if m.direction = 1
         return m.minPos ' fixed focus
-        ' return m.maxPos - item.width
+        ' return m.maxPos - itemRect.width
       end if
     end if
     return m.minPos
   end function
 
-  function getOffsetForScreenPosition(item, screenPos)
-    if item <> invalid
-      return item.translation[m.axes] + screenPos
+  function getOffsetForScreenPosition(itemRect, screenPos)
+    if itemRect <> invalid
+      return itemRect.translation[m.axes] + screenPos
     else
       return m.minPos
     end if
@@ -175,9 +170,9 @@ class ItemScroller
 
   function getIndexAtPosition(position, direction)
     for i = 0 to m.itemRects.count() - 1
-      item = m.itemRects[i]
-      screenPos = m.getScreenPositionForItem(item, direction)
-      itemPos = m.getOffsetForScreenPosition(item, screenPos)
+      itemRect = m.itemRects[i]
+      screenPos = m.getScreenPositionForItem(itemRect, direction)
+      itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
       ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
       if itemPos > abs(position)
         return i - 1
@@ -271,24 +266,27 @@ class ItemScroller
 
   function updateItemFocus(index)
     m.logMethod("updateItemFocus", index)
-    m.focusedItem = m.itemRects[index]
+    m.focusedItem = m.items[index]
 
     if m.focusedItem <> invalid
       m.focusedIndex = index
+
+      'this shoudl be enough to ge the machinery going
       m.focusedItem.isFocused = m.focusedItem.isFocusable
 
-      if m.focusedItem.content <> invalid and m.focusedItem.subType() = "HorizontalRow"
-        focusedItem = m.focusedItem.content.getChild(m.focusedItem.itemFocused)
 
-        if focusedItem <> invalid
-          m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
-        else
-          m.top._focusedRenderer = invalid
-        end if
-        m.logWarn("focusing on list ", m.focusedItem.content.title)
-        m.focusedItem.setFocus(true)
+      ' if m.focusedItem.content <> invalid and m.focusedItem.subType() = "HorizontalRow"
+      '   focusedItem = m.content.getChild(m.focusedItem.itemFocused)
 
-      end if
+      '   if focusedItem <> invalid
+      '     m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
+      '   else
+      '     m.top._focusedRenderer = invalid
+      '   end if
+      '   m.logWarn("focusing on list ", m.focusedItem.content.title)
+      '   m.focusedItem.setFocus(true)
+
+      ' end if
     else
       m.top.rowFocused = -1
     end if

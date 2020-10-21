@@ -58,7 +58,7 @@ function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
   w = sx
   y = csh
   for i = 0 to numberOfCols
-    rects.push({ x: w, y: y, width: cw, height: ch })
+    rects.push({ translation: [w,y], size: [cw, ch] })
     w += cw + csw
   end for
 end function
@@ -139,7 +139,7 @@ end function
 function getItemFocusXPosition(index) 
   rect = m.rects[index] 
   if rect <> invalid
-    return rect.x
+    return rect.translation[0]
   end if
   return 0
 end function
@@ -246,7 +246,7 @@ function applyViewStateForCell(id, viewState)
             cell.itemContent = item
           end if
 
-          cell.translation = [m.rects[index].x, m.rects[index].y]
+          cell.translation = m.rects[index]
           m.cellHolder.appendChild(cell)
           cell.index = m.top.index
           m.cellsById[id] = cell

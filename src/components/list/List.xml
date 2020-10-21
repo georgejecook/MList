@@ -8,6 +8,14 @@
         type='floatArray'
         value='[363,406]' />
     <field
+        id='width'
+        type='float'
+        value='1920' />
+    <field
+        id='height'
+        type='float'
+        value='1080' />
+    <field
         id='animSpeed'
         type='float'
         value='0.3' />

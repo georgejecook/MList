@@ -1,12 +1,14 @@
 import "pkg:/source/roku-list/ListItemScroller.bs"
+import "pkg:/source/roku-list/ListItemViewManager.bs"
 import "pkg:/source/roku_modules/mc/Tasks.brs"
 
 function init()
   log_registerLogger("List")
   m.rowsGroup = m.top.findNode("rowsGroup") 
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
-  m.moveAnimation = m.top.findNode("moveAnimation") 
-  m.itemScroller = new ListItemScroller(m.rowsGroup, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  m.moveAnimation = m.top.findNode("moveAnimation")
+  m.viewManager = new ListItemViewManager(m.top, m.rowsGroup)
+  m.itemScroller = new ListItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
 
   ' m.top.clippingRect = [0,0,1920,550]
   m.overlay = m.top.findNode("overlay") 
@@ -28,25 +30,13 @@ end function
 function resetState()
   m.currentY = 0
   m.listIndex = 0
-  m.rowsGroup.removeChildren(m.rowsGroup.getChildren(-1, 0))
+  
+  m.viewManager.createRenderers(m.top.content)
 
-  m.lists = []
-
-  if m.content <> invalid
-    for each item in m.content.getChildren(-1, 0)
-      if item.cellType <> invalid and item.cellType = "RectComp"
-        list = makeRectComp(item)
-      else
-        list = makeList(item)
-      end if
-      m.lists.push(list)
-    end for
-  end if
-
-  'TODO - MU namespace not resolving - INVESTIGATE
   addListListeners()
+
   m.currentList = m.visibleLists[m.top.rowFocused]
-  m.itemScroller.moveYFocus(0)
+  m.itemScroller.move(0)
   setInitialTimer = m.top.findNode("setInitialTimer")
   setInitialTimer.observeField("fire", "onSetInitialTimerFire")
   setInitialTimer.control = "start"
@@ -55,60 +45,9 @@ end function
 
 function onSetInitialTimerFire()
   m.logMethod(">>onSetInitialTimerFire")
-  layoutLists()
-  for each row in m.visibleLists
-    ' row.viewState = "partial"
-    row.viewState = "hidden"
-  end for
+  m.viewManager.layoutLists()
   m.itemScroller.updateRowStates(0, 0, 5, 10)
 end function
-
-function layoutLists()
-  m.currentY = 0
-
-  m.visibleLists = []
-  m.hiddenLists = []
-  m.itemRects = []
-  for each list in m.lists
-    list.visible = not list.isHidden
-    if list.visible
-      list.translation = [0, m.currentY]
-      if list.subType() = "Rectangle"
-        m.currentY += list.height + 40
-      else
-        m.currentY += m.top.cellSize[1] + m.top.cellSpacing[1] + 40
-      end if
-      m.visibleLists.push(list)
-    else
-      m.hiddenLists.push(list)
-    end if
-  end for
-
-  m.itemScroller.updateItems(m.visibleLists)
-end function
-
-function layoutCells()
-  cw = m.top.cellSize[0]
-  ch = m.top.cellSize[1]
-  csw = m.top.cellSpacing[0]
-  csh = m.top.cellSpacing[1]
-  m.rects = []
-  'rects.push({ x: - cw, y: 0, width: cw, height: ch })
-  content = m.top.content
-  numCells = content.getChildCount()
-  createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
-end function
-
-function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
-  w = sx
-  y = csh
-  for i = 0 to numberOfCols
-    rects.push({ x: w, y: y, width: cw, height: ch })
-    w += cw + csw
-  end for
-end function
-
-
 
 function onContentChange()
   if m.content = invalid or not m.content.isSameNode(m.top.content)
@@ -124,37 +63,6 @@ function onAnimateToRowChange()
   end if
 end function
 
-function makeList(rowContent)
-  list = m.rowsGroup.createChild("HorizontalRow")
-  list.id = str(m.listIndex).trim()
-  list.cellSize = m.top.cellSize
-  list.cellSpacing = m.top.cellSpacing
-  list.numCols = m.top.numCols
-  list.unfocusCellScale = m.top.unfocusCellScale
-  list.unfocusCount = m.top.unfocusCount
-  list.viewState = "hidden"
-  list.content = rowContent
-  list.isOnScreen = m.listIndex < 5
-  m.listIndex++
-
-  return list
-end function
-
-function makeRectComp(rowContent)
-  list = m.rowsGroup.createChild("Rectangle")
-  list.id = str(m.listIndex).trim()
-  list.color = "#aaffaa"
-  list.addFields({ "content": rowContent })
-  list.addFields({ "isFocusable": true })
-  list.addFields({ "isHidden": false })
-  list.addFields({ "isFocused": false })
-  list.width = 1920
-  list.height = 300
-  list.content = rowContent
-  m.listIndex++
-
-  return list
-end function
 
 function addListListeners()
   for each list in m.visibleLists
