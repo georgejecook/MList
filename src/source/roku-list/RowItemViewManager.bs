@@ -1,18 +1,12 @@
 import "pkg:/source/roku-list/ItemViewManager.bs"
 
-class HorizontalRowItemViewManager extends ItemViewManager
-  public visibleViews = []
-  public hiddenViews = []
+class RowItemViewManager extends ItemViewManager
 
-  public visibleContent = []
-  public itemRects = []
-
-  function new(owner, container)
+function new(owner, container)
     super(owner, container)
   end function
 
-
-  override function getRenderer(item)
+  override function getRenderer(index)
     return invalid
   end function
 

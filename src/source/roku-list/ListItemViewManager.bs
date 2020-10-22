@@ -1,53 +1,48 @@
 import "pkg:/source/roku-list/ItemViewManager.bs"
+import "pkg:/source/roku-list/ListMixin.bs"
 
 class ListItemViewManager extends ItemViewManager
-  public visibleViews = []
-  public hiddenViews = []
-
-  public visibleContent = []
-  public itemRects = []
-
   function new(owner, container)
     super(owner, container)
   end function
 
-
-  override function getRenderer(item)
+  override function getRenderer(index)
     return invalid
   end function
 
-  override function createRenderers(items)
+  override function createRenderers()
     m.container.removeChildren(m.container.getChildren(-1, 0))
-  
     m.lists = []
+    y = 0
+    w = m.owner.width
+
     if m.content <> invalid
+      index = 0
       for each item in m.content.getChildren(-1, 0)
-        if item.cellType <> invalid and item.cellType = "RectComp"
-          list = m.makeRectComp(item)
+        settings = ListMixin.getRowSettings(m.owner, item)
+
+        if item.rowCompName <> invalid and item.rowCompName = "RectComp"
+          list = m.creatRectangle(item, index, settings)
         else
-          list = m.makeList(item)
+          list = m.createHorizontalRow(item, index, settings)
         end if
+
+        list.translation = [0, y]
+
+        y += list.height + settings.space
+
         m.lists.push(list)
+        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
+
+        index++
       end for
     end if
   end function
 
   function layoutLists()
-    y = 0
-
-    w = m.owner.width
     for each list in m.lists
       list.visible = not list.isHidden
       if list.visible
-        list.translation = [0, y]
-        'TODO get rect for item..
-        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
-
-        if list.subType() = "Rectangle"
-          y += list.height + 40
-        else
-          y += m.owner.cellSize[1] + m.owner.cellSpacing[1] + 40
-        end if
         m.visibleViews.push(list)
         m.visibleContent.push(list.content)
       else
@@ -58,38 +53,34 @@ class ListItemViewManager extends ItemViewManager
     for each item in m.visibleViews
       item.viewState = "hidden"
     end for
-  
+
     m.itemScroller.updateItems()
   end function
 
-  function makeList(rowContent)
-    list = m.rowsGroup.createChild("HorizontalRow")
-    list.id = str(m.listIndex).trim()
-    list.cellSize = m.top.cellSize
-    list.cellSpacing = m.top.cellSpacing
-    list.numCols = m.top.numCols
-    list.unfocusCellScale = m.top.unfocusCellScale
-    list.unfocusCount = m.top.unfocusCount
+  function createHorizontalRow(rowContent, index, settings)
+    list = m.container.createChild("HorizontalRow")
+    list.id = str(index).trim()
     list.viewState = "hidden"
+    list.owner = m.owner
     list.content = rowContent
-    list.isOnScreen = m.listIndex < 5
-    m.listIndex++
+    list.isOnScreen = index < 5
 
     return list
   end function
 
-  function makeRectComp(rowContent)
-    list = m.rowsGroup.createChild("Rectangle")
-    list.id = str(m.listIndex).trim()
+  function creatRectangle(rowContent, index, settings)
+    list = m.container.createChild("Rectangle")
+    list.id = str(index).trim()
     list.color = "#aaffaa"
-    list.addFields({ "content": rowContent })
-    list.addFields({ "isFocusable": true })
-    list.addFields({ "isHidden": false })
-    list.addFields({ "isFocused": false })
+    list.addFields({ "content": rowContent 
+      "isFocusable": true
+      "isHidden": false
+      "isFocused": false
+    })
     list.width = 1920
     list.height = 300
+    list.owner = m.owner
     list.content = rowContent
-    m.listIndex++
 
     return list
   end function

@@ -1,21 +1,7 @@
 
 function init()
   print "in FocusTestScene init"
-
-
   listHolder = m.top.findNode("listHolder")
-
-  'create after we've set up our cell tracker and provider
-  ' m.list = listHolder.createChild("RowList")
-  '   m.list.rowHeights = [450]
-  '   m.list.focusXOffset = [100]
-  '   m.list.rowSpacings = []
-  '   m.list.rowItemSize = [400,350]
-  '   m.list.rowItemSpacing = [0,0]
-  '   m.list.showRowLabel = [true]
-  '   m.list.itemSize = [1920, 450]
-  '   m.list.numRows = 3
-  '   m.list.itemComponentName = "ImageCell"
 
   m.list = listHolder.createChild("List")
   m.list.translation = [0, 0]
@@ -25,12 +11,12 @@ function init()
   m.top._cellTracker = m.global.cellTracker
   m.contentId = 0
   onResetChange()
+  mv_initializeView(m.list)
   m.list.observeField("itemSelected", "itemSelcetedChanged")
   m.list.observeField("itemFocused", "itemFocusedChanged")
   m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
   m.list.observeField("itemSelected", "itemSelectedChanged")
   m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-  ' m.list.observeField("rowFocused", "onInfoChange")
 
 end function
 

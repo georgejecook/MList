@@ -9,15 +9,11 @@ function Init()
   mv_initializeFocusManager(m.global)
 
   m.cellProvider = createObject("roSGNode", "CellProvider") 
-  m.top._cellProvider = m.cellProvider
   m.global.addFields({ "cellProvider": m.cellProvider })
 
-
   m.cellTracker = createObject("roSGNode", "CellTracker") 
-  m.top._cellTracker = m.cellTracker
   m.global.addFields({ "cellTracker": m.cellTracker })
   m.top.addFields({ "_global": m.global })
-
 
   m.cellTracker.observeField("numberOfCellsInUse", "onInfoChange")
   m.cellTracker.observeField("numberOfCells", "onInfoChange")

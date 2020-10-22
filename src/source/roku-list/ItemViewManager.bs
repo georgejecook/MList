@@ -1,14 +1,26 @@
 class ItemViewManager
   public container = invalid
   public owner = invalid
+
+  public visibleViews = []
+  public hiddenViews = []
+
+  public visibleContent = []
+  public itemRects = []
+  public content = invalid
+
   
   function new(owner, container)
     m.container = container
     m.owner = owner
   end function
 
+  function setContent(content)
+    m.content = content
+    m.createRenderers()
+  end function
 
-  function getRenderer(item)
+  function getRenderer(index)
     return invalid
   end function
 

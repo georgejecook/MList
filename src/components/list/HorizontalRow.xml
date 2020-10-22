@@ -5,71 +5,31 @@
 
   <interface>
     <field
+        id='content'
+        type='node' />
+    <field
+        id='owner'
+        type='node' />
+    <field
         id='index'
         type='integer' />
-    <!-- fixed|floating|focusWrap|zoom|custom -->
-    <field
-        id='animSpeed'
-        type='float'
-        value='0.3' />
     <field
         id='animateToItem'
         type='integer'
-        onChange='onAnimateToItemChange'
         value='0' />
     <field
         id='isOnScreen'
         type='boolean'
-        onChange='onIsOnScreenChange'
         alwaysNotify='false'
         value='false' />
     <field
-        id='fastAnimationSpeed'
-        type='float'
-        value='1' />
-    <field
-        id='focusType'
-        value='fixed'
-        type='string' />
-    <field
         id='isHidden'
         type='boolean'
-        value='false'
-        onChange='onIsHiddenChange' />
-    <field
-        id='content'
-        type='node'
-        onChange='onContentChange' />
+        value='false' />
     <field
         id='viewState'
         type='string'
-        onChange='onViewStateChange'
         alwaysNotify='true' />
-
-    <field
-        id='cellSize'
-        type='floatArray'
-        value='[300,300]' />
-    <field
-        id='cellSpacing'
-        type='floatArray'
-        value='[20,20]' />
-    <field
-        id='numCols'
-        type='integer'
-        value='12' />
-    <field
-        id='focusIndexOffset'
-        type='integer'
-        value='0' />
-    <field
-        id='unfocusCellScale'
-        type='float'
-        value='0.5' />
-    <field
-        id='unfocusCount'
-        type='float'
-        value='3' />
 
     <field
         id='itemFocused'
@@ -90,8 +50,10 @@
         value='0' />
     <field
         id='currFocusItemIndex'
-        type='integer'
-        onChange='onCurrFocusItemIndexChange' />
+        type='integer' />
+    <field
+        id='height'
+        type='integer' />
 
   </interface>
 

@@ -1,0 +1,121 @@
+namespace ListMixin
+  function createRowSettings(cellSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
+    settings = createObject("roSGNode", "RowSettings")
+
+    if cellSettings = invalid
+      cellSettings = ListMixin.createCellSettings()
+    end if
+
+    if headerSettings = invalid
+      headerSettings = ListMixin.createHeaderSettings()
+    end if
+
+    settings.update({
+      rowCompName: compName
+      screenPos: screenPos
+      height: height
+      space: space
+      cellSettings: cellSettings
+      headerSettings: headerSettings
+    })
+
+    return settings
+  end function
+
+  function createHeaderSettings(labelTranslation = [30, 20], height = 50, font = "font:MediumSystemBold", fontSize = 30)
+    settings = createObject("roSGNode", "HeaderSettings")
+
+    settings.update({
+      labelTranslation: labelTranslation
+      height: height
+      font: font
+      fontSize: fontSize
+    })
+
+    return settings
+  end function
+
+  function createCellSettings(compName = "TileRenderer", size = [300, 500], space = 30, screenPos = 0)
+    settings = createObject("roSGNode", "CellSettings")
+
+    settings.update({
+      compName: compName
+      size: size
+      space: space
+      screenPos: screenPos
+    })
+
+    return settings
+  end function
+
+  ' function createGridRowSettings(compName = "TileRenderer", numCols = 3, spacing = [20, 20], cellSize = [300, 500], screenPos = 0, headerSettings = invalid)
+  '   'TODO
+  '   return {}
+  ' end function
+
+  ' function createGridRowContent(items, rowSettings)
+  '   rowContent = createObject("roSGNode", "roku_list_GridRowContent")
+  '   rows = []
+  '   for each item in items.getChildren(-1, 0)
+  '     row = createObject("roSGNode", "roku_list_RowContent")
+  '     row.group = rowContent
+  '   end for
+  '   rowContent.rowSettings = rowSettings
+  '   rowContent.appendChildren(rows)
+  '   return rowContent
+  ' end function
+
+  function createFocusSettings(animSpeed = 0.3, fastAnimSpeed = 0.1, animStyle = "fixed")
+    settings = createObject("roSGNode", "CellSettings")
+    settings.update({
+      animSpeed: animSpeed
+      fastAnimSpeed: fastAnimSpeed
+      animStyle: animStyle
+    })
+    return settings
+
+  end function
+  ' 'usage
+  ' 'ON GET JSON DATA
+  ' json = m.serverGetDataHomeScreen()
+  ' content = createObjecT("roSGnode", "ContentNode")
+  ' content.appendChild(makeHeroRow(json.hero))
+  ' content.appendChild(makeFavesRow(json.faves))
+  ' moviesGridSettings = createGridRowSettings("TileRenderer")
+  ' myGridRowContent = createGridRowContent(makeGridItems(json.showsGrid), moviesGridSettings)
+  ' for each show in json.shows
+  ' content.appendChild(makeShowRow(show))
+  ' end for
+
+  function setTileSettings(compName = "TileRenderer", cellSize = [300, 500])
+  end function
+
+  function getRowSettings(list, row = invalid)
+    if row <> invalid and row.settings <> invalid
+      return row.settings
+    else
+      return list.rowSettings
+    end if
+  end function
+
+  function getCellSettings(list, row = invalid, item = invalid)
+    if item <> invalid and item.settings <> invalid
+      return item.settings
+    else if row <> invalid and row.settings <> invalid
+      return row.CellSettings
+    else
+      return list.rowSettings.cellSettings
+    end if
+  end function
+
+  function getFocusSettings(list, row = invalid)
+    if row <> invalid and row.focusSettings <> invalid
+      return row.focusSettings
+    else
+      return list.focusSettings
+    end if
+  end function
+
+  ' roku_list.setRowSettings(row, rowRenderer, offset, cellREnderr, cellSize)
+  ' roku_list.setTileSettings(content, cellRenderer, cellSize)
+end namespace 

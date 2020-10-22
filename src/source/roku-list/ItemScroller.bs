@@ -19,7 +19,6 @@ class ItemScroller
   public rowHidingMode = "hidden"
 
   function new(viewManager, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
-    m.group = group
     m.viewManager = viewManager
     m.group = m.viewManager.group
     m.axes = axes

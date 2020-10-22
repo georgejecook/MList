@@ -1,9 +1,13 @@
 import "pkg:/source/roku-list/ListItemScroller.bs"
 import "pkg:/source/roku-list/ListItemViewManager.bs"
 import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku-list/ListMixin.bs"
 
 function init()
   log_registerLogger("List")
+  m.top.rowSettings = ListMixin.createRowSettings()
+  m.top.focusSettings = ListMixin.createFocusSettings()
+
   m.rowsGroup = m.top.findNode("rowsGroup") 
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
@@ -11,42 +15,23 @@ function init()
   m.itemScroller = new ListItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
 
   ' m.top.clippingRect = [0,0,1920,550]
-  m.overlay = m.top.findNode("overlay") 
-  m.focusTimer = m.top.findNode("focusTimer") 
+  ' m.overlay = m.top.findNode("overlay") 
+  ' m.focusTimer = m.top.findNode("focusTimer") 
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.content = invalid
-  m.numberOfRowsToShow = 3
-  m.top.rowFocused = 0
-  m.visibleLists = []
-  m.hiddenLists = []
-  m.lists = []
-  m.lastStates = {}
-  m.content = invalid
-  m.focusTimer.observeField("fire", "currFocusItemIndexChanged")
-  resetState()
+  ' m.lastStates = {}
 end function
 
 function resetState()
-  m.currentY = 0
-  m.listIndex = 0
-  
-  m.viewManager.createRenderers(m.top.content)
-
-  addListListeners()
-
-  m.currentList = m.visibleLists[m.top.rowFocused]
+  m.viewManager.setContent(m.top.content)
+  m.itemScroller.updateItemStates(0, 0, 5, 10)
   m.itemScroller.move(0)
-  setInitialTimer = m.top.findNode("setInitialTimer")
-  setInitialTimer.observeField("fire", "onSetInitialTimerFire")
-  setInitialTimer.control = "start"
-  m.itemScroller.updateRowFocus(0)
 end function
 
 function onSetInitialTimerFire()
   m.logMethod(">>onSetInitialTimerFire")
-  m.viewManager.layoutLists()
-  m.itemScroller.updateRowStates(0, 0, 5, 10)
+  ' m.viewManager.layoutLists()
 end function
 
 function onContentChange()
@@ -63,122 +48,121 @@ function onAnimateToRowChange()
   end if
 end function
 
+' function addListListeners()
+'   for each list in m.visibleLists
+'     list.observeField("itemFocused", "itemFocusedChanged")
+'     list.observeField("itemUnfocused", "itemUnfocusedChanged")
+'     list.observeField("itemSelected", "itemSelectedChanged")
+'     ' list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+'     list.observeField("isHidden", "onListIsHiddenChange")
+'     list.observeField("isFocusable", "onListIsFocuableChange")
+'     list.observeField("currTarget", "onCurrTargetChange")
+'   end for
+' end function
 
-function addListListeners()
-  for each list in m.visibleLists
-    list.observeField("itemFocused", "itemFocusedChanged")
-    list.observeField("itemUnfocused", "itemUnfocusedChanged")
-    list.observeField("itemSelected", "itemSelectedChanged")
-    ' list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-    list.observeField("isHidden", "onListIsHiddenChange")
-    list.observeField("isFocusable", "onListIsFocuableChange")
-    list.observeField("currTarget", "onCurrTargetChange")
-  end for
-end function
+' function itemFocusedChanged()
+'   m.top.itemFocused = m.currentList.itemFocused
+' end function
 
-function itemFocusedChanged()
-  m.top.itemFocused = m.currentList.itemFocused
-end function
+' function itemUnfocusedChanged()
+'   m.top.itemUnfocused = m.currentList.itemUnfocused
+' end function
 
-function itemUnfocusedChanged()
-  m.top.itemUnfocused = m.currentList.itemUnfocused
-end function
+' function itemSelectedChanged()
+'   m.top.itemSelected = m.currentList.itemSelected
+' end function
 
-function itemSelectedChanged()
-  m.top.itemSelected = m.currentList.itemSelected
-end function
+' function currFocusItemIndexChanged() 
+'   ' ? "currFocusItemIndexChanged " ; 
+'   list = m.visibleLists[m.top.rowFocused]
+'   if list <> invalid and list.subType() = "HorizontalRow"
+'     index = list.currFocusItemIndex
+'     m.top.currFocusItemIndex = index
+'     rect = getBoundsForIndex(m.top.rowFocused, int(index))
 
-function currFocusItemIndexChanged() 
-  ' ? "currFocusItemIndexChanged " ; 
-  list = m.visibleLists[m.top.rowFocused]
-  if list <> invalid and list.subType() = "HorizontalRow"
-    index = list.currFocusItemIndex
-    m.top.currFocusItemIndex = index
-    rect = getBoundsForIndex(m.top.rowFocused, int(index))
+'     if rect <> invalid
+'       ' ? " rect is "; formatJson(rect)
+'       m.overlay.width = rect.height
+'       m.overlay.height = rect.width
+'       yOffset = list.translation[1] + m.rowsGroup.translation[1]
 
-    if rect <> invalid
-      ' ? " rect is "; formatJson(rect)
-      m.overlay.width = rect.height
-      m.overlay.height = rect.width
-      yOffset = list.translation[1] + m.rowsGroup.translation[1]
+'       'floating
+'       ' if m.list.content.yOffset <> invalid
+'       '   yOffset -= m.currentList.content.yOffset 
+'       ' end if
+'       m.overlay.translation = [rect.x, rect.y + yOffset]
+'     else
+'       ? " no rect for focused item"
+'     end if
+'   end if
+' end function
 
-      'floating
-      ' if m.list.content.yOffset <> invalid
-      '   yOffset -= m.currentList.content.yOffset 
-      ' end if
-      m.overlay.translation = [rect.x, rect.y + yOffset]
-    else
-      ? " no rect for focused item"
-    end if
-  end if
-end function
+' function onListIsHiddenChange(evt)
+'   m.viewManager.layoutLists()
+' end function
 
-function onListIsHiddenChange(evt)
-  layoutLists()
-end function
+' function onListIsFocuableChange(evt)
+'   'TODO update focus if we're currently focused on the list
+' end function
 
-function onListIsFocuableChange(evt)
-  'TODO update focus if we're currently focused on the list
-end function
+' function onCurrTargetChange(evt)
+'   currTarget = m.currentList.currTarget
+'   ' ? "currTargetSet"; formatJson(currTarget)
+' end function
 
-function onCurrTargetChange(evt)
-  currTarget = m.currentList.currTarget
-  ' ? "currTargetSet"; formatJson(currTarget)
-end function
+' function getBoundsForIndex(rowIndex, index)
+'   rect = invalid
+'   list = m.visibleLists[rowIndex]
+'   if list <> invalid and list.subType() = "HorizontalRow"
+'     set = list.currTargetSet
+'     ' ? " set.focusIndex " ; set.focusIndex + list.focusIndexOffset
+'     if set <> invalid
+'       return set[index]
+'     end if
+'   end if
 
-function getBoundsForIndex(rowIndex, index)
-  rect = invalid
-  list = m.visibleLIsts[rowIndex]
-  if list <> invalid and list.subType() = "HorizontalRow"
-    set = list.currTargetSet
-    ' ? " set.focusIndex " ; set.focusIndex + list.focusIndexOffset
-    if set <> invalid
-      return set[index]
-    end if
-  end if
+'   if rect <> invalid
+'     ' ? "INDEX" ; index ; " " ; formatJson(dynamicCell.boundingRect()); "  " ; formatJson(dynamicCell.localBoundingRect()); "  " ; formatJson(dynamicCell.sceneBoundingRect()); "  " 
+'     return rect
+'   else
+'     ? "could not find target "
+'     return {
+'       width: 0
+'       height: 0
+'       translation: [0, 0]
+'     }
+'   end if
 
-  if rect <> invalid
-    ' ? "INDEX" ; index ; " " ; formatJson(dynamicCell.boundingRect()); "  " ; formatJson(dynamicCell.localBoundingRect()); "  " ; formatJson(dynamicCell.sceneBoundingRect()); "  " 
-    return rect
-  else
-    ? "could not find target "
-    return {
-      width: 0
-      height: 0
-      translation: [0, 0]
-    }
-  end if
+' end function
 
-end function
+' function isHiddenChange()
+'   ? "ishiddenchange"
+'   if m.top.isHidden
+'     for each rowId in m.laststates
+'       list = m.visibleLists[rowId.toInt()]
+'       if list <> invalid
+'         list.viewState = "hidden"
+'       else
+'         ? "ERROR could not find visible list for "; rowId
+'       end if
+'     end for
+'   else
+'     for each rowId in m.laststates
+'       list = m.visibleLists[rowId.toInt()]
+'       if list <> invalid
+'         list.viewState = m.laststates[rowId]
+'       else
+'         ? "ERROR could not find visible list for "; rowId
+'       end if
+'     end for
 
-function isHiddenChange()
-  ? "ishiddenchange"
-  if m.top.isHidden
-    for each rowId in m.laststates
-      list = m.visibleLists[rowId.toInt()]
-      if list <> invalid
-        list.viewState = "hidden"
-      else
-        ? "ERROR could not find visible list for "; rowId
-      end if
-    end for
-  else
-    for each rowId in m.laststates
-      list = m.visibleLists[rowId.toInt()]
-      if list <> invalid
-        list.viewState = m.laststates[rowId]
-      else
-        ? "ERROR could not find visible list for "; rowId
-      end if
-    end for
+'   end if
 
-  end if
+' end function
 
-end function
-
-function getFocusedBounds()
-  return getBoundsForIndex(m.top.rowFocused, int(m.currentList.currFocusItemIndex))
-end function
+' function getFocusedBounds()
+'   return getBoundsForIndex(m.top.rowFocused, int(m.currentList.currFocusItemIndex))
+' end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress

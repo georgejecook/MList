@@ -9,6 +9,8 @@
     "**/.settings": true,
     "**/.factorypath": true,
     "/tmp/**": true,
+    "test-project": true,
+    "*.code-workspace": true,
   },
   "search.exclude": {
     "**/.git/objects/**": true,
@@ -34,14 +36,5 @@
     "**/.history/**": true,
     ".history/**": true,
     "**/out/**": true,
-  },
-  "jira-plugin.workingProject": "",
-  "workbench.colorCustomizations": {
-    "statusBar.background": "#551A8B",
-    "statusBar.debuggingBackground": "#551A8B",
-    "panelTitle.activeBorder": "#ff0000",
-    "activityBar.background": "#272071",
-    "titleBar.activeBackground": "#362D9F",
-    "titleBar.activeForeground": "#FAFAFD"
   },
 }

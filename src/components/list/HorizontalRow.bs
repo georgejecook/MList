@@ -1,356 +1,359 @@
+import "pkg:/source/roku-list/ListMixin.bs"
+
 function init()
   log_registerLogger("List")
-  m.cellHolder = m.top.findNode("cellHolder")
-  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
-  m.moveAnimation = m.top.findNode("moveAnimation") 
-  m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
+  m.top.observeField("content", "onContentChange")
 
-  m.header = m.top.findNode("header")
-  m.cellProvider = m.global.cellProvider
-  m.cellTracker = m.global.cellTracker
-  m.cellsById = {}
-  m.currentDirection = 0
-  m.previousViewState = ""
-  m.content = invalid
+  ' m.cellHolder = m.top.findNode("cellHolder")
+  ' m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  ' m.moveAnimation = m.top.findNode("moveAnimation") 
+  ' m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
+
+  ' m.header = m.top.findNode("header")
+  ' m.cellProvider = m.global.cellProvider
+  ' m.cellTracker = m.global.cellTracker
+  ' m.cellsById = {}
+  ' m.currentDirection = 0
+  ' m.previousViewState = ""
+  ' m.content = invalid
 end function
 
-function onContentIsHiddenChange()
-  m.top.isHidden = m.content.isHidden = true
-end function
+' function onContentIsHiddenChange()
+'   m.top.isHidden = m.content.isHidden = true
+' end function
 
 function onContentChange(evt)
   ' m.logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
-    toggleContentListener(false)
     m.content = m.top.content
-    if m.content.isHidden <> true
-      configureHeader()
-      if m.content.focusType <> invalid
-        m.top.focusType = m.content.focusType
-      end if
-      toggleContentListener(true)
-      layoutCells()
-      onViewStateChange()
-    else
-    end if
+    calculateHeight()
+    ' if m.content.isHidden <> true
+    '   ' configureHeader()
+    '   ' if m.content.focusType <> invalid
+    '   '   m.top.focusType = m.content.focusType
+    '   ' end if
+    '   ' toggleContentListener(true)
+    '   ' layoutCells()
+    '   ' onViewStateChange()
+    ' else
+    ' end if
   end if
 end function
 
-function configureHeader()
-  if m.content <> invalid
-    m.header.text = m.content.title
+function calculateHeight()
+  settings = ListMixin.getRowSettings(m.top.owner, m.content)
+  if settings.height <> -1
+    m.top.height = settings.height
   else
-    m.header.text = ""
+    m.top.height = settings.cellSettings.size[1]
   end if
 end function
 
-function toggleContentListener(isActive)
-  if m.content <> invalid
-    if isActive
-      m.content.observeField("isHidden", "onContentIsHiddenChange")
-    else
-      m.content.unObserveField("isHidden")
-    end if
-  end if
-end function
+' function configureHeader()
+'   if m.content <> invalid
+'     m.header.text = m.content.title
+'   else
+'     m.header.text = ""
+'   end if
+' end function
 
-function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
-  w = sx
-  y = csh
-  for i = 0 to numberOfCols
-    rects.push({ translation: [w,y], size: [cw, ch] })
-    w += cw + csw
-  end for
-end function
+' function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
+'   w = sx
+'   y = csh
+'   for i = 0 to numberOfCols
+'     rects.push({ translation: [w,y], size: [cw, ch] })
+'     w += cw + csw
+'   end for
+' end function
 
-function layoutCells()
-  cw = m.top.cellSize[0]
-  ch = m.top.cellSize[1]
-  csw = m.top.cellSpacing[0]
-  csh = m.top.cellSpacing[1]
-  m.rects = []
-  'rects.push({ x: - cw, y: 0, width: cw, height: ch })
-  content = m.top.content
-  numCells = content.getChildCount()
-  createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
+' function layoutCells()
+'   cw = m.top.cellSize[0]
+'   ch = m.top.cellSize[1]
+'   csw = m.top.cellSpacing[0]
+'   csh = m.top.cellSpacing[1]
+'   m.rects = []
+'   'rects.push({ x: - cw, y: 0, width: cw, height: ch })
+'   content = m.top.content
+'   numCells = content.getChildCount()
+'   createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
 
-  'create all the content 
-  ' for i = 0 to numCells
-  '   cell = m.cellHolder.createChild("DynamicCell")
-  '   cell.index = i
-  '   cell.itemContent = content.getChild(i)
-  '   currRect = m.rects[i]
-  '   cell.currRect = currRect
-  '   cell.translation = [currRect.x, currRect.y]
-  ' end for
-  m.top.currTargetSet = m.rects
-  'updateListVisibility(m.top.viewState)
-end function
+'   'create all the content 
+'   ' for i = 0 to numCells
+'   '   cell = m.cellHolder.createChild("DynamicCell")
+'   '   cell.index = i
+'   '   cell.itemContent = content.getChild(i)
+'   '   currRect = m.rects[i]
+'   '   cell.currRect = currRect
+'   '   cell.translation = [currRect.x, currRect.y]
+'   ' end for
+'   m.top.currTargetSet = m.rects
+'   'updateListVisibility(m.top.viewState)
+' end function
 
-function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
-  m.logMethod("animateToIndex from", oldIndex, "to", index)
-  nextCell = m.rects[index]
+' function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
+'   m.logMethod("animateToIndex from", oldIndex, "to", index)
+'   nextCell = m.rects[index]
 
-  if nextCell = invalid
-    m.logError("could not idenitfy next cell with index", index)
-    return invalid
-  end if
+'   if nextCell = invalid
+'     m.logError("could not idenitfy next cell with index", index)
+'     return invalid
+'   end if
 
-  targetX = getItemFocusXPosition(index)
-  'TODO count visible rows between oldIndex and newIndex
-  steps = abs(oldIndex - index)
-  if m.moveAnimation.state = "play"
-    m.moveAnimation.control = "pause"
-  end if
-  m.moveAnimationInterpolator.keyValue = [[m.cellHolder.translation[0], 20], [- targetX, 20]]
-  m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
+'   targetX = getItemFocusXPosition(index)
+'   'TODO count visible rows between oldIndex and newIndex
+'   steps = abs(oldIndex - index)
+'   if m.moveAnimation.state = "play"
+'     m.moveAnimation.control = "pause"
+'   end if
+'   m.moveAnimationInterpolator.keyValue = [[m.cellHolder.translation[0], 20], [- targetX, 20]]
+'   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
 
 
-  if m.top.viewState <> "show"
-    m.top.viewState = "show"
-  end if
+'   if m.top.viewState <> "show"
+'     m.top.viewState = "show"
+'   end if
 
-  if m.moveAnimation.state = "pause"
-    m.moveAnimation.control = "resume"
-  else
-    m.moveAnimation.control = "start"
-  end if
+'   if m.moveAnimation.state = "pause"
+'     m.moveAnimation.control = "resume"
+'   else
+'     m.moveAnimation.control = "start"
+'   end if
 
-end function
+' end function
 
-function onAnimateToItemChange()
-  if m.content <> invalid
-    ' m.logInfo("onAnimateToItemChange", m.top.animateToItem)
-    animateToIndex(m.top.itemFocused, m.top.animateToItem, m.top.fastAnimationSpeed)
-  end if
-end function
+' function onAnimateToItemChange()
+'   if m.content <> invalid
+'     ' m.logInfo("onAnimateToItemChange", m.top.animateToItem)
+'     animateToIndex(m.top.itemFocused, m.top.animateToItem, m.top.fastAnimationSpeed)
+'   end if
+' end function
 
-function getIndexAtX(xPos)
-  for i = 0 to m.rects.count() - 1
-    x = getItemFocusXPosition(i)
-    if abs(x) >= abs(xPos)
-      return i
-    end if
-  end for
+' function getIndexAtX(xPos)
+'   for i = 0 to m.rects.count() - 1
+'     x = getItemFocusXPosition(i)
+'     if abs(x) >= abs(xPos)
+'       return i
+'     end if
+'   end for
 
-  return -1
-end function
+'   return -1
+' end function
 
-function getItemFocusXPosition(index) 
-  rect = m.rects[index] 
-  if rect <> invalid
-    return rect.translation[0]
-  end if
-  return 0
-end function
+' function getItemFocusXPosition(index) 
+'   rect = m.rects[index] 
+'   if rect <> invalid
+'     return rect.translation[0]
+'   end if
+'   return 0
+' end function
 
-function onAnimationFractionChange()
-  x = m.cellHolder.translation[0]
-  index = getIndexAtX(x)
-  ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
+' function onAnimationFractionChange()
+'   x = m.cellHolder.translation[0]
+'   index = getIndexAtX(x)
+'   ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
 
-  if m.moveAnimationInterpolator.fraction = 1
-    if index = -1
-      index = 0
-    end if
-    m.top.itemFocused = index
-    if m.top.viewState = "show"
-      m.top.viewState = "partial"
-    end if
-  else
-    'updating horizontal list efficiency while scrolling..
-    if index <> -1 and index <> m.top.rowFocused
-      updateListVisibility("show")
-    end if
-    m.top.itemFocused = index
+'   if m.moveAnimationInterpolator.fraction = 1
+'     if index = -1
+'       index = 0
+'     end if
+'     m.top.itemFocused = index
+'     if m.top.viewState = "show"
+'       m.top.viewState = "partial"
+'     end if
+'   else
+'     'updating horizontal list efficiency while scrolling..
+'     if index <> -1 and index <> m.top.rowFocused
+'       updateListVisibility("show")
+'     end if
+'     m.top.itemFocused = index
 
-  end if
+'   end if
 
-end function
+' end function
 
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'++ flyweight heuristics (i.e. cell reuse)
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '++ flyweight heuristics (i.e. cell reuse)
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function onViewStateChange()
-  ' m.logInfo("onViewStateChange", m.top.index, m.top.viewState)
-  if m.top.viewState <> m.previousViewState 
-    m.previousViewState = m.top.viewState
-    updateListVisibility(m.top.viewState)
-  end if
-end function
+' function onViewStateChange()
+'   ' m.logInfo("onViewStateChange", m.top.index, m.top.viewState)
+'   if m.top.viewState <> m.previousViewState 
+'     m.previousViewState = m.top.viewState
+'     updateListVisibility(m.top.viewState)
+'   end if
+' end function
 
-function updateListVisibility(state)
-  if m.content <> invalid
-    ' m.logMethod("updateListVisibility", m.top.index, state)
-    states = {}
+' function updateListVisibility(state)
+'   if m.content <> invalid
+'     ' m.logMethod("updateListVisibility", m.top.index, state)
+'     states = {}
 
-    if state = "hidden" or state = "partial"
-      setListStateMap(states, 0, m.content.getChildCount(), "hidden")
-    end if
+'     if state = "hidden" or state = "partial"
+'       setListStateMap(states, 0, m.content.getChildCount(), "hidden")
+'     end if
 
-    if state = "show"
-      ' setListStateMap(states, 0, m.content.getChildCount(), "show")
-      setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
-    else if state = "partial"
-      'TODO - calcculate this!
-      setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
-    end if
+'     if state = "show"
+'       ' setListStateMap(states, 0, m.content.getChildCount(), "show")
+'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
+'     else if state = "partial"
+'       'TODO - calcculate this!
+'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
+'     end if
 
-    toggleCellStates(states)
-  end if
-end function
+'     toggleCellStates(states)
+'   end if
+' end function
 
-function setListStateMap(states, startIndex, endIndex, state)
-  ' m.logMethod("setListStateMap", startIndex, endIndex, state)
-  for i = startIndex to endIndex
+' function setListStateMap(states, startIndex, endIndex, state)
+'   ' m.logMethod("setListStateMap", startIndex, endIndex, state)
+'   for i = startIndex to endIndex
 
-    if i >= 0 and i < m.content.getChildCount()
-      states[str(i).trim()] = state
-    end if
-  end for
-end function
+'     if i >= 0 and i < m.content.getChildCount()
+'       states[str(i).trim()] = state
+'     end if
+'   end for
+' end function
 
-function toggleCellStates(states)
-  'm.cellTracker.callFunc("setViewStates", states)
-  for each id in states
-    applyViewStateForCell(id, states[id])
-  end for
-end function
+' function toggleCellStates(states)
+'   'm.cellTracker.callFunc("setViewStates", states)
+'   for each id in states
+'     applyViewStateForCell(id, states[id])
+'   end for
+' end function
 
-function onIsOnScreenChange()
-  ' m.logMethod("onIsOnScreenChange")
-  isOnScreen = m.top.isOnScreen
-  for each id in m.cellsById
-    cell = m.cellsById[id]
-    if isOnScreen
-      cell.itemContent = m.content.getChild(id.toInt())
-    end if
-    cell.visible = isOnScreen
-  end for
-end function
+' function onIsOnScreenChange()
+'   ' m.logMethod("onIsOnScreenChange")
+'   isOnScreen = m.top.isOnScreen
+'   for each id in m.cellsById
+'     cell = m.cellsById[id]
+'     if isOnScreen
+'       cell.itemContent = m.content.getChild(id.toInt())
+'     end if
+'     cell.visible = isOnScreen
+'   end for
+' end function
 
-function applyViewStateForCell(id, viewState)
-  index = id.toInt()
-  isOnScreen = m.top.isOnScreen
-  ' ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
-  item = m.content.getChild(index)
-  if item <> invalid
-    if viewState = "show"
-      if m.cellsById[id] = invalid
-        cell = m.cellProvider@.getCell(item.cellType)
-        if cell <> invalid
-          cell.visible = isOnScreen
+' function applyViewStateForCell(id, viewState)
+'   index = id.toInt()
+'   isOnScreen = m.top.isOnScreen
+'   ' ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
+'   item = m.content.getChild(index)
+'   if item <> invalid
+'     if viewState = "show"
+'       if m.cellsById[id] = invalid
+'         cell = m.cellProvider@.getCell(item.cellType)
+'         if cell <> invalid
+'           cell.visible = isOnScreen
 
-          if isOnScreen
-            cell.itemContent = item
-          end if
+'           if isOnScreen
+'             cell.itemContent = item
+'           end if
 
-          cell.translation = m.rects[index]
-          m.cellHolder.appendChild(cell)
-          cell.index = m.top.index
-          m.cellsById[id] = cell
-        else 
-          ? ">>ERR no cell for " ; item.cellType
-        end if
-      end if
-    else
-      cell = m.cellsById[id]
-      if cell <> invalid
-        m.cellProvider@.releaseCell(cell) 
-        m.cellsById.delete(id)
-      end if
-    end if
-  end if
-end function
+'           cell.translation = m.rects[index]
+'           m.cellHolder.appendChild(cell)
+'           cell.index = m.top.index
+'           m.cellsById[id] = cell
+'         else 
+'           ? ">>ERR no cell for " ; item.cellType
+'         end if
+'       end if
+'     else
+'       cell = m.cellsById[id]
+'       if cell <> invalid
+'         m.cellProvider@.releaseCell(cell) 
+'         m.cellsById.delete(id)
+'       end if
+'     end if
+'   end if
+' end function
 
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'++ lifecycle
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '++ lifecycle
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function onCurrFocusItemIndexChange()
-end function
+' function onCurrFocusItemIndexChange()
+' end function
 
-function onIsFocusedChange()
-end function
+' function onIsFocusedChange()
+' end function
 
-function moveXFocus(direction)
-  nextIndex = m.top.itemFocused + direction
+' function moveXFocus(direction)
+'   nextIndex = m.top.itemFocused + direction
 
-  if nextIndex < 0
-    nextIndex = 0
-  else if nextIndex > m.rects.count() - 1
-    nextIndex = m.rects.count() - 1
-  end if
-  animateToIndex(m.top.itemFocused, nextIndex)
-  m.top.itemFocused = nextIndex
+'   if nextIndex < 0
+'     nextIndex = 0
+'   else if nextIndex > m.rects.count() - 1
+'     nextIndex = m.rects.count() - 1
+'   end if
+'   animateToIndex(m.top.itemFocused, nextIndex)
+'   m.top.itemFocused = nextIndex
 
-end function
+' end function
 
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'++ KeyPress
-'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' '++ KeyPress
+' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function onKeyPressLeft() as boolean
-  m.logMethod("onKeyPressLeft")
-  moveXFocus(-1)
-  return true
-end function
+' function onKeyPressLeft() as boolean
+'   m.logMethod("onKeyPressLeft")
+'   moveXFocus(-1)
+'   return true
+' end function
 
-function onKeyPressRight() as boolean
-  m.logMethod("onKeyPressRight")
-  moveXFocus(1)
-  return true
-end function
+' function onKeyPressRight() as boolean
+'   m.logMethod("onKeyPressRight")
+'   moveXFocus(1)
+'   return true
+' end function
 
 
-function getLongPressIntervalForKey(key) as float
-  m.logMethod("getLongPressIntervalForKey", key)
-  if key = "left" or key = "right"
-    return 0.5
-  else
-    return 0
-  end if
-end function
+' function getLongPressIntervalForKey(key) as float
+'   m.logMethod("getLongPressIntervalForKey", key)
+'   if key = "left" or key = "right"
+'     return 0.5
+'   else
+'     return 0
+'   end if
+' end function
 
-function onLongPressStart(key) as boolean
-  m.logMethod(">>>>onLongPressStart", key)
+' function onLongPressStart(key) as boolean
+'   m.logMethod(">>>>onLongPressStart", key)
 
-  if key = "left" or key = "right"
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
-    if key = "left"
-      targetIndex = 0 
-    else
-      targetIndex = m.content.getChildCount() - 1
-    end if
-    animateToIndex(m.top.itemFocused, targetIndex)
-    return true
-  end if
+'   if key = "left" or key = "right"
+'     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+'     if key = "left"
+'       targetIndex = 0 
+'     else
+'       targetIndex = m.content.getChildCount() - 1
+'     end if
+'     animateToIndex(m.top.itemFocused, targetIndex)
+'     return true
+'   end if
 
-  return false
-end function
+'   return false
+' end function
 
-function onLongPressFinish(key) as boolean
-  if key = "left" or key = "right"
-    'fixed focus 
-    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
-    index = getIndexAtX(m.cellHolder.translation[0])
-    if m.currentDirection = -1
-      nextIndex = index - 1
-    else
-      nextIndex = index
-      index -= m.currentDirection
-    end if
+' function onLongPressFinish(key) as boolean
+'   if key = "left" or key = "right"
+'     'fixed focus 
+'     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+'     index = getIndexAtX(m.cellHolder.translation[0])
+'     if m.currentDirection = -1
+'       nextIndex = index - 1
+'     else
+'       nextIndex = index
+'       index -= m.currentDirection
+'     end if
 
-    if nextIndex < 0
-      nextIndex = 0
-    else if index > m.rects.count() - 1
-      nextIndex = m.rects.count() - 1
-    end if
+'     if nextIndex < 0
+'       nextIndex = 0
+'     else if index > m.rects.count() - 1
+'       nextIndex = m.rects.count() - 1
+'     end if
 
-    animateToIndex(index, nextIndex)
-    return true
-  end if
+'     animateToIndex(index, nextIndex)
+'     return true
+'   end if
 
-  return false
-end function
+'   return false
+' end function
