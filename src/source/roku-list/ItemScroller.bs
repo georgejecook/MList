@@ -102,10 +102,9 @@ class ItemScroller extends BaseClass
 
   function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
     m.logInfo("moveToIndex", index, screenPos, animated)
-    itemRect = m.rects[index]
 
-    if itemRect = invalid
-      m.logWarn("no itemRect for index", index)
+    targetTranslation = m.getTargetTranslation(index, screenPos)
+    if targetTranslation = invalid
       return false
     end if
 
@@ -124,24 +123,14 @@ class ItemScroller extends BaseClass
     end if
 
 
-    screenPos = m.getScreenPositionForItem(itemRect, m.direction)
-    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
-    m.nextIndex = m.index + m.direction
-    'TODO count visible rows between oldIndex and newIndex
-    steps = abs(m.index - index)
-    if steps = 0
-      steps = 1
-    end if
-
-    if m.axes = 0
-      targetTranslation = [- targetPos, m.container.translation[1]]
-    else
-      targetTranslation = [m.container.translation[0], - targetPos]
-    end if
-
     m.logInfo("moving to ", targetTranslation, animated)
     if animated
+      'TODO count visible rows between oldIndex and newIndex
+      steps = abs(m.index - index)
+      if steps = 0
+        steps = 1
+      end if
+
       if m.moveAnimation.state = "play"
         m.moveAnimation.control = "pause"
       end if
@@ -155,7 +144,31 @@ class ItemScroller extends BaseClass
       end if
     else
       m.container.translation = targetTranslation
+      'TODO -check if jump is bigger than a certain amount
+      m.updateRenderedComponents()
+      m.setFocusIndex(index, false)
     end if
+  end function
+
+  function getTargetTranslation(index, screenPos = invalid)
+    itemRect = m.rects[index]
+
+    if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
+      return invalid
+    end if
+
+    screenPos = m.getScreenPositionForItem(itemRect, m.direction)
+    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+    m.nextIndex = m.index + m.direction
+
+    if m.axes = 0
+      return [- targetPos, m.container.translation[1]]
+    else
+      return [m.container.translation[0], - targetPos]
+    end if
+
   end function
 
   function finishAnimating()
@@ -252,37 +265,48 @@ class ItemScroller extends BaseClass
 
     '2. maintain a collection of controls that are in bounds right now:
     m.onScreenCompMap = m.getComoponentsInViewPort(- m.container.translation[m.axes])
-
+    'notify what IS in view
     for each id in m.onScreenCompMap
-      comp = m.comopnents[id.toInt()]
+      comp = m.components[id.toInt()]
       if comp <> invalid
         if m.onScreenCompMap[id] = true and comp.isOnScreen = false
-          comp.screenState = { state: "didEnter", direction: m.direction }
+          'ensure clients always get willEnter before didEnter
+          ' if comp.viewPortState = invalid or comp.viewPortState.state <> "willEnter" 
+          '   comp.viewPortState = { state: "willEnter", direction: m.direction }
+          ' end if
+
+          comp.viewPortState = { state: "didEnter", direction: m.direction }
           comp.isOnScreen = true
         else if m.onScreenCompMap[id] = false and comp.isOnScreen = true
-          comp.screenState = { state: "didExit", direction: m.direction }
+          'ensure clients always get willExit before didExit
+          ' if comp.viewPortState = invalid or comp.viewPortState.state <> "willExit" 
+          '   comp.viewPortState = { state: "willExit", direction: m.direction }
+          ' end if
+
+          comp.viewPortState = { state: "didExit", direction: m.direction }
           comp.isOnScreen = false
         end if
       end if 
     end for
 
-    if isMoving
+    'notify what WILL come into view
+    if isMoving and m.nextIndex <> m.index
       nextRect = m.rects[m.nextIndex]
       screenPos = m.getScreenPositionForItem(nextRect, m.direction)
       nextPos = m.getOffsetForScreenPosition(nextRect, screenPos)
       nextOnScreenCompMap = m.getComoponentsInViewPort(nextPos)
+      ' m.logInfo("nextOnScreenCompMap", nextOnScreenCompMap)
       for each id in nextOnScreenCompMap
-        comp = m.comopnents[id.toInt()]
+        comp = m.components[id.toInt()]
         if comp <> invalid
-          if m.nextOnScreenCompMap[id] = true and comp.isOnScreen = false
-            comp.screenState = { state: "willEnter", direction: m.direction }
-          else if m.nextOnScreenCompMap[id] = false and comp.isOnScreen = true
-            comp.screenState = { state: "willExit", direction: m.direction }
+          ' m.logInfo(id, comp.isOnScreen, nextOnScreenCompMap[id])
+          if nextOnScreenCompMap[id] = true and comp.isOnScreen = false
+            comp.viewPortState = { state: "willEnter", direction: m.direction }
+          else if nextOnScreenCompMap[id] = false and comp.isOnScreen = true
+            comp.viewPortState = { state: "willExit", direction: m.direction }
           end if
         end if 
       end for
-    else
-      nextOnScreenCompMap = {}
     end if
 
   end function

@@ -57,6 +57,96 @@ namespace Tests
       m.assertEqual(compStates, expected)
     end function
 
+    '@Test first show
+    function setFocusIndex_first_show()
+      m.scroller.updateRenderedComponents()
+      m.scroller.setFocusIndex(0, false)
+      'TODO test me
+      comps = m.scroller.components
+      m.checkOnScreenComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests setFocusIndex
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    '@Only
+    '@Test Moving
+    function setFocusIndex_moving()
+      comps = m.scroller.components
+      m.resetViewPortStates()
+      m.printStates(comps)
+      m.scroller.moveToIndex(0, invalid, false)
+      m.scroller.direction = 1
+      ' m.checkViewPortStates(comps, [0, 1, 2, 3], [4], [], [])
+      m.container.translation = m.scroller.getTargetTranslation(1)
+      m.scroller.setFocusIndex(1, true)
+      m.printStates(comps)
+      m.container.translation = m.scroller.getTargetTranslation(2)
+      m.scroller.setFocusIndex(2, true)
+      m.printStates(comps)
+      m.container.translation = m.scroller.getTargetTranslation(3)
+      m.scroller.setFocusIndex(3, true)
+      m.printStates(comps)
+      m.container.translation = m.scroller.getTargetTranslation(4)
+      m.scroller.setFocusIndex(4, true)
+      m.printStates(comps)
+      m.container.translation = m.scroller.getTargetTranslation(5)
+      m.scroller.setFocusIndex(5, true)
+      m.printStates(comps)
+      ? ""
+      m.checkViewPortStates(comps, [0, 1, 2, 3], [4, 5], [0], [])
+      '@onlyparams[1, 2, [1, 2, 3], [], [4, 5], [0]]
+
+    end function
+
+    function printStates(comps)
+      for i = 0 to 15
+        comp = comps[i]
+        ? comp.id ; " " ; comp.viewPortState.state ; " " ; comp.isOnScreen
+      end for
+
+    end function
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '++ utils
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    function resetViewPortStates()
+      for each comp in m.scroller.components
+        comp.viewPortState = {}
+      end for
+    end function
+
+    function checkOnScreenComps(comps, onScreenIds, offScreenIds)
+      for each id in onScreenIds
+        m.assertTrue(comps[id].isOnScreen)
+      end for
+
+      for each id in offScreenIds
+        m.assertFalse(comps[id].isOnScreen)
+      end for
+    end function
+
+    function checkViewPortStates(comps, enterIds = [], exitIds = [], willEnterids = [], willExitIds = [])
+      for each id in enterIds
+        m.assertEqual(comps[id].viewPortState.state, "didEnter")
+      end for
+
+      for each id in exitIds
+        m.assertEqual(comps[id].viewPortState.state, "didExit")
+      end for
+
+      for each id in willEnterIds
+        m.assertEqual(comps[id].viewPortState.state, "willEnter")
+      end for
+
+      for each id in willExitIds
+        m.assertEqual(comps[id].viewPortState.state, "willExit")
+      end for
+
+    end function
+
     private function configureScroller(axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
       m.scroller.axes = axes
       m.owner.translation = [0, 0]
