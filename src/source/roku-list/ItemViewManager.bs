@@ -1,16 +1,22 @@
-class ItemViewManager
+import "pkg:/source/roku-list/BaseClass.bs"
+
+class ItemViewManager extends BaseClass
+  'owning views
   public container = invalid
   public owner = invalid
 
-  public visibleViews = []
-  public hiddenViews = []
-
-  public visibleContent = []
-  public itemRects = []
+  'content
   public content = invalid
-
+  public components = []
+  public rects = []
+  
+  'tracking
+  public visibleItems = []
+  public visibleComponents = []
+  public hiddenComponents = []
   
   function new(owner, container)
+    super("ItemViewManager")
     m.container = container
     m.owner = owner
   end function

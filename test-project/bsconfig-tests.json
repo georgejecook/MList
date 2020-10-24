@@ -1,0 +1,30 @@
+{
+  "rootDir": "src",
+  "files": [
+    "manifest",
+    "source/**/*.*",
+    "components/**/*.*"
+  ],
+  "autoImportComponentScript": true,
+  "createPackage": false,
+  "stagingFolderPath": "build",
+  "diagnosticFilters": [
+    {
+      "src": "**/roku_modules/**/*.*",
+      "codes": [
+        1107,
+        1009,
+        1013,
+        1001
+      ]
+    }
+  ],
+  "plugins": [
+    "/home/george/hope/open-source/rooibos/rooibos/bsc-plugin/dist/plugin.js"
+  ],
+  "rooibos": {
+    "frameworkSourcePath": "/home/george/hope/open-source/rooibos/rooibos/framework/src/source",
+    "showOnlyFailures": true,
+    "lineWidth": 70
+  }
+}

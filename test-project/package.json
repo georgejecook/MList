@@ -1,9 +1,49 @@
 {
-  "private": true,
+  "name": "maestro-roku-list-tests",
+  "version": "4.0.0",
+  "description": "Lists",
+  "directories": {
+    "doc": "docs"
+  },
   "dependencies": {
-    "ap": "file:../"
+    "log": "file:../../roku-log",
+    "mc": "file:../../maestro-roku-core",
+    "ml": "file:..",
+    "mv": "file:../../maestro-roku-view"
   },
   "devDependencies": {
-    "ropm": "^0.6.3"
+    "brighterscript": "file:/home/george/hope/open-source/vsc/brighterscript",
+    "ropm": "^0.5.0",
+    "vscode-languageserver": "^6.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgejecook/maestro-roku-list.git"
+  },
+  "keywords": [
+    "brightscript",
+    "mvvm",
+    "framework",
+    "fun"
+  ],
+  "author": "George Cook",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/georgejecook/maestro-roku-list/issues"
+  },
+  "homepage": "https://github.com/georgejecook/maestro-roku-list#readme",
+  "ts-node": {
+    "transpileOnly": true,
+    "compileOptions": {
+      "incremental": true,
+      "allowJs": false
+    }
+  },
+  "ropm": {
+    "rootDir": "src"
+  },
+  "scripts": {
+    "build": "npx bsc",
+    "build-tests": "bsc --project bsconfig-tests.json"
   }
 }

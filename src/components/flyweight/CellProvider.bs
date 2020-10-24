@@ -1,10 +1,12 @@
+import "pkg:/source/roku_modules/mc/Utils.brs"
+
 function init()
   reset()
 end function
 
 function onDebugMChange()
   m.top._m = m
-  
+
 end function
 
 function reset(args = invalid)
@@ -18,7 +20,7 @@ function getTrackers(cellType)
   trackers = m.cellTypes[cellType]
   if trackers = invalid
     trackers = { usedCellsById: {}
-      allCells : []
+      allCells: []
       freeCellsById: {}
       numberOfCellsInPool: 0
     }
@@ -27,7 +29,28 @@ function getTrackers(cellType)
   return trackers
 end function
 
-function addPreBakedCells(number, cellType = "SimpleCell")
+function getRopmSafeCellType(cellType)
+  if cellType = invalid
+    cellType = ""
+    prefix = getRopmPrefix(resetCells, "resetCells")
+    if left(cellType, len(prefix)) <> prefix
+      cellType += prefix + "_" + cellType
+    end if
+  end if
+
+  return cellType
+end function
+
+function getRopmPrefix(func, rootName)
+  name = mc_getFunctionName(func)
+  parts = name.split("_")
+  if parts.count() > 1 and name.right(len(name) - len(parts[0])) = rootName
+    return parts[0]
+  end if
+end function
+
+function addPreBakedCells(number, cellType = invalid)
+  cellType = getRopmSafeCellType(cellType)
   ' ? "adding "; number; " cells of type "; cellType
   trackers = getTrackers(cellType)
   for i = 0 to number
@@ -36,15 +59,17 @@ function addPreBakedCells(number, cellType = "SimpleCell")
     trackers.numberOfCellsInPool++
     trackers.freeCellsById[cell.id] = cell
     trackers.allCells.push(cell)
-    m.top.numberOfCells ++
+    m.top.numberOfCells++
   end for
   ' ? "finished making cells"
 end function
 
-function getCell(cellType = "SimpleCell")
+function getCell(cellType = invalid)
   ' ? "asked for cell of "; cellType
+  cellType = getRopmSafeCellType(cellType)
+
   trackers = getTrackers(cellType)
-  
+
   if trackers.freeCellsById.count() = 0
     ? "Ran out of cells:"
     if m.top.isCreateMoreEnabled
@@ -59,11 +84,11 @@ function getCell(cellType = "SimpleCell")
       exit for
     end for
   end if
-  
+
   cell = trackers.freeCellsById[id]
   trackers.freeCellsById.delete(id)
   trackers.usedCellsById[id] = cell
-  m.top.numberOfCellsInUse ++
+  m.top.numberOfCellsInUse++
   ' ? "returning cell with id"; id
   return cell
 end function
@@ -75,7 +100,7 @@ function releaseCell(cell)
     trackers.usedCellsById.delete(cell.id)
     cell.getParent().removeChild(cell)
     trackers.freeCellsById[cell.id] = cell
-    m.top.numberOfCellsInUse --
+    m.top.numberOfCellsInUse--
   end if
 end function
 
@@ -87,4 +112,7 @@ function createCell(cellType)
   trackers.allCells.push(cell)
   trackers.freeCellsById[cell.id] = cell
   return cell
+end function
+
+function resetCells()
 end function

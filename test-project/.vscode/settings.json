@@ -1,6 +1,44 @@
 {
+  "search.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.meteor/local": true,
+    "**/build/**": true,
+    "build/**": true,
+    "**/.history/**": true,
+    ".history/**": true,
+    ".history/**/*": true,
+    "out/**": true,
+    "**/out/**": true,
+    "test-project": true,
+    "/tmp/**": true,
+    "**/dist/**": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.meteor/local": true,
+    "**/build/**": true,
+    "**/.history/**": true,
+    ".history/**": true,
+    "**/out/**": true,
+    "test-project": true,
+    "**/dist/**": true
+  },
   "files.exclude": {
+    "build": true,
+    ".history": true,
     "node_modules": true,
-    "out": true
-  }
+    "out": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "/tmp/**": true,
+    "test-project": true,
+    "*.code-workspace": true,
+    "**/dist/**": true
+  },
 }

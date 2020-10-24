@@ -1,14 +1,17 @@
-import "pkg:/source/roku_modules/mc/Tasks.brs"
+import "pkg:/source/roku-list/BaseClass.bs"
 
-class ItemScroller
+class ItemScroller extends BaseClass
 
-  public itemRects = []
+  public rects = []
   public items = []
+  public components = []
+  public renderedComponents = []
+  public onScreenCompMap = []
   public index = 0
   public focusedIndex = 0
   public nextIndex = 0
   public targetIndex = 0
-  public group = invalid
+  public container = invalid
   public direction = 0
   public axes = 0 'x = 0, y =1
   public minPos = 0
@@ -16,30 +19,52 @@ class ItemScroller
   public animSpeed = 0.3
   public regularAnimSpeed = 0.3
   public fastAnimSpeed = 2
-  public rowHidingMode = "hidden"
+  public componentBufferMode = "offScreen"
+  public numberOfItems = 0
+  public screenRect = { translation: [0, 0], size: [1920, 1080] }
 
   function new(viewManager, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+    super("ItemScroller")
     m.viewManager = viewManager
-    m.group = m.viewManager.group
+    m.container = m.viewManager.container
     m.axes = axes
     m.minPos = minPos
     m.maxPos = maxPos
     m.moveAnimation = moveAnimation
     m.moveAnimationInterpolator = moveAnimationInterpolator
-    m.observeNodeField = mc_Tasks_observeNodeField
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
   end function
 
-  public function updateItems()
+  public function onViewManagerUpdate()
+    m.components = m.viewManager.visibleComponents ' content items 
     m.items = m.viewManager.visibleItems ' content items 
-    m.itemRects = m.viewManager.itemRects ' calculated views for the items
+    m.rects = m.viewManager.rects ' calculated views for the items
+    m.numberOfItems = m.items.count()
+    owner = m.viewManager.owner
+    'TODO - use bounds here
+    m.screenRect = { translation: owner.translation, size: [owner.width, owner.height] }
+  end function
+
+  public function reset()
+    'TODO
+    m.moveToIndex(0, invalid, false)
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ collection movement
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function move(offset, animated = true, screenPos = invalid, fast = false)
+  function moveToEnd(direction, screenPos = invalid, animated = true, fast = false)
+    if direction = -1
+      index = 0
+    else
+      index = m.numberOfItems - 1
+    end if
+    m.moveToIndex(index, screenPos, animated, fast)
+  end function
+
+  function move(offset, screenPos = invalid, animated = true, fast = false)
+
     index = m.index + offset
 
     if offset > 0
@@ -50,9 +75,10 @@ class ItemScroller
 
     index = m.getValidTargetIndex(index, direction)
 
-    if m.focusedItem <> invalid
-      m.itemScroller.moveToIndex(index, screenPos, animated, fast)
-      m.rowsGroup.translation = [0, - m.focusedItem.translation[1]]
+    m.logInfo("move", m.index, offset, index, screenPos, animated, fast)
+
+    if index <> -1
+      m.moveToIndex(index, screenPos, animated, fast)
     end if
   end function
 
@@ -61,26 +87,34 @@ class ItemScroller
       return 0
     end if
 
-    if index > m.itemRects.count() - 1
-      return m.getValidTargetIndex(m.itemRects.count() - 1, -1)
+    if index > m.numberOfItems - 1
+      return m.getValidTargetIndex(m.numberOfItems - 1, -1)
     end if
 
-    'ensure we dont' move to a non-focusable rowlist
-    itemRect = m.itemRects[index]
-    itemRect = m.items[index]
-    while itemRect <> invalid and not itemRect.isFocusable and index < m.itemRects.count() - 1 and index > -1
+    item = m.items[index]
+    while item <> invalid and item.isFocusable <> false and index < m.numberOfItems - 1 and index > -1
       index += direction
-      itemRect = m.itemRects[index]
+      item = m.items[index]
     end while
 
     return index
   end function
 
   function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
+    m.logInfo("moveToIndex", index, screenPos, animated)
+    itemRect = m.rects[index]
 
-    itemRect = m.itemRects[index]
     if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
       return false
+    end if
+
+    m.targetIndex = index
+
+    if m.targetIndex > m.index
+      m.direction = 1
+    else
+      m.direction = -1
     end if
 
     if fast
@@ -89,12 +123,6 @@ class ItemScroller
       m.animSpeed = m.regularAnimSpeed
     end if
 
-    m.targetIndex = index
-    if m.targetIndex > m.index
-      m.direction = 1
-    else
-      m.direction = -1
-    end if
 
     screenPos = m.getScreenPositionForItem(itemRect, m.direction)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
@@ -106,26 +134,28 @@ class ItemScroller
       steps = 1
     end if
 
-    if m.moveAnimation.state = "play"
-      m.moveAnimation.control = "pause"
-    end if
     if m.axes = 0
-      x = - targetPos
-      y = m.group.translation[1]
+      targetTranslation = [- targetPos, m.container.translation[1]]
     else
-      x = m.group.translation[0]
-      y = - targetPos
+      targetTranslation = [m.container.translation[0], - targetPos]
     end if
 
-    m.moveAnimationInterpolator.keyValue = [m.group.translation, [x, y]]
-    m.moveAnimation.duration = steps * m.animSpeed
+    m.logInfo("moving to ", targetTranslation, animated)
+    if animated
+      if m.moveAnimation.state = "play"
+        m.moveAnimation.control = "pause"
+      end if
+      m.moveAnimationInterpolator.keyValue = [m.container.translation, targetTranslation]
+      m.moveAnimation.duration = steps * m.animSpeed
 
-    if m.moveAnimation.state = "pause"
-      m.moveAnimation.control = "resume"
+      if m.moveAnimation.state = "pause"
+        m.moveAnimation.control = "resume"
+      else
+        m.moveAnimation.control = "start"
+      end if
     else
-      m.moveAnimation.control = "start"
+      m.container.translation = targetTranslation
     end if
-
   end function
 
   function finishAnimating()
@@ -168,8 +198,8 @@ class ItemScroller
   end function
 
   function getIndexAtPosition(position, direction)
-    for i = 0 to m.itemRects.count() - 1
-      itemRect = m.itemRects[i]
+    for i = 0 to m.rects.count() - 1
+      itemRect = m.rects[i]
       screenPos = m.getScreenPositionForItem(itemRect, direction)
       itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
       ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
@@ -187,73 +217,151 @@ class ItemScroller
 
   function onAnimationFractionChange(fraction)
     ' m.logInfo("onAnimationFractionChange", fraction)
-    position = m.group.translation[m.axes]
-    index = m.getIndexAtPosition(position)
+    position = m.container.translation[m.axes]
+    index = m.getIndexAtPosition(position, m.direction)
 
     if fraction = 1
-      if index = -1
-        index = 0
+      if index <> m.index
+        m.setFocusIndex(index, false)
       end if
-      ' updateItemFocus(index)
+      m.targetIndex = -1
     else
-      ' m.logInfo(">>>", y, index, m.top.index)
-      if index <> -1 and index <> m.top.index and ((index mod 10) = 0 or index < 10 or index < m.content.getchildCount() - 10)
-        m.updateItemStates(m.direction, index)
+      if index <> m.index 
+        m.setFocusIndex(index, true)
       end if
-      ' nextIndex = getListAtY(y - 1400)
-      'TODO - actually run this propertly
-      m.itemRects[nextIndex].isOnScreen = true
     end if
 
+  end function
+
+  function setFocusIndex(index, isMoving)
+    'This MUST be called infrequently
+    if index = -1
+      m.index = 0
+      m.nextIndex = 1
+    else
+      m.index = index
+      m.nextIndex = m.index + m.direction
+    end if
+
+    'things that need to happen in here:
+    '1. update the screen state
+    ' this should be based on the look aheads/look behinds.. 
+    if ((index mod 10) = 0 or index < 10 or index < m.numberOfItems - 10)
+      m.updateRenderedComponents()
+    end if
+
+    '2. maintain a collection of controls that are in bounds right now:
+    m.onScreenCompMap = m.getComopnentsInViewPort(- m.container.translation[m.axes])
+
+    for each id in m.onScreenCompMap
+      comp = m.comopnents[id.toInt()]
+      if comp <> invalid
+        if m.onScreenCompMap[id] = true and comp.isOnScreen = false
+          comp.screenState = { state: "didEnter", direction: m.direction }
+          comp.isOnScreen = true
+        else if m.onScreenCompMap[id] = false and comp.isOnScreen = true
+          comp.screenState = { state: "didExit", direction: m.direction }
+          comp.isOnScreen = false
+        end if
+      end if 
+    end for
+    
+    if isMoving
+      nextRect = m.rects[m.nextIndex]
+      screenPos = m.getScreenPositionForItem(nextRect, m.direction)
+      nextPos = m.getOffsetForScreenPosition(nextRect, screenPos)
+      nextOnScreenCompMap = m.getComopnentsInViewPort(nextPos)
+      for each id in nextOnScreenCompMap
+        comp = m.comopnents[id.toInt()]
+        if comp <> invalid
+          if m.nextOnScreenCompMap[id] = true and comp.isOnScreen = false
+            comp.screenState = { state: "willEnter", direction: m.direction }
+          else if m.nextOnScreenCompMap[id] = false and comp.isOnScreen = true
+            comp.screenState = { state: "willExit", direction: m.direction }
+          end if
+        end if 
+      end for
+    else
+      nextOnScreenCompMap = {}
+    end if
+
+  end function
+
+  function getComopnentsInViewPort(startOffset)
+    compStates = {}
+
+    sStart = m.screenRect.translation[m.axes] + startOffset
+    sEnd = sStart + m.screenRect.size[m.axes]
+
+    for each comp in m.renderedComponents
+      cRect = m.rects[comp.index]
+      cStart = cRect.translation[m.axes]
+      cEnd = cStart + cRect.size[m.axes]
+      if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+        compStates[comp.id] = true
+      else 
+        compStates[comp.id] = false
+      end if
+    end for
+
+    return compStates
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ visibility state management
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function updateItemStates(direction, newIndex, beforeCount = 5, afterCount = 10)
+  function updateRenderedComponents()
+
+    'TODO make these settings
+    beforeCount = 5
+    afterCount = 10
+
     ' ? "new Index" ; newIndex; " direction "; direction
-    if direction < 0
+    if m.direction < 0
       numberOfItemsToShowBefore = beforeCount
       numberOfItemsToShowAfter = afterCount
     else
       numberOfItemsToShowBefore = beforeCount
       numberOfItemsToShowAfter = afterCount
     end if
-    m.updateItemVisibilities(newIndex, m.index, numberOfItemsToShowBefore, numberOfItemsToShowAfter)
+
+    m.updateComponentScreenStates(numberOfItemsToShowBefore, numberOfItemsToShowAfter)
   end function
 
-  function updateItemVisibilities(newIndex, oldIndex, numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3) as void
-    ' m.logMethod("updateItemVisibilities newIndex", newIndex, "old", oldIndex)
-    states = {}
-    if m.content = invalid or newIndex = oldIndex
+  function updateComponentScreenStates(numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3) as void
+    ' m.logMethod("updateComponentScreenStates newIndex", newIndex, "old", oldIndex)
+    screenStateMap = {}
+
+    if m.content = invalid
       return 
     end if
 
-    m.setListStateMap(states, 0, m.content.getChildCount(), m.rowHidingMode)
-    m.setListStateMap(states, newIndex - numberOfItemsToShowBefore, newIndex + numberOfItemsToShowAfter, "partial")
+    m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
+    m.updateScreenStateMap(screenStateMap, m.index - numberOfItemsToShowBefore, m.index + numberOfItemsToShowAfter, "buffer")
 
-    ' ? "updating states: " ; formatJson(states)
-    for each rowId in states
-      list = m.itemRects[rowId.toInt()]
-      if list <> invalid and list.hasField("viewState")
-        list.viewState = states[rowId]
+    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
+    for each id in screenStateMap
+      component = m.components[id.toInt()]
+
+      if component <> invalid
+        component.screenState = screenStateMap[id]
       else
-        ' ? "ERROR could not find visible list for "; rowId
+        ' ? "ERROR could not find visible component for "; id
       end if
     end for
 
-    m.lastStates = states
+    m.lastStates = screenStateMap
   end function
 
-  function setListStateMap(states, startIndex, endIndex, state)
+  function updateScreenStateMap(screenStateMap, startIndex, endIndex, state)
     for i = startIndex to endIndex
 
-      if i >= 0 and i < m.itemRects.count()
-        row = m.itemRects[i]
+      if i >= 0 and i < m.rects.count()
+        component = m.components[i]
 
-        if row <> invalid
-          states[row.id] = state
+        if component <> invalid
+          screenStateMap[component.id] = state
         end if
       end if
     end for
@@ -278,19 +386,19 @@ class ItemScroller
       '   focusedItem = m.content.getChild(m.focusedItem.itemFocused)
 
       '   if focusedItem <> invalid
-      '     m.top._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
+      '     m._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
       '   else
-      '     m.top._focusedRenderer = invalid
+      '     m._focusedRenderer = invalid
       '   end if
       '   m.logWarn("focusing on list ", m.focusedItem.content.title)
       '   m.focusedItem.setFocus(true)
 
       ' end if
     else
-      m.top.rowFocused = -1
+      m.rowFocused = -1
     end if
 
-    m.itemScroller.updateItemStates(0, m.index)
+    m.updateComponentScreenStates(0, m.index)
   end function
 
 end class

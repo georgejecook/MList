@@ -8,7 +8,7 @@
         type='string' />
     <field
         id='headerSettings'
-        type='assocarray' />
+        type='node' />
     <field
         id='cellSettings'
         type='node' />

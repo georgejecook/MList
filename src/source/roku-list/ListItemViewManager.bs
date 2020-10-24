@@ -2,6 +2,7 @@ import "pkg:/source/roku-list/ItemViewManager.bs"
 import "pkg:/source/roku-list/ListMixin.bs"
 
 class ListItemViewManager extends ItemViewManager
+
   function new(owner, container)
     super(owner, container)
   end function
@@ -12,7 +13,13 @@ class ListItemViewManager extends ItemViewManager
 
   override function createRenderers()
     m.container.removeChildren(m.container.getChildren(-1, 0))
-    m.lists = []
+    m.visibleComponents = []
+    m.hiddenComponents = []
+    m.components = []
+    m.rects = []
+
+    'TODO remove/recycle views
+
     y = 0
     w = m.owner.width
 
@@ -22,67 +29,61 @@ class ListItemViewManager extends ItemViewManager
         settings = ListMixin.getRowSettings(m.owner, item)
 
         if item.rowCompName <> invalid and item.rowCompName = "RectComp"
-          list = m.creatRectangle(item, index, settings)
+          component = m.creatRectangle(item, index, settings)
         else
-          list = m.createHorizontalRow(item, index, settings)
+          component = m.createHorizontalRow(item, index, settings)
         end if
 
-        list.translation = [0, y]
+        component.screenState = "offScreen"
 
-        y += list.height + settings.space
+        m.components.push(component)
 
-        m.lists.push(list)
-        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
+        component.visible = item.isHidden <> true
+        if component.visible
+          component.translation = [0, y]
+
+          'TODO better handle the whole visibility
+
+          y += component.height + settings.space
+
+          m.rects.push({ translation: component.translation, size: [w, component.height] })
+          m.visibleComponents.push(component)
+          m.visibleItems.push(component.content)
+        else
+          m.hiddenComponents.push(component)
+        end if
 
         index++
       end for
     end if
   end function
 
-  function layoutLists()
-    for each list in m.lists
-      list.visible = not list.isHidden
-      if list.visible
-        m.visibleViews.push(list)
-        m.visibleContent.push(list.content)
-      else
-        m.hiddenViews.push(list)
-      end if
-    end for
-
-    for each item in m.visibleViews
-      item.viewState = "hidden"
-    end for
-
-    m.itemScroller.updateItems()
-  end function
-
   function createHorizontalRow(rowContent, index, settings)
-    list = m.container.createChild("HorizontalRow")
-    list.id = str(index).trim()
-    list.viewState = "hidden"
-    list.owner = m.owner
-    list.content = rowContent
-    list.isOnScreen = index < 5
+    component = m.container.createChild("HorizontalRow")
+    component.id = str(index).trim()
+    component.screenState = "offScreen"
+    component.owner = m.owner
+    component.content = rowContent
+    component.isOnScreen = index < 5
 
-    return list
+    return component
   end function
 
   function creatRectangle(rowContent, index, settings)
-    list = m.container.createChild("Rectangle")
-    list.id = str(index).trim()
-    list.color = "#aaffaa"
-    list.addFields({ "content": rowContent 
+    component = m.container.createChild("Rectangle")
+    component.id = str(index).trim()
+    component.color = "#aaffaa"
+    component.addFields({ "content": rowContent 
       "isFocusable": true
       "isHidden": false
       "isFocused": false
     })
-    list.width = 1920
-    list.height = 300
-    list.owner = m.owner
-    list.content = rowContent
+    component.width = 1920
+    component.height = 300
+    component.owner = m.owner
+    component.content = rowContent
 
-    return list
+    return component
   end function
 
 

@@ -7,6 +7,8 @@ function init()
   log_registerLogger("List")
   m.top.rowSettings = ListMixin.createRowSettings()
   m.top.focusSettings = ListMixin.createFocusSettings()
+  m.top.observeField("content", "onContentChange")
+  m.top.observeField("animateToRow", "onAnimateToRowChange")
 
   m.rowsGroup = m.top.findNode("rowsGroup") 
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
@@ -25,8 +27,9 @@ end function
 
 function resetState()
   m.viewManager.setContent(m.top.content)
-  m.itemScroller.updateItemStates(0, 0, 5, 10)
-  m.itemScroller.move(0)
+  m.itemScroller.onViewManagerUpdate()
+  m.itemScroller.moveToEnd(-1)
+  ' m.itemScroller.updateItemStates(0, 0, 5, 10)
 end function
 
 function onSetInitialTimerFire()
@@ -44,7 +47,7 @@ end function
 function onAnimateToRowChange()
   if m.content <> invalid
     ' animateToIndex(m.top.rowFocused, m.top.animateToRow, m.top.fastAnimationSpeed)
-    m.itemScroller.animateToIndex(m.top.animateToRow, m.top.fastAnimationSpeed)
+    m.itemScroller.moveToIndex(m.top.animateToRow)
   end if
 end function
 
@@ -141,7 +144,7 @@ end function
 '     for each rowId in m.laststates
 '       list = m.visibleLists[rowId.toInt()]
 '       if list <> invalid
-'         list.viewState = "hidden"
+'         list.screenState = "offScreen"
 '       else
 '         ? "ERROR could not find visible list for "; rowId
 '       end if
@@ -150,7 +153,7 @@ end function
 '     for each rowId in m.laststates
 '       list = m.visibleLists[rowId.toInt()]
 '       if list <> invalid
-'         list.viewState = m.laststates[rowId]
+'         list.screenState = m.laststates[rowId]
 '       else
 '         ? "ERROR could not find visible list for "; rowId
 '       end if
@@ -195,12 +198,11 @@ function onLongPressStart(key) as boolean
   if key = "up" or key = "down"
     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
     if key = "up"
-      targetIndex = 0 
+      m.itemScroller.moveToEnd(-1)
     else
-      targetIndex = m.visibleLists.count() - 1
+      m.itemScroller.moveToEnd(1)
     end if
 
-    m.itemScroller.animateToIndex(m.top.rowFocused, targetIndex)
     return true
   end if
 

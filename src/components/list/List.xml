@@ -6,8 +6,7 @@
     <field
         id='content'
         type='node'
-        value='invalid'
-        onChange='onContentChange' />
+        value='invalid' />
     <field
         id='focusSettings'
         type='node' />
@@ -35,7 +34,6 @@
     <field
         id='animateToRow'
         type='integer'
-        onChange='onAnimateToRowChange'
         value='0' />
     <field
         id='rowFocused'

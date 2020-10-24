@@ -1,5 +1,4 @@
 sub Main(args as dynamic)
-
   InitScreen()
 end sub
 

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8' ?>
+<?xml version='1.0' encoding='utf-8'?>
 
 <component
     name='ComplexCell'
@@ -10,25 +10,12 @@
         id='index'
         type='int' />
     <field
-        id='groupHasFocus'
-        type='boolean'
-        onChange='focusPercentChanged' />
-    <field
         id='itemContent'
-        type='node'
-        onChange='itemContentChanged' />
-    <field
-        id='currTarget'
-        type='float'
-        onChange='currTargetChanged' />
-    <field
-        id='currRect'
-        type='rect2d'
-        onChange='currRectChanged' />
+        type='node' />
     <field
         id='focusPercent'
-        type='float'
-        onChange='focusPercentChanged' />
+        type='float' />
+
   </interface>
 
 
@@ -36,9 +23,8 @@
     <Rectangle
         id='theRect'
         color='#8034eb'
-        width="300"
-        height="300"
-        >
+        width='300'
+        height='300'>
     </Rectangle>
     <Poster
         id='poster'

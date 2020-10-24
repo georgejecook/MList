@@ -59,8 +59,8 @@ class ListController
   '   m.logMethod(">>onSetInitialTimerFire")
   '   layoutLists()
   '   for each row in m.visibleLists
-  '     ' row.viewState = "partial"
-  '     row.viewState = "hidden"
+  '     ' row.screenState = "buffer"
+  '     row.screenState = "offScreen"
   '   end for
   '   updateRowStates(0, 0, 5, 10)
   ' end function
@@ -108,7 +108,7 @@ class ListController
   '   list.numCols = m.top.numCols
   '   list.unfocusCellScale = m.top.unfocusCellScale
   '   list.unfocusCount = m.top.unfocusCount
-  '   list.viewState = "hidden"
+  '   list.screenState = "offScreen"
   '   list.content = rowContent
   '   list.isOnScreen = m.listIndex < 5
   '   m.listIndex++
@@ -356,13 +356,13 @@ class ListController
   '   end if
 
   '   setListStateMap(states, 0, m.content.getChildCount(), m.top.rowHidingMode)
-  '   setListStateMap(states, newIndex - numberOfRowsToShowBefore, newIndex + numberOfRowsToShowAfter, "partial")
+  '   setListStateMap(states, newIndex - numberOfRowsToShowBefore, newIndex + numberOfRowsToShowAfter, "buffer")
 
   '   ' ? "updating states: " ; formatJson(states)
   '   for each rowId in states
   '     list = m.visibleLists[rowId.toInt()]
-  '     if list <> invalid and list.hasField("viewState")
-  '       list.viewState = states[rowId]
+  '     if list <> invalid and list.hasField("screenState")
+  '       list.screenState = states[rowId]
   '     else
   '       ' ? "ERROR could not find visible list for "; rowId
   '     end if
@@ -416,7 +416,7 @@ class ListController
   '     for each rowId in m.laststates
   '       list = m.visibleLists[rowId.toInt()]
   '       if list <> invalid
-  '         list.viewState = "hidden"
+  '         list.screenState = "offScreen"
   '       else
   '         ? "ERROR could not find visible list for "; rowId
   '       end if
@@ -425,7 +425,7 @@ class ListController
   '     for each rowId in m.laststates
   '       list = m.visibleLists[rowId.toInt()]
   '       if list <> invalid
-  '         list.viewState = m.laststates[rowId]
+  '         list.screenState = m.laststates[rowId]
   '       else
   '         ? "ERROR could not find visible list for "; rowId
   '       end if

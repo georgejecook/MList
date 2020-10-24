@@ -13,10 +13,12 @@
     <field
         id='index'
         type='integer' />
+
     <field
         id='animateToItem'
         type='integer'
         value='0' />
+
     <field
         id='isOnScreen'
         type='boolean'
@@ -27,7 +29,7 @@
         type='boolean'
         value='false' />
     <field
-        id='viewState'
+        id='screenState'
         type='string'
         alwaysNotify='true' />
 

@@ -8,10 +8,10 @@ function Init()
   m.logInfo("in appcontroller init")
   mv_initializeFocusManager(m.global)
 
-  m.cellProvider = createObject("roSGNode", "CellProvider") 
+  m.cellProvider = createObject("roSGNode", "ml_CellProvider") 
   m.global.addFields({ "cellProvider": m.cellProvider })
 
-  m.cellTracker = createObject("roSGNode", "CellTracker") 
+  m.cellTracker = createObject("roSGNode", "ml_CellTracker") 
   m.global.addFields({ "cellTracker": m.cellTracker })
   m.top.addFields({ "_global": m.global })
 
@@ -28,7 +28,7 @@ function Init()
   m.rootScreen = createObject("roSGNode", "ListScreen")
   m.rootScreen.isRoot = true
   m.navController@.push(m.rootScreen)
-  mv_setFocus(m.rootScreen)
+  mv_setFocus(m.navController)
 end function
 
 
@@ -37,6 +37,7 @@ function onInfoChange()
 end function
 
 function onGainedFocus(isSelfFocused)
+  m.logInfo("onGainedFocus")
   if isSelfFocused
     mv_setFocus(m.navController)
     m.logInfo("Focused on main content")
@@ -52,10 +53,16 @@ end function
 function prebakeCells()
   ? "adding prebaked cells"
 
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeImageCells, "ImageCell")
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "SimpleCell")
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "SimpleCell2")
-  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ComplexCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeImageCells, "ml_ImageCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "ml_SimpleCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "ml_SimpleCell2")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ml_ComplexCell")
 
   ? "finished adding prebaked cells"
+end function
+
+function onKeyPressOK() as boolean
+  ? "OK"
+  mv_setFocus(m.navController)
+  return true
 end function

@@ -14,7 +14,7 @@ function init()
   ' m.cellTracker = m.global.cellTracker
   ' m.cellsById = {}
   ' m.currentDirection = 0
-  ' m.previousViewState = ""
+  ' m.previousscreenState = ""
   ' m.content = invalid
 end function
 
@@ -34,7 +34,7 @@ function onContentChange(evt)
     '   ' end if
     '   ' toggleContentListener(true)
     '   ' layoutCells()
-    '   ' onViewStateChange()
+    '   ' onscreenStateChange()
     ' else
     ' end if
   end if
@@ -87,7 +87,7 @@ end function
 '   '   cell.translation = [currRect.x, currRect.y]
 '   ' end for
 '   m.top.currTargetSet = m.rects
-'   'updateListVisibility(m.top.viewState)
+'   'updateListVisibility(m.top.screenState)
 ' end function
 
 ' function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
@@ -109,8 +109,8 @@ end function
 '   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
 
 
-'   if m.top.viewState <> "show"
-'     m.top.viewState = "show"
+'   if m.top.screenState <> "onScreen"
+'     m.top.screenState = "onScreen"
 '   end if
 
 '   if m.moveAnimation.state = "pause"
@@ -157,13 +157,13 @@ end function
 '       index = 0
 '     end if
 '     m.top.itemFocused = index
-'     if m.top.viewState = "show"
-'       m.top.viewState = "partial"
+'     if m.top.screenState = "onScreen"
+'       m.top.screenState = "buffer"
 '     end if
-'   else
+'   els
 '     'updating horizontal list efficiency while scrolling..
 '     if index <> -1 and index <> m.top.rowFocused
-'       updateListVisibility("show")
+'       updateListVisibility("onScreen")
 '     end if
 '     m.top.itemFocused = index
 
@@ -175,11 +175,11 @@ end function
 ' '++ flyweight heuristics (i.e. cell reuse)
 ' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-' function onViewStateChange()
-'   ' m.logInfo("onViewStateChange", m.top.index, m.top.viewState)
-'   if m.top.viewState <> m.previousViewState 
-'     m.previousViewState = m.top.viewState
-'     updateListVisibility(m.top.viewState)
+' function onscreenStateChange()
+'   ' m.logInfo("onscreenStateChange", m.top.index, m.top.screenState)
+'   if m.top.screenState <> m.previousscreenState 
+'     m.previousscreenState = m.top.screenState
+'     updateListVisibility(m.top.screenState)
 '   end if
 ' end function
 
@@ -188,16 +188,16 @@ end function
 '     ' m.logMethod("updateListVisibility", m.top.index, state)
 '     states = {}
 
-'     if state = "hidden" or state = "partial"
-'       setListStateMap(states, 0, m.content.getChildCount(), "hidden")
+'     if state = "offScreen" or state = "buffer"
+'       setListStateMap(states, 0, m.content.getChildCount(), "offScreen")
 '     end if
 
-'     if state = "show"
-'       ' setListStateMap(states, 0, m.content.getChildCount(), "show")
-'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
-'     else if state = "partial"
+'     if state = "onScreen"
+'       ' setListStateMap(states, 0, m.content.getChildCount(), "onScreen")
+'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "onScreen")
+'     else if state = "buffer"
 '       'TODO - calcculate this!
-'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "show")
+'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "onScreen")
 '     end if
 
 '     toggleCellStates(states)
@@ -215,9 +215,9 @@ end function
 ' end function
 
 ' function toggleCellStates(states)
-'   'm.cellTracker.callFunc("setViewStates", states)
+'   'm.cellTracker.callFunc("setscreenStates", states)
 '   for each id in states
-'     applyViewStateForCell(id, states[id])
+'     applyscreenStateForCell(id, states[id])
 '   end for
 ' end function
 
@@ -233,13 +233,13 @@ end function
 '   end for
 ' end function
 
-' function applyViewStateForCell(id, viewState)
+' function applyscreenStateForCell(id, screenState)
 '   index = id.toInt()
 '   isOnScreen = m.top.isOnScreen
-'   ' ? "applyViewStateForCell "; id ; " vs " ; viewState ; " isonScreen" ; isOnScreen
+'   ' ? "applyscreenStateForCell "; id ; " vs " ; screenState ; " isonScreen" ; isOnScreen
 '   item = m.content.getChild(index)
 '   if item <> invalid
-'     if viewState = "show"
+'     if screenState = "onScreen"
 '       if m.cellsById[id] = invalid
 '         cell = m.cellProvider@.getCell(item.cellType)
 '         if cell <> invalid

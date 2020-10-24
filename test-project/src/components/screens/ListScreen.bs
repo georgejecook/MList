@@ -3,7 +3,7 @@ function init()
   print "in FocusTestScene init"
   listHolder = m.top.findNode("listHolder")
 
-  m.list = listHolder.createChild("List")
+  m.list = listHolder.createChild("ml_List")
   m.list.translation = [0, 0]
   m.cellProvider = m.global.cellProvider
   m.top._cellProvider = m.global.cellProvider
@@ -17,7 +17,6 @@ function init()
   m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
   m.list.observeField("itemSelected", "itemSelectedChanged")
   m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-
 end function
 
 function onResetChange()
@@ -96,23 +95,23 @@ function currFocusItemIndexChanged()
 end function
 
 function onAddTypeOnes()
-  addItems("SimpleCell", m.top._addTypeOnes)
+  addItems("ml_SimpleCell", m.top._addTypeOnes)
 end function
 
 function onAddComplex()
-  addItems("ComplexCell", m.top._addTypeComplex)
+  addItems("ml_ComplexCell", m.top._addTypeComplex)
 end function
 
 function onAddTypeTwos()
-  addItems("SimpleCell2", m.top._addTypeTwos)
+  addItems("ml_SimpleCell2", m.top._addTypeTwos)
 end function
 
 function onAddTypeOnePrebakes()
-  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeOnePrebakes, "SimpleCell")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeOnePrebakes, "ml_SimpleCell")
 end function
 
 function onAddTypeTwoPrebakes()
-  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeTwoPrebakes, "SimpleCell2")
+  m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeTwoPrebakes, "ml_SimpleCell2")
 end function
 
 function addItems(cellType, number)
@@ -132,9 +131,9 @@ function makeItems(cellType, number)
     child.title = "Item " + child.id.tostr()
 
     if m.contentId mod 5 = 0
-      cellType = "SimpleCell"
+      cellType = "ml_SimpleCell"
     else if m.contentId mod 7 = 0
-      cellType = "ComplexCell"
+      cellType = "ml_ComplexCell"
     end if
 
     child.addFields({
@@ -161,8 +160,8 @@ function toggleCellState(items, state)
     if item <> invalid
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", item.id)
       if dynamicCell <> invalid
-        ' ? "setting viewstate on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
-        dynamicCell.viewState = state
+        ' ? "setting screenState on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
+        dynamicCell.screenState = state
       end if
     end if
   end for
@@ -173,7 +172,7 @@ function onHideRow()
   ? "onHide" 
 
   row = m.list.content.getChild(focusedRow)
-  toggleCellState(getRowItems(row, m.top._hideRowItems), "hidden")
+  toggleCellState(getRowItems(row, m.top._hideRowItems), "offScreen")
 end function
 
 
@@ -181,7 +180,7 @@ function onShowRow()
   ? "onShow"
 
   row = m.list.content.getChild(focusedRow)
-  toggleCellState(getRowItems(row, m.top._showRowItems), "show")
+  toggleCellState(getRowItems(row, m.top._showRowItems), "onScreen")
 end function
 
 function getRowItems(row, number)
@@ -197,7 +196,7 @@ function onHideItems()
   for i = 0 to m.top._hideItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
-      dynamicCell.viewState = "hidden"
+      dynamicCell.screenState = "offScreen"
     end if
   end for
 end function
@@ -206,7 +205,7 @@ function onShowItems()
   for i = 0 to m.top._showItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
-      dynamicCell.viewState = "show"
+      dynamicCell.screenState = "onScreen"
     end if
   end for
 end function
