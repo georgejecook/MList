@@ -16,5 +16,23 @@
         "clear": true,
       },
     },
+    {
+      "label": "build-tests",
+      "type": "shell",
+      "command": "npm run build-tests",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+    },
   ]
 }

@@ -7,13 +7,13 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "module",
-      "preLaunchTask": "build",
+      "name": "unit-tests",
+      "preLaunchTask": "build-tests",
       "stopOnEntry": false,
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",
-      "rootDir": "${workspaceFolder}/build",
+      "rootDir": "${workspaceFolder}/dist",
       "files": [
         "manifest",
         "source/**/*.*",

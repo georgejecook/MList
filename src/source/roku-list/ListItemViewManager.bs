@@ -4,7 +4,7 @@ import "pkg:/source/roku-list/ListMixin.bs"
 class ListItemViewManager extends ItemViewManager
 
   function new(owner, container)
-    super(owner, container)
+    super("ListItemViewManager", owner, container)
   end function
 
   override function getRenderer(index)

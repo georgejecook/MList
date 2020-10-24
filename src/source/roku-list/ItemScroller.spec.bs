@@ -1,0 +1,95 @@
+namespace Tests
+
+  '@TestSuite ItemSCroller tests
+  class ItemScrollerTests extends Rooibos.BaseTestSuite
+
+    override function setUp()
+      log_initializeLogManager()
+    end function
+
+    override function beforeEach()
+      m.owner = m.createSimpleMockNode("owner")
+      m.owner.translation = [0, 0]
+      m.owner.width = 1920
+      m.owner.height = 1080
+
+      m.container = m.createSimpleMockNode("container")
+      m.container.translation = [0, 0]
+      m.container.width = 1920
+      m.container.height = 1080
+
+      m.animation = m.createSimpleMockNode("animation")
+      m.interpolator = m.createSimpleMockNode("interpolator")
+
+      m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
+      m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.animation, m.interpolator)
+      m.configureScroller(1, 20)
+    end function
+
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    '@It tests getComponentsInViewPort
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    '@Test Simple
+    '@Params[0,     [0,1,2,3], [4,5,6,7,8,9,10] ]
+    '@Params[200,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[250,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[300,   [0,1,2,3,4], [5,6,7,8,9,10] ]
+    '@Params[301,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[350,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[400,   [1,2,3,4], [0,5,6,7,8,9,10] ]
+    '@Params[550,   [1,2,3,4,5], [0,6,7,8,9,10] ]
+    '@Params[600,   [1,2,3,4,5], [0,6,7,8,9,10] ]
+    '@Params[601,   [2,3,4,5], [0,1, 6,7,8,9,10] ]
+    '@Params[700,   [2,3,4,5], [0,1, 6,7,8,9,10] ]
+    '@Params[800,   [2,3,4,5, 6], [0,1, 7,8,9,10] ]
+    function getComponentsInViewPort_Scroll_left_to_right(offset, trueIds, falseIds)
+      m.scroller.updateRenderedComponents()
+      compStates = m.scroller.getComoponentsInViewPort(offset)
+
+      expected = {}
+      for each id in trueIds
+        expected[str(id).trim()] = true
+      end for
+      for each id in falseIds
+        expected[str(id).trim()] = false
+      end for
+      m.assertEqual(compStates, expected)
+    end function
+
+    private function configureScroller(axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
+      m.scroller.axes = axes
+      m.owner.translation = [0, 0]
+      m.owner.width = screenSize[0]
+      m.owner.height = screenSize[1]
+
+      m.container.translation = [0, 0]
+      m.container.width = screenSize[0]
+      m.container.height = screenSize[0]
+
+      content = []
+
+      for i = 0 to numItems
+        content.push({
+          id: str(i).trim()
+        })
+      end for
+
+      m.viewManager.itemSize = itemSize
+      m.viewManager.setContent(content)
+
+      m.scroller.onViewManagerUpdate()
+    end function
+
+    private function createSimpleMockNode(id)
+      return {
+        id: id
+        addFields: function(fields)
+          m.append(fields)
+        end function
+        observeField: function(field, func)
+        end function
+      }
+    end function
+  end class
+end namespace

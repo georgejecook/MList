@@ -251,7 +251,7 @@ class ItemScroller extends BaseClass
     end if
 
     '2. maintain a collection of controls that are in bounds right now:
-    m.onScreenCompMap = m.getComopnentsInViewPort(- m.container.translation[m.axes])
+    m.onScreenCompMap = m.getComoponentsInViewPort(- m.container.translation[m.axes])
 
     for each id in m.onScreenCompMap
       comp = m.comopnents[id.toInt()]
@@ -265,12 +265,12 @@ class ItemScroller extends BaseClass
         end if
       end if 
     end for
-    
+
     if isMoving
       nextRect = m.rects[m.nextIndex]
       screenPos = m.getScreenPositionForItem(nextRect, m.direction)
       nextPos = m.getOffsetForScreenPosition(nextRect, screenPos)
-      nextOnScreenCompMap = m.getComopnentsInViewPort(nextPos)
+      nextOnScreenCompMap = m.getComoponentsInViewPort(nextPos)
       for each id in nextOnScreenCompMap
         comp = m.comopnents[id.toInt()]
         if comp <> invalid
@@ -287,7 +287,7 @@ class ItemScroller extends BaseClass
 
   end function
 
-  function getComopnentsInViewPort(startOffset)
+  function getComoponentsInViewPort(startOffset)
     compStates = {}
 
     sStart = m.screenRect.translation[m.axes] + startOffset
@@ -302,6 +302,7 @@ class ItemScroller extends BaseClass
       else 
         compStates[comp.id] = false
       end if
+      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd) 
     end for
 
     return compStates
@@ -333,19 +334,22 @@ class ItemScroller extends BaseClass
     ' m.logMethod("updateComponentScreenStates newIndex", newIndex, "old", oldIndex)
     screenStateMap = {}
 
-    if m.content = invalid
+    if m.numberOfItems = 0
       return 
     end if
 
     m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
-    m.updateScreenStateMap(screenStateMap, m.index - numberOfItemsToShowBefore, m.index + numberOfItemsToShowAfter, "buffer")
-
+    m.updateScreenStateMap(screenStateMap, m.index - numberOfItemsToShowBefore, m.index + numberOfItemsToShowAfter, "onScreen")
+    m.renderedComponents = []
     ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
     for each id in screenStateMap
       component = m.components[id.toInt()]
 
       if component <> invalid
         component.screenState = screenStateMap[id]
+        if component.screenState = "onScreen"
+          m.renderedComponents.push(component)
+        end if
       else
         ' ? "ERROR could not find visible component for "; id
       end if

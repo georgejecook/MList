@@ -3,7 +3,7 @@ import "pkg:/source/roku-list/ItemViewManager.bs"
 class RowItemViewManager extends ItemViewManager
 
 function new(owner, container)
-    super(owner, container)
+  super("RowItemViewManager", owner, container)
   end function
 
   override function getRenderer(index)

@@ -9,21 +9,26 @@ class ItemViewManager extends BaseClass
   public content = invalid
   public components = []
   public rects = []
-  
+
   'tracking
   public visibleItems = []
   public visibleComponents = []
   public hiddenComponents = []
-  
-  function new(owner, container)
-    super("ItemViewManager")
+
+  function new(name, owner, container)
+    super(name)
     m.container = container
     m.owner = owner
   end function
 
   function setContent(content)
     m.content = content
-    m.createRenderers()
+    m.createRenderers(content)
+    index = 0
+    for each component in m.components
+      component.index = index
+      index++
+    end for
   end function
 
   function getRenderer(index)
