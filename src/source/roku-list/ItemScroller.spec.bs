@@ -159,13 +159,13 @@ namespace Tests
 
       for i = first to last step direction
         comp = comps[i]
-        ? comp.id ; " " ; comp.viewportEvent.state ; " " ; comp.isOnScreen
+        ? comp.id ; " " ; comp.listEvent.name ; " " ; comp.isOnScreen
       end for
     end function
 
     function resetViewPortStates()
       for each comp in m.scroller.components
-        comp.viewportEvent = {}
+        comp.listEvent = {}
       end for
     end function
 
@@ -182,19 +182,19 @@ namespace Tests
     function checkViewportEvent(comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
 
       for each id in enterIds
-        m.assertEqual(comps[id].viewportEvent.state, "didEnter")
+        m.assertEqual(comps[id].listEvent.name, "didEnter")
       end for
 
       for each id in exitIds
-        m.assertEqual(comps[id].viewportEvent.state, "didExit")
+        m.assertEqual(comps[id].listEvent.name, "didExit")
       end for
 
       for each id in willEnterIds
-        m.assertEqual(comps[id].viewportEvent.state, "willEnter")
+        m.assertEqual(comps[id].listEvent.name, "willEnter")
       end for
 
       for each id in willExitIds
-        m.assertEqual(comps[id].viewportEvent.state, "willExit")
+        m.assertEqual(comps[id].listEvent.name, "willExit")
       end for
 
     end function

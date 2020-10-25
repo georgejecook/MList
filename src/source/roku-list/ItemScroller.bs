@@ -311,24 +311,24 @@ class ItemScroller extends BaseClass
       if comp <> invalid
         if m.onScreenCompMap[id] = true and comp.isOnScreen = false
           'ensure clients always get willEnter before didEnter
-          if comp.viewportEvent = invalid or comp.viewportEvent.state <> "willEnter" 
-            event = { state: "willEnter", direction: m.direction, index: comp.index }
-            comp.viewportEvent = event
+          if comp.listEvent = invalid or comp.listEvent.name <> "willEnter" 
+            event = { name: "willEnter", direction: m.direction, index: comp.index }
+            comp.listEvent = event
             events.push(event)
           end if
-          event = { state: "didEnter", direction: m.direction, index: comp.index }
-          comp.viewportEvent = event
+          event = { name: "didEnter", direction: m.direction, index: comp.index }
+          comp.listEvent = event
           events.push(event)
           comp.isOnScreen = true
         else if m.onScreenCompMap[id] = false and comp.isOnScreen = true
           'ensure clients always get willExit before didExit
-          if comp.viewportEvent = invalid or comp.viewportEvent.state <> "willExit" 
-            event = { state: "willExit", direction: m.direction, index: comp.index }
-            comp.viewportEvent = event
+          if comp.listEvent = invalid or comp.listEvent.name <> "willExit" 
+            event = { name: "willExit", direction: m.direction, index: comp.index }
+            comp.listEvent = event
             events.push(event)
           end if
-          event = { state: "didExit", direction: m.direction, index: comp.index }
-          comp.viewportEvent = event
+          event = { name: "didExit", direction: m.direction, index: comp.index }
+          comp.listEvent = event
           events.push(event)
           comp.isOnScreen = false
         end if
@@ -347,12 +347,12 @@ class ItemScroller extends BaseClass
         if comp <> invalid
           ' m.logInfo(id, comp.isOnScreen, nextOnScreenCompMap[id])
           if nextOnScreenCompMap[id] = true and comp.isOnScreen = false
-            event = { state: "willEnter", direction: m.direction, index: comp.index }
-            comp.viewportEvent = event
+            event = { name: "willEnter", direction: m.direction, index: comp.index }
+            comp.listEvent = event
             events.push(event)
           else if nextOnScreenCompMap[id] = false and comp.isOnScreen = true
-            event = { state: "willExit", direction: m.direction, index: comp.index }
-            comp.viewportEvent = event
+            event = { name: "willExit", direction: m.direction, index: comp.index }
+            comp.listEvent = event
             events.push(event)
           end if
         end if 

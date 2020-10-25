@@ -1,0 +1,15 @@
+namespace ListDelegateMixin
+
+  ' /**
+  '  * @member setDelegate
+  '  * @memberof module:ListDelegateMixin
+  '  * @instance
+  '  * @function
+  '  * @description description
+  '  * @param {MList} list instance to add delegate methods for
+  '  * @param {class} instance, target for the delegate methods - if invalid, then methods will be called on top function scope
+  '  * @returns {returnType} returnDescription
+  '  */
+  function setListDelegate(list, instance)
+  end function
+end namespace

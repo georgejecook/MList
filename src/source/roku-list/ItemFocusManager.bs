@@ -59,39 +59,39 @@ class ItemFocusManager extends BaseClass
       if m.didStart
         return
       end if
-      state = "onWillGainFocus"
-      nextState = "onWillLoseFocus"
+      name = "onWillGainFocus"
+      nextname = "onWillLoseFocus"
     else if fraction = 1
       if m.didFinish
         return
       end if
-      state = "onDidGainFocus"
-      nextState = "onDidLoseFocus"
+      name = "onDidGainFocus"
+      nextname = "onDidLoseFocus"
     else
-      state = "onGainingFocus"
-      nextState = "onLosingFocus"
+      name = "onGainingFocus"
+      nextname = "onLosingFocus"
     end if
 
     event = {
       direction: m.direction
       fraction: fraction
-      state: state
+      name: name
       index: m.index
     }
     nextEvent = {
       direction: m.direction
       fraction: fraction
-      state: nextState
+      name: nextName
       index: m.nextIndex
     }
 
     'let components know, so they can react
-    m.component.focusEvent = event
-    m.nextComponent.focusEvent = nextEvent
+    m.component.listEvent = event
+    m.nextComponent.listEvent = nextEvent
 
     for each delegate in m.delegates
-      delegate.focusEvent = event
-      delegate.focusEvent = nextEvent
+      delegate.listEvent = event
+      delegate.listEvent = nextEvent
     end for
   end function
 
