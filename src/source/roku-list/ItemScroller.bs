@@ -8,8 +8,10 @@ class ItemScroller extends BaseClass
   public renderedComponents = []
   public onScreenCompMap = []
   public index = 0
+  public indexPosition = 0
   public focusedIndex = 0
   public nextIndex = 0
+  public nextPosition = 0
   public targetIndex = 0
   public container = invalid
   public direction = 0
@@ -104,6 +106,7 @@ class ItemScroller extends BaseClass
     m.logInfo("moveToIndex", index, screenPos, animated)
 
     targetTranslation = m.getTargetTranslation(index, screenPos)
+
     if targetTranslation = invalid
       return false
     end if
@@ -115,6 +118,8 @@ class ItemScroller extends BaseClass
     else
       m.direction = -1
     end if
+
+    m.setNextIndex(m.index + m.direction)
 
     if fast
       m.animSpeed = m.regularAnimSpeed / m.fastAnimSpeed
@@ -161,7 +166,6 @@ class ItemScroller extends BaseClass
     screenPos = m.getScreenPositionForItem(itemRect, m.direction)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
     ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
-    m.nextIndex = m.index + m.direction
 
     if m.axes = 0
       return [- targetPos, m.container.translation[1]]
@@ -179,6 +183,16 @@ class ItemScroller extends BaseClass
       nextIndex = m.nextIndex
     end if
     m.moveToIndex(nextIndex, invalid, true, m.fastAnimSpeed)
+  end function
+
+  function setNextIndex(index, screenPos = invalid)
+    m.nextIndex = index
+    nextTranslation = m.getTargetTranslation(index, screenPos)
+    if nextTranslation <> invalid
+      m.nextPosition = nextTranslation[m.axes]
+    else
+      m.nextPosition = m.indexPosition
+    end if
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -246,14 +260,24 @@ class ItemScroller extends BaseClass
 
   end function
 
-  function setFocusIndex(index, isMoving)
+  ' /**
+  '  * @member setFocusIndex
+  '  * @memberof module:ItemScroller
+  '  * @instance
+  '  * @function
+  '  * @description Responsible for all state updates, and hooks pertaning to focus position.
+  '  *       NOTE : does NOT update position - you should be in position when calling this. for speed does not recalculate index: you should know the index when you call me!
+  '  * @param {integer} index - the index you KNOW you are on when your move is finished (finished could mean from one index to nextindex, while animating; doesn' have to be targetIndex)
+  '  * @param {boolean} isMoving - if true, then deltas are calculated for next position, and observers fired if their screen status will change
+  '  */
+  function setFocusIndex(index, isMoving, screenPos = invalid)
     'This MUST be called infrequently
     if index = -1
       m.index = 0
-      m.nextIndex = 1
+      m.setNextIndex(0, screenPos)
     else
       m.index = index
-      m.nextIndex = m.index + m.direction
+      m.setNextIndex(m.index + m.direction)
     end if
 
     'things that need to happen in here:
@@ -398,6 +422,28 @@ class ItemScroller extends BaseClass
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ focus management
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ focus progres
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  ' /**
+  '  * @member updateItemFocuses
+  '  * @memberof module:nameOfClass
+  '  * @instance
+  '  * @function
+  '  * @description description
+  '  * @param {paramType} paramDescription
+  '  * @returns {returnType} returnDescription
+  '  */
+
+  function updateItemFocuses()
+    if m.direction = 1
+    else
+    end if
+    sPos = m.container.translation[m.axes]
+  end function
 
   function updateItemFocus(index)
     m.logMethod("updateItemFocus", index)

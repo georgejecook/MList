@@ -8,18 +8,19 @@ namespace Tests
     end function
 
     override function beforeEach()
-      m.owner = m.createSimpleMockNode("owner")
+
+      m.owner = Tests.Utils.createSimpleMockNode("owner")
       m.owner.translation = [0, 0]
       m.owner.width = 1920
       m.owner.height = 1080
 
-      m.container = m.createSimpleMockNode("container")
+      m.container = Tests.Utils.createSimpleMockNode("container")
       m.container.translation = [0, 0]
       m.container.width = 1920
       m.container.height = 1080
 
-      m.animation = m.createSimpleMockNode("animation")
-      m.interpolator = m.createSimpleMockNode("interpolator")
+      m.animation = Tests.Utils.createSimpleMockNode("animation")
+      m.interpolator = Tests.Utils.createSimpleMockNode("interpolator")
 
       m.viewManager = new TestItemViewManager(m.owner, m.container, 1)
       m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.animation, m.interpolator)
@@ -30,7 +31,6 @@ namespace Tests
     '@It tests getComponentsInViewPort
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    '@Only
     '@Test Simple
     '@Params[0,     [0,1,2,3], [4,5,6,7,8,9,10] ]
     '@Params[200,   [0,1,2,3,4], [5,6,7,8,9,10] ]
@@ -201,37 +201,10 @@ namespace Tests
 
     private function configureScroller(axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
       m.scroller.axes = axes
-      m.owner.translation = [0, 0]
-      m.owner.width = screenSize[0]
-      m.owner.height = screenSize[1]
 
-      m.container.translation = [0, 0]
-      m.container.width = screenSize[0]
-      m.container.height = screenSize[0]
-
-      content = []
-
-      for i = 0 to numItems
-        content.push({
-          id: str(i).trim()
-        })
-      end for
-
-      m.viewManager.itemSize = itemSize
-      m.viewManager.setContent(content)
+      Tests.Utils.configureViewManager(m.viewManager, axes, numItems, itemSize, screenSize)
 
       m.scroller.onViewManagerUpdate()
-    end function
-
-    private function createSimpleMockNode(id)
-      return {
-        id: id
-        addFields: function(fields)
-          m.append(fields)
-        end function
-        observeField: function(field, func)
-        end function
-      }
     end function
   end class
 end namespace

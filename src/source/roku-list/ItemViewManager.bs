@@ -4,11 +4,11 @@ class ItemViewManager extends BaseClass
   'owning views
   public container = invalid
   public owner = invalid
-
   'content
   public content = invalid
   public components = []
   public rects = []
+
 
   'tracking
   public visibleItems = []
@@ -23,6 +23,7 @@ class ItemViewManager extends BaseClass
 
   function setContent(content)
     m.content = content
+    m.container.removeChildren(m.container.getChildren(-1, 0))
     m.createRenderers(content)
     index = 0
     for each component in m.components
@@ -36,5 +37,13 @@ class ItemViewManager extends BaseClass
   end function
 
   function createRenderers(items)
+  end function
+
+  function convertChildTranslationToOwner(containerTranslation)
+    return [m.container.translation[0] + containerTranslation[0], m.container.translation[1] + containerTranslation[1]]
+  end function
+
+  function convertOwnerTranslationToChild(ownerTranslation)
+    return [m.container.translation[0] - ownerTranslation[0], m.container.translation[1] - ownerTranslation[1]]
   end function
 end class

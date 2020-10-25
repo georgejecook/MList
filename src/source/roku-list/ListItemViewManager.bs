@@ -12,7 +12,6 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   override function createRenderers()
-    m.container.removeChildren(m.container.getChildren(-1, 0))
     m.visibleComponents = []
     m.hiddenComponents = []
     m.components = []

@@ -1,0 +1,43 @@
+namespace Tests.Utils
+  function configureViewManager(viewManager, axes, numItems = 20, itemSize = [300, 300], screenSize = [1920, 1080]) 
+    owner = viewManager.owner
+    container = viewManager.container
+
+    owner.translation = [0, 0]
+    owner.width = screenSize[0]
+    owner.height = screenSize[1]
+
+    container.translation = [0, 0]
+    container.width = screenSize[0]
+    container.height = screenSize[0]
+
+    content = []
+
+    for i = 0 to numItems
+      content.push({
+        id: str(i).trim()
+      })
+    end for
+
+    viewManager.itemSize = itemSize
+    viewManager.setContent(content)
+  end function
+
+  function createSimpleMockNode(id)
+    return {
+      id: id
+      addFields: function(fields)
+        m.append(fields)
+      end function
+      observeField: function(field, func)
+      end function
+      getChildren: function(first, num)
+      end function
+      removeChildren: function(children)
+      end function
+      createChild: function(compName)
+      end function
+    }
+  end function
+
+end namespace
