@@ -35,6 +35,7 @@ class ItemScroller extends BaseClass
     m.moveAnimation = moveAnimation
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
+
   end function
 
   public function onViewManagerUpdate()
@@ -43,6 +44,12 @@ class ItemScroller extends BaseClass
     m.rects = m.viewManager.rects ' calculated views for the items
     m.numberOfItems = m.items.count()
     owner = m.viewManager.owner
+    m.delegates = [owner]
+
+    if owner.delegate <> invalid
+      m.delegates.push(owner.delegate)
+    end if
+
     'TODO - use bounds here
     m.screenRect = { translation: owner.translation, size: [owner.width, owner.height] }
   end function
@@ -187,6 +194,8 @@ class ItemScroller extends BaseClass
 
   function setNextIndex(index, screenPos = invalid)
     m.nextIndex = index
+    nextRect = m.rects[m.nextIndex]
+    screenPos = m.getScreenPositionForItem(nextRect, m.direction, screenPos)
     nextTranslation = m.getTargetTranslation(index, screenPos)
     if nextTranslation <> invalid
       m.nextPosition = nextTranslation[m.axes]
@@ -207,8 +216,8 @@ class ItemScroller extends BaseClass
         return itemRect.screenPos
       else if m.direction = -1
         return m.minPos
-        'TODO this logic is broken
       else if m.direction = 1
+        'TODO - calculate position that can fit on screen
         return m.minPos ' fixed focus
         ' return m.maxPos - itemRect.width
       end if
@@ -287,27 +296,40 @@ class ItemScroller extends BaseClass
       m.updateRenderedComponents()
     end if
 
-    '2. maintain a collection of controls that are in bounds right now:
+    m.notifyViewportEvents(isMoving)
+  end function
+
+  function notifyViewportEvents(isMoving)
+    'maintain a collection of controls that are in bounds right now:
     m.onScreenCompMap = m.getComoponentsInViewPort(- m.container.translation[m.axes])
-    'notify what IS in view
+
+    'we assign events to each component AND send them to the owner, so it can choose what to do
+    events = []
+
     for each id in m.onScreenCompMap
       comp = m.components[id.toInt()]
       if comp <> invalid
         if m.onScreenCompMap[id] = true and comp.isOnScreen = false
           'ensure clients always get willEnter before didEnter
-          ' if comp.viewPortState = invalid or comp.viewPortState.state <> "willEnter" 
-          '   comp.viewPortState = { state: "willEnter", direction: m.direction }
-          ' end if
-
-          comp.viewPortState = { state: "didEnter", direction: m.direction }
+          if comp.viewportEvent = invalid or comp.viewportEvent.state <> "willEnter" 
+            event = { state: "willEnter", direction: m.direction, index: comp.index }
+            comp.viewportEvent = event
+            events.push(event)
+          end if
+          event = { state: "didEnter", direction: m.direction, index: comp.index }
+          comp.viewportEvent = event
+          events.push(event)
           comp.isOnScreen = true
         else if m.onScreenCompMap[id] = false and comp.isOnScreen = true
           'ensure clients always get willExit before didExit
-          ' if comp.viewPortState = invalid or comp.viewPortState.state <> "willExit" 
-          '   comp.viewPortState = { state: "willExit", direction: m.direction }
-          ' end if
-
-          comp.viewPortState = { state: "didExit", direction: m.direction }
+          if comp.viewportEvent = invalid or comp.viewportEvent.state <> "willExit" 
+            event = { state: "willExit", direction: m.direction, index: comp.index }
+            comp.viewportEvent = event
+            events.push(event)
+          end if
+          event = { state: "didExit", direction: m.direction, index: comp.index }
+          comp.viewportEvent = event
+          events.push(event)
           comp.isOnScreen = false
         end if
       end if 
@@ -325,14 +347,21 @@ class ItemScroller extends BaseClass
         if comp <> invalid
           ' m.logInfo(id, comp.isOnScreen, nextOnScreenCompMap[id])
           if nextOnScreenCompMap[id] = true and comp.isOnScreen = false
-            comp.viewPortState = { state: "willEnter", direction: m.direction }
+            event = { state: "willEnter", direction: m.direction, index: comp.index }
+            comp.viewportEvent = event
+            events.push(event)
           else if nextOnScreenCompMap[id] = false and comp.isOnScreen = true
-            comp.viewPortState = { state: "willExit", direction: m.direction }
+            event = { state: "willExit", direction: m.direction, index: comp.index }
+            comp.viewportEvent = event
+            events.push(event)
           end if
         end if 
       end for
     end if
 
+    for each delegate in m.delegates
+      delegate.viewportEvents = events
+    end for
   end function
 
   function getComoponentsInViewPort(startOffset)

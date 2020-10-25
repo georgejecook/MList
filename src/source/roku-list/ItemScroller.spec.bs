@@ -77,34 +77,34 @@ namespace Tests
       comps = m.scroller.components
       m.resetViewPortStates()
       m.printStates(comps)
-      m.checkViewPortStates(comps, [], [], [], [])
+      m.checkViewportEvent(comps, [], [], [], [])
 
       m.scroller.moveToIndex(0, invalid, false)
       m.scroller.direction = 1
       m.container.translation = m.scroller.getTargetTranslation(1)
       m.scroller.setFocusIndex(1, true)
       m.printStates(comps)
-      m.checkViewPortStates(comps, [5], [1, 2, 3, 4], [0], [])
+      m.checkViewportEvent(comps, [5], [1, 2, 3, 4], [0], [])
 
       m.container.translation = m.scroller.getTargetTranslation(2)
       m.scroller.setFocusIndex(2, true)
       m.printStates(comps)
-      m.checkViewPortStates(comps, [6], [2, 3, 4, 5], [1], [0])
+      m.checkViewportEvent(comps, [6], [2, 3, 4, 5], [1], [0])
 
       m.container.translation = m.scroller.getTargetTranslation(3)
       m.scroller.setFocusIndex(3, true)
       m.printStates(comps)
-      m.checkViewPortStates(comps, [7], [3, 4, 5, 6], [2], [0, 1])
+      m.checkViewportEvent(comps, [7], [3, 4, 5, 6], [2], [0, 1])
 
       m.container.translation = m.scroller.getTargetTranslation(4)
       m.scroller.setFocusIndex(4, true)
       m.printStates(comps)
-      m.checkViewPortStates(comps, [8], [4, 5, 6, 7], [3], [0, 1, 2])
+      m.checkViewportEvent(comps, [8], [4, 5, 6, 7], [3], [0, 1, 2])
 
       m.container.translation = m.scroller.getTargetTranslation(5)
       m.scroller.setFocusIndex(5, true)
       m.printStates(comps)
-      m.checkViewPortStates(comps, [9], [5, 6, 7, 8], [4], [0, 1, 2, 3])
+      m.checkViewportEvent(comps, [9], [5, 6, 7, 8], [4], [0, 1, 2, 3])
 
     end function
 
@@ -113,34 +113,34 @@ namespace Tests
       comps = m.scroller.components
       m.resetViewPortStates()
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [], [], [], [])
+      m.checkViewportEvent(comps, [], [], [], [])
 
       m.scroller.moveToIndex(10, invalid, false)
       m.scroller.direction = -1
       m.container.translation = m.scroller.getTargetTranslation(9)
       m.scroller.setFocusIndex(9, true)
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [7], [11, 10, 9, 8], [12], [13])
+      m.checkViewportEvent(comps, [7], [11, 10, 9, 8], [12], [13])
 
       m.container.translation = m.scroller.getTargetTranslation(8)
       m.scroller.setFocusIndex(8, true)
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [6], [10, 9, 8, 7], [11], [12, 13])
+      m.checkViewportEvent(comps, [6], [10, 9, 8, 7], [11], [12, 13])
 
       m.container.translation = m.scroller.getTargetTranslation(7)
       m.scroller.setFocusIndex(7, true)
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [5], [9, 8, 7, 6], [10], [11, 12, 13])
+      m.checkViewportEvent(comps, [5], [9, 8, 7, 6], [10], [11, 12, 13])
 
       m.container.translation = m.scroller.getTargetTranslation(6)
       m.scroller.setFocusIndex(6, true)
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [4], [8, 7, 6, 5], [9], [10, 11, 12, 13])
+      m.checkViewportEvent(comps, [4], [8, 7, 6, 5], [9], [10, 11, 12, 13])
 
       m.container.translation = m.scroller.getTargetTranslation(5)
       m.scroller.setFocusIndex(5, true)
       m.printStates(comps, -1)
-      m.checkViewPortStates(comps, [3], [7, 6, 5, 4], [8], [9, 10, 12, 12, 13])
+      m.checkViewportEvent(comps, [3], [7, 6, 5, 4], [8], [9, 10, 12, 12, 13])
 
     end function
 
@@ -159,13 +159,13 @@ namespace Tests
 
       for i = first to last step direction
         comp = comps[i]
-        ? comp.id ; " " ; comp.viewPortState.state ; " " ; comp.isOnScreen
+        ? comp.id ; " " ; comp.viewportEvent.state ; " " ; comp.isOnScreen
       end for
     end function
 
     function resetViewPortStates()
       for each comp in m.scroller.components
-        comp.viewPortState = {}
+        comp.viewportEvent = {}
       end for
     end function
 
@@ -179,22 +179,22 @@ namespace Tests
       end for
     end function
 
-    function checkViewPortStates(comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
+    function checkViewportEvent(comps, willEnterIds = [], enterIds = [], willExitIds = [], exitIds = [])
 
       for each id in enterIds
-        m.assertEqual(comps[id].viewPortState.state, "didEnter")
+        m.assertEqual(comps[id].viewportEvent.state, "didEnter")
       end for
 
       for each id in exitIds
-        m.assertEqual(comps[id].viewPortState.state, "didExit")
+        m.assertEqual(comps[id].viewportEvent.state, "didExit")
       end for
 
       for each id in willEnterIds
-        m.assertEqual(comps[id].viewPortState.state, "willEnter")
+        m.assertEqual(comps[id].viewportEvent.state, "willEnter")
       end for
 
       for each id in willExitIds
-        m.assertEqual(comps[id].viewPortState.state, "willExit")
+        m.assertEqual(comps[id].viewportEvent.state, "willExit")
       end for
 
     end function
