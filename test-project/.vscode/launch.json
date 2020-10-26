@@ -7,9 +7,9 @@
     {
       "type": "brightscript",
       "request": "launch",
-      "name": "Tests",
+      "name": "MODULE + UI Rig",
       "stopOnEntry": false,
-      "preLaunchTask": "build-tests",
+      "preLaunchTask": "build-module-and-rig",
       "envFile": "${workspaceFolder}/.vscode/.env",
       "host": "${env:ROKU_DEV_TARGET}",
       "password": "${env:ROKU_DEVPASSWORD}",

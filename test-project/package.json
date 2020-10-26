@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "brighterscript": "file:/home/george/hope/open-source/vsc/brighterscript",
-    "ropm": "^0.5.0",
+    "ropm": "file:../../../vsc/ropm",
     "vscode-languageserver": "^6.1.1"
   },
   "repository": {
@@ -43,6 +43,7 @@
     "rootDir": "src"
   },
   "scripts": {
+    "build-all": "cd .. && npm run build && cd test-project && ropm copy && npx bsc",
     "build": "npx bsc"
   }
 }

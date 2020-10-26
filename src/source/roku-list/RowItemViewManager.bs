@@ -10,7 +10,7 @@ function new(owner, container)
     return invalid
   end function
 
-  override function createRenderers(items)
+  override function createRenderers(content)
   end function
 
 

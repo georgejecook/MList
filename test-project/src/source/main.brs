@@ -2,7 +2,6 @@ sub Main(args as dynamic)
   InitScreen()
 end sub
 
-
 function InitScreen() as void
   'this will be where you setup your typical roku app
   'it will not be launched when running unit tests

@@ -15,8 +15,8 @@
     "mv": "file:../maestro-roku-view"
   },
   "devDependencies": {
-    "brighterscript": "^0.16.12",
-    "ropm": "^0.5.0",
+    "brighterscript": "file:/home/george/hope/open-source/vsc/brighterscript",
+    "ropm": "file:../../vsc/ropm",
     "source-map": "^0.7.3"
   },
   "repository": {
@@ -49,6 +49,6 @@
   },
   "scripts": {
     "build": "npx bsc",
-    "build-tests": "npx bsc"
+    "build-tests": "npx bsc --project bsconfig-tests.json"
   }
 }

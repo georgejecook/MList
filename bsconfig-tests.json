@@ -4,9 +4,7 @@
     "manifest",
     "source/**/*.*",
     "components/**/*.*",
-    "images/**/*.*",
-    "!**/*.spec.bs",
-    "!**/main.bs"
+    "images/**/*.*"
   ],
   "autoImportComponentScript": true,
   "createPackage": false,
@@ -20,5 +18,13 @@
         1001
       ]
     }
-  ]
+  ],
+  "plugins": [
+    "/home/george/hope/open-source/rooibos/rooibos/bsc-plugin/dist/plugin.js"
+  ],
+  "rooibos": {
+    "frameworkSourcePath": "/home/george/hope/open-source/rooibos/rooibos/framework/src/source",
+    "showOnlyFailures": true,
+    "lineWidth": 70
+  }
 }

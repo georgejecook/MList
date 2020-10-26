@@ -13,6 +13,9 @@
     <field
         id='index'
         type='integer' />
+    <field
+        id='listEvent'
+        type='assocarray' />
 
     <field
         id='animateToItem'
@@ -28,10 +31,6 @@
         id='isHidden'
         type='boolean'
         value='false' />
-    <field
-        id='screenState'
-        type='string'
-        alwaysNotify='true' />
 
     <field
         id='itemFocused'

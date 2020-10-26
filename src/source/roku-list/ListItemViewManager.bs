@@ -11,7 +11,7 @@ class ListItemViewManager extends ItemViewManager
     return invalid
   end function
 
-  override function createRenderers()
+  override function createRenderers(content)
     m.visibleComponents = []
     m.hiddenComponents = []
     m.components = []
@@ -22,9 +22,9 @@ class ListItemViewManager extends ItemViewManager
     y = 0
     w = m.owner.width
 
-    if m.content <> invalid
+    if content <> invalid
       index = 0
-      for each item in m.content.getChildren(-1, 0)
+      for each item in content.getChildren(-1, 0)
         settings = ListMixin.getRowSettings(m.owner, item)
 
         if item.rowCompName <> invalid and item.rowCompName = "RectComp"
