@@ -2,7 +2,7 @@ import "pkg:/source/roku-list/BaseClass.bs"
 
 class ItemFocusManager extends BaseClass
 
-  public owner = invalid
+  public viewManager = invalid
   public component = 0
   public index = 0
   public indexPosition = 0
@@ -13,16 +13,15 @@ class ItemFocusManager extends BaseClass
   public didStart = false
   public didFinish = false
 
-  function new(itemScroller, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, moveAnimation, moveAnimationInterpolator)
     super("ItemFocusManager")
-    m.itemScroller = itemScroller
-    m.viewManager = itemScroller.viewManager
-    m.container = m.viewManager.container
-    m.delegate = m.viewManager.owner
+    m.viewManager = viewManager
+    m.container = viewManager.container
+    m.delegate = viewManager.owner
     m.moveAnimation = moveAnimation
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
-    owner = m.viewManager.owner
+    owner = viewManager.owner
     m.delegates = [owner]
 
     if owner.delegate <> invalid
@@ -36,7 +35,7 @@ class ItemFocusManager extends BaseClass
     m.index = index
     m.indexPosition = indexPosition
     m.nextIndex = nextIndex
-    m.nextIndexPosition = nextPosition
+    m.nextPosition = nextPosition
     m.direction = direction
     m.component = m.viewManager.getRenderer(m.index)
     m.nextComponent = m.viewManager.getRenderer(m.nextIndex)
@@ -50,8 +49,13 @@ class ItemFocusManager extends BaseClass
   end function
 
   function onContainerPositionChange(offset)
-    fraction = (offset - m.indexPosition) / (m.nextIndexPosition - m.indexPosition)
-    m.onFocusUpdate(abs(fraction))
+    nextPos = (m.nextPosition - m.indexPosition)
+    if nextPos <> 0
+      fraction = (offset - m.indexPosition) / nextPos
+      m.onFocusUpdate(abs(fraction))
+    else
+      ? "FIXME"
+    end if
   end function
 
   function onFocusUpdate(fraction) as void
@@ -86,8 +90,13 @@ class ItemFocusManager extends BaseClass
     }
 
     'let components know, so they can react
-    m.component.listEvent = event
-    m.nextComponent.listEvent = nextEvent
+    if m.component <> invalid
+      m.component.listEvent = event
+    end if
+
+    if m.nextComponent <> invalid
+      m.nextComponent.listEvent = nextEvent
+    end if
 
     for each delegate in m.delegates
       delegate.listEvent = event

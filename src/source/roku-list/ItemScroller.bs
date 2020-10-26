@@ -5,6 +5,8 @@ class ItemScroller extends BaseClass
   public rects = []
   public items = []
   public components = []
+  public viewManager = invalid
+  public focusManager = invalid
   public renderedComponents = []
   public onScreenCompMap = []
   public index = 0
@@ -135,7 +137,7 @@ class ItemScroller extends BaseClass
     end if
 
 
-    m.logInfo("moving to ", targetTranslation, animated)
+    ' m.logInfo("moving to ", targetTranslation, animated)
     if animated
       'TODO count visible rows between oldIndex and newIndex
       steps = abs(m.index - index)
@@ -172,7 +174,7 @@ class ItemScroller extends BaseClass
 
     screenPos = m.getScreenPositionForItem(itemRect, m.direction)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+    ' ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
 
     if m.axes = 0
       return [- targetPos, m.container.translation[1]]
@@ -183,7 +185,7 @@ class ItemScroller extends BaseClass
   end function
 
   function finishAnimating()
-    ? "stop ci " ; m.index ; " ni " ; m.nextIndex
+    ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
     if m.direction = -1
       nextIndex = m.nextIndex + 1
     else
@@ -255,6 +257,8 @@ class ItemScroller extends BaseClass
     ' m.logInfo("onAnimationFractionChange", fraction)
     position = m.container.translation[m.axes]
     index = m.getIndexAtPosition(position, m.direction)
+    
+    m.focusManager.onContainerPositionChange(position)    
 
     if fraction = 1
       if index <> m.index
@@ -297,6 +301,9 @@ class ItemScroller extends BaseClass
     end if
 
     m.notifyViewportEvents(isMoving)
+
+    m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
+
   end function
 
   function notifyViewportEvents(isMoving)
@@ -360,7 +367,7 @@ class ItemScroller extends BaseClass
     end if
 
     for each delegate in m.delegates
-      delegate.viewportEvents = events
+      delegate.listEvents = events
     end for
   end function
 

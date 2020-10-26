@@ -1,4 +1,5 @@
 import "pkg:/source/roku-list/ListMixin.bs"
+import "pkg:/source/roku-list/ListItemDelegateMixin.bs"
 
 function init()
   log_registerLogger("List")
@@ -16,7 +17,10 @@ function init()
   ' m.currentDirection = 0
   ' m.previousscreenState = ""
   ' m.content = invalid
+  ListItemDelegateMixin.setDelegate()
 end function
+
+
 
 ' function onContentIsHiddenChange()
 '   m.top.isHidden = m.content.isHidden = true
@@ -357,3 +361,48 @@ end function
 
 '   return false
 ' end function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ delegate
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function onWillEnter(index, direction)
+  ? "onWillEnter " ; index ; " " ; direction
+end function
+
+function onWillExit(index, direction)
+  ? "onWillExit " ; index ; " " ; direction
+end function
+
+function onDidEnter(index, direction)
+  ? "onDidEnter " ; index ; " " ; direction
+end function
+
+function onDidExit(index, direction)
+  ? "onDidExit " ; index ; " " ; direction
+end function
+
+function onWillGainFocus(index, direction)
+  ? "onWillGainFocus " ; index ; " " ; direction
+end function
+
+function onWillListFocus(index, direction)
+  ? "onWillListFocus " ; index ; " " ; direction
+end function
+
+function onDidGainFocus(index, direction)
+  ? "onDidGainFocus " ; index ; " " ; direction
+end function
+
+function onDidLoseFocus(index, direction)
+  ? "onDidLoseFocus " ; index ; " " ; direction
+end function
+
+function onGainingFocus(index, direction, fraction)
+  ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
+end function
+
+function onLosingFocus(index, direction, fraction)
+  ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
+end function

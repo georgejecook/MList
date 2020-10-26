@@ -4,6 +4,7 @@
     extends='mv_BaseView'>
 
   <interface>
+    <!-- content state -->
     <field
         id='content'
         type='node' />
@@ -13,9 +14,19 @@
     <field
         id='index'
         type='integer' />
+
+    <!-- screen and selection state -->
     <field
         id='listEvent'
         type='assocarray' />
+    <field
+        id='screenState'
+        type='string' />
+    <field
+        id='isOnScreen'
+        type='boolean'
+        alwaysNotify='false'
+        value='false' />
 
     <field
         id='animateToItem'
@@ -23,35 +34,16 @@
         value='0' />
 
     <field
-        id='isOnScreen'
-        type='boolean'
-        alwaysNotify='false'
-        value='false' />
-    <field
         id='isHidden'
         type='boolean'
         value='false' />
 
+
+    <!-- conver to size -->
     <field
-        id='itemFocused'
-        type='integer'
-        value='0' />
-    <field
-        id='itemUnfocused'
+        id='width'
         type='integer' />
-    <field
-        id='itemSelected'
-        type='integer' />
-    <field
-        id='currTargetSet'
-        type='array' />
-    <field
-        id='defaultTargetSetFocusIndex'
-        type='integer'
-        value='0' />
-    <field
-        id='currFocusItemIndex'
-        type='integer' />
+
     <field
         id='height'
         type='integer' />

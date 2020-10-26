@@ -8,7 +8,7 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   override function getRenderer(index)
-    return invalid
+    return m.components[index]
   end function
 
   override function createRenderers(content)
@@ -32,7 +32,7 @@ class ListItemViewManager extends ItemViewManager
         else
           component = m.createHorizontalRow(item, index, settings)
         end if
-
+        component.index = index
         component.screenState = "offScreen"
 
         m.components.push(component)
