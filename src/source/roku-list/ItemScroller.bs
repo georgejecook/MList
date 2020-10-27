@@ -169,7 +169,7 @@ class ItemScroller extends BaseClass
 
     if itemRect = invalid
       m.logWarn("no itemRect for index", index)
-      return invalid
+      return [-1,-1]
     end if
 
     screenPos = m.getScreenPositionForItem(itemRect, m.direction)
@@ -199,6 +199,7 @@ class ItemScroller extends BaseClass
     nextRect = m.rects[m.nextIndex]
     screenPos = m.getScreenPositionForItem(nextRect, m.direction, screenPos)
     nextTranslation = m.getTargetTranslation(index, screenPos)
+
     if nextTranslation <> invalid
       m.nextPosition = nextTranslation[m.axes]
     else
@@ -258,15 +259,17 @@ class ItemScroller extends BaseClass
     position = m.container.translation[m.axes]
     index = m.getIndexAtPosition(position, m.direction)
     
-    m.focusManager.onContainerPositionChange(position)    
-
+    
     if fraction = 1
+      m.focusManager.onFocusAnimationUpdate(1)    
       if index <> m.index
         m.setFocusIndex(index, false)
       end if
       m.targetIndex = -1
     else
+      m.focusManager.onContainerPositionChange(position)    
       if index <> m.index 
+        m.focusManager.onFocusAnimationUpdate(1)    
         m.setFocusIndex(index, true)
       end if
     end if
@@ -292,6 +295,9 @@ class ItemScroller extends BaseClass
       m.index = index
       m.setNextIndex(m.index + m.direction)
     end if
+
+    'TODO -note - we need to know what screenPos WAS in a floating scenario!!
+    m.indexPosition = m.getTargetTranslation(m.index, screenPos)[m.axes]
 
     'things that need to happen in here:
     '1. update the screen state
@@ -344,10 +350,8 @@ class ItemScroller extends BaseClass
 
     'notify what WILL come into view
     if isMoving and m.nextIndex <> m.index
-      nextRect = m.rects[m.nextIndex]
-      screenPos = m.getScreenPositionForItem(nextRect, m.direction)
-      nextPos = m.getOffsetForScreenPosition(nextRect, screenPos)
-      nextOnScreenCompMap = m.getComoponentsInViewPort(nextPos)
+      nextTranslation = m.getTargetTranslation(m.nextIndex, screenPos)
+      nextOnScreenCompMap = m.getComoponentsInViewPort(nextTranslation[m.axes])
       ' m.logInfo("nextOnScreenCompMap", nextOnScreenCompMap)
       for each id in nextOnScreenCompMap
         comp = m.components[id.toInt()]

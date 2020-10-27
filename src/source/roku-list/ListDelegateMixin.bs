@@ -10,6 +10,172 @@ namespace ListDelegateMixin
   '  * @param {class} instance, target for the delegate methods - if invalid, then methods will be called on top function scope
   '  * @returns {returnType} returnDescription
   '  */
-  function setListDelegate(list, instance)
+  function setListDelegate(list, instance = invalid)
+    m.listEventMap = {}
+
+    if instance <> invalid
+      funcMap = {
+        "onWillEnter": "willEnter"
+        "onWillExit": "willExit"
+        "onDidEnter": "didEnter"
+        "onDidExit": "didExit"
+        "onWillGainFocus": "willGainFocus"
+        "onWillLoseFocus": "willLoseFocus"
+        "onDidGainFocus": "didGainFocus"
+        "onDidLoseFocus": "didLoseFocus"
+        "onGainingFocus": "gainingFocus"
+        "onLosingFocus": "losingFocus"
+      }
+
+      for each eventName in funcMap
+        if mc_isFunction(instance[eventName])
+          m.listEventMap[funcMap[eventName]] = true
+        end if
+      end for
+    else
+      'no way to get a function pointer by name :(
+      if mc_isFunction(onWillEnter)
+        m.listEventMap["willEnter"] = true
+      end if
+      if mc_isFunction(onWillExit)
+        m.listEventMap["willExit"] = true
+      end if
+      if mc_isFunction(onDidEnter)
+        m.listEventMap["didEnter"] = true
+      end if
+      if mc_isFunction(onDidExit)
+        m.listEventMap["didExit"] = true
+      end if
+      if mc_isFunction(onWillGainFocus)
+        m.listEventMap["willGainFocus"] = true
+      end if
+      if mc_isFunction(onWillLoseFocus)
+        m.listEventMap["willLoseFocus"] = true
+      end if
+      if mc_isFunction(onDidGainFocus)
+        m.listEventMap["didGainFocus"] = true
+      end if
+      if mc_isFunction(onDidLoseFocus)
+        m.listEventMap["didLoseFocus"] = true
+      end if
+      if mc_isFunction(onGainingFocus)
+        m.listEventMap["gainingFocus"] = true
+      end if
+      if mc_isFunction(onLosingFocus)
+        m.listEventMap["losingFocus"] = true
+      end if
+    end if
+
+    m.isObservingListEvents = m.listEventMap.count() > 0
+    if m.isObservingListEvents
+      m.listEventInstance = instance
+      mc_toggleObserver(list, "listEvent", mc_getFunctionName(onListEventBridge))
+      mc_toggleObserver(list, "listEvents", mc_getFunctionName(onListEventsBridge))
+    end if
+  end function
+
+  function onListEventBridge(sgEvent) as void
+    if m.isObservingListEvents 
+      ListDelegateMixin.handleListEvent(sgEvent.getData())
+    end if
+  end function
+
+  function onListEventsBridge(sgEvent) as void
+    if m.isObservingListEvents 
+      for each event in sgEvent.getData() 
+        ListDelegateMixin.handleListEvent(event)
+      end for
+    end if
+  end function
+
+  function handleListEvent(event) as void
+    eventName = event.name
+    if not m.isObservingListEvents or m.listEventMap[eventName] <> true
+      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      return
+    end if
+    ' ? "onListEventBridge OBSERVED " ; eventName
+
+    if eventName = "willEnter"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onWillEnter(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onWillEnter(event.index, event.direction)
+      end if
+    else if eventName = "willExit"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onWillExit(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onWillExit(event.index, event.direction)
+      end if
+
+    else if eventName = "didEnter"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onDidEnter(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onDidEnter(event.index, event.direction)
+      end if
+
+    else if eventName = "didExit"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onDidExit(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onDidExit(event.index, event.direction)
+      end if
+
+    else if eventName = "willGainFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onWillGainFocus(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onWillGainFocus(event.index, event.direction)
+      end if
+
+    else if eventName = "willLoseFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onWillLoseFocus(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onWillLoseFocus(event.index, event.direction)
+      end if
+
+    else if eventName = "didGainFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onDidGainFocus(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onDidGainFocus(event.index, event.direction)
+      end if
+
+    else if eventName = "didLoseFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onDidLoseFocus(event.index, event.direction)
+      else
+        'bs:disable-next-line
+        onDidLoseFocus(event.index, event.direction)
+      end if
+
+    else if eventName = "gainingFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onGainingFocus(event.index, event.direction, event.fraction)
+      else
+        'bs:disable-next-line
+        onGainingFocus(event.index, event.direction, event.fraction)
+      end if
+
+    else if eventName = "losingFocus"
+      if m.listEventInstance <> invalid
+        m.listEventInstance.onLosingFocus(event.index, event.direction, event.fraction)
+      else
+        'bs:disable-next-line
+        onLosingFocus(event.index, event.direction, event.fraction)
+      end if
+
+    end if
+
   end function
 end namespace

@@ -1,3 +1,5 @@
+import "pkg:/source/roku_modules/ml/roku-list/ListDelegateMixin.brs"
+import "pkg:/source/ListScreenVM.bs"
 
 function init()
   print "in FocusTestScene init"
@@ -10,8 +12,18 @@ function init()
   m.cellTracker = m.global.cellTracker
   m.top._cellTracker = m.global.cellTracker
   m.contentId = 0
+  m.listVM = new ListScreenVM()
+
   onResetChange()
   mv_initializeView(m.list)
+
+  
+  'delegate functions are implemented in this script
+  ml_ListDelegateMixin_setListDelegate(m.list) 
+
+  'delegate functions are implemented on m.listVM class
+  ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
+
   m.list.observeField("itemSelected", "itemSelcetedChanged")
   m.list.observeField("itemFocused", "itemFocusedChanged")
   m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
@@ -209,7 +221,6 @@ function onShowItems()
     end if
   end for
 end function
-
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ keypresses

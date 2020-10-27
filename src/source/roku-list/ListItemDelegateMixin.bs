@@ -76,10 +76,10 @@ namespace ListItemDelegateMixin
     event = sgEvent.getData()
     eventName = event.name
     if not m.isObservingListEvents or m.listEventMap[eventName] <> true
-      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
-    ? "onListEventBridge OBSERVED " ; eventName
+    ' ? "onListEventBridge OBSERVED " ; eventName
 
     'lament: not being able to get functions in the node scope is such a bummer
     if eventName = "willEnter"

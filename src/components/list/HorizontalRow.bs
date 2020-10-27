@@ -17,7 +17,7 @@ function init()
   ' m.currentDirection = 0
   ' m.previousscreenState = ""
   ' m.content = invalid
-  ListItemDelegateMixin.setDelegate()
+  ' ListItemDelegateMixin.setDelegate()
 end function
 
 

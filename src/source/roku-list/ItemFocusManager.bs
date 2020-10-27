@@ -3,12 +3,12 @@ import "pkg:/source/roku-list/BaseClass.bs"
 class ItemFocusManager extends BaseClass
 
   public viewManager = invalid
-  public component = 0
+  public nextComponent = invalid
+  public component = invalid
   public index = 0
   public indexPosition = 0
   public nextIndex = 0
   public nextPosition = 0
-  public nextComponent = 0
   public direction = 0
   public didStart = false
   public didFinish = false
@@ -30,8 +30,10 @@ class ItemFocusManager extends BaseClass
 
   end function
 
-
   function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
+    ' m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
     m.index = index
     m.indexPosition = indexPosition
     m.nextIndex = nextIndex
@@ -45,35 +47,43 @@ class ItemFocusManager extends BaseClass
   end function
 
   function onFocusAnimationUpdate(fraction)
-    m.onFocusUpdate(fraction)
+    if m.didStart and not m.didFinish
+      m.onFocusUpdate(fraction)
+    end if
   end function
 
   function onContainerPositionChange(offset)
-    nextPos = (m.nextPosition - m.indexPosition)
-    if nextPos <> 0
-      fraction = (offset - m.indexPosition) / nextPos
-      m.onFocusUpdate(abs(fraction))
+    distance = abs(m.nextPosition - m.indexPosition)
+    currentPos = abs(m.indexPosition - offset)
+    ' ? "offset " ; offset ; " IP " ; m.indexPosition ; " D " ; distance ; " C " ; currentPos
+    if distance <> 0
+      fraction = (currentPos / distance)
+      if m.direction = -1
+        fraction = 1 - fraction
+      end if
+      m.onFocusUpdate(fraction)
     else
-      ? "FIXME"
+      ' ? "FIXME"
     end if
   end function
 
   function onFocusUpdate(fraction) as void
-    if fraction = 0 
-      if m.didStart
-        return
-      end if
-      name = "onWillGainFocus"
-      nextname = "onWillLoseFocus"
+    if not m.didStart
+      name = "willLoseFocus"
+      nextName = "willGainFocus"
+      m.didStart = true
+    else if fraction = 0
+      return
     else if fraction = 1
       if m.didFinish
         return
       end if
-      name = "onDidGainFocus"
-      nextname = "onDidLoseFocus"
+      m.didFinish = true
+      name = "didLoseFocus"
+      nextName = "didGainFocus"
     else
-      name = "onGainingFocus"
-      nextname = "onLosingFocus"
+      name = "losingFocus"
+      nextName = "gainingFocus"
     end if
 
     event = {

@@ -44,9 +44,9 @@
     <field
         id='listEvents'
         type='array' />
-    <field
+    <!-- <field
         id='viewPortEvents'
-        type='array' />
+        type='array' /> -->
 
     <field
         id='rowFocused'
