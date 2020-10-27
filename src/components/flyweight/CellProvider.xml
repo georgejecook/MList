@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8' ?>
+<?xml version='1.0' encoding='utf-8'?>
 
 <component
     name='CellProvider'
@@ -17,6 +17,10 @@
         id='isCreateMoreEnabled'
         type='boolean'
         value='false' />
+    <field
+        id='numerOfCellsToCreateWhenDry'
+        type='integer'
+        value='30' />
     <field
         id='numberOfCellsInUse'
         type='integer'

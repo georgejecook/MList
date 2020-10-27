@@ -1,6 +1,8 @@
 import "pkg:/source/roku_modules/mc/Utils.brs"
+import "pkg:/source/roku_modules/log/LogMixin.brs"
 
 function init()
+  log_registerLogger("CellProvider")
   reset()
 end function
 
@@ -10,7 +12,7 @@ function onDebugMChange()
 end function
 
 function reset(args = invalid)
-  ' ? "resetting cell trackers"
+  m.logInfo("reset")
   m.cellTypes = {}
   m.top.numberOfCells = 0
   m.top.numberOfCellsInUse = 0
@@ -51,15 +53,20 @@ end function
 
 function addPreBakedCells(number, cellType = invalid)
   cellType = getRopmSafeCellType(cellType)
-  ' ? "adding "; number; " cells of type "; cellType
+  m.logInfo("adding ", number, cellType, "cells")
   trackers = getTrackers(cellType)
+
   for i = 0 to number
     cell = createObject("roSGNode", cellType)
-    cell.id = str(trackers.numberOfCellsInPool).trim()
-    trackers.numberOfCellsInPool++
-    trackers.freeCellsById[cell.id] = cell
-    trackers.allCells.push(cell)
-    m.top.numberOfCells++
+    if cell <> invalid
+      cell.id = str(trackers.numberOfCellsInPool).trim()
+      trackers.numberOfCellsInPool++
+      trackers.freeCellsById[cell.id] = cell
+      trackers.allCells.push(cell)
+      m.top.numberOfCells++
+    else
+      m.logError("error creating cell with type", cellType)
+    end if
   end for
   ' ? "finished making cells"
 end function
@@ -71,12 +78,14 @@ function getCell(cellType = invalid)
   trackers = getTrackers(cellType)
 
   if trackers.freeCellsById.count() = 0
-    ? "Ran out of cells:"
+    m.logWarn("ran out of cells getting type :", cellType)
+
     if m.top.isCreateMoreEnabled
-      ? " - creating one now"
-      createCell(cellType)
+      m.logWarn("creating", m.top.numerOfCellsToCreateWhenDry, "more", cellType, "cells")
+      for i = 0 to m.top.numerOfCellsToCreateWhenDry
+        createCell(cellType)
+      end for
     else
-      ? "cant create more isCreateMoreEnabled is false"
       return invalid
     end if
   else
@@ -103,7 +112,6 @@ function releaseCell(cell)
     m.top.numberOfCellsInUse--
   end if
 end function
-
 
 function createCell(cellType)
   trackers = getTrackers(cellType)

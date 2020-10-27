@@ -39,10 +39,8 @@ function createData()
   content = createObject("roSGNode", "ContentNode")
 
   for i = 0 to m.top._numberOfRows
-    row = content.createChild("ContentNode")
+    row = content.createChild("ml_HorizontalRowContent")
     row.title = "ROW " + str(i)
-    row.addField("isHidden", "boolean", true)
-    row.addField("isFocusable", "boolean", true)
     if i <> 0
       if i mod 9 = 0
         row.addFields({ "focusType": "floatingWrap" })
@@ -108,7 +106,7 @@ function onAddTypeOnes()
 end function
 
 function onAddComplex()
-  addItems("ml_ComplexCell", m.top._addTypeComplex)
+  addItems("ml_SimpleTile", m.top._addTypeComplex)
 end function
 
 function onAddTypeTwos()
@@ -142,7 +140,7 @@ function makeItems(cellType, number)
     if m.contentId mod 5 = 0
       cellType = "ml_SimpleCell"
     else if m.contentId mod 7 = 0
-      cellType = "ml_ComplexCell"
+      cellType = "ml_Cell"
     end if
 
     child.addFields({

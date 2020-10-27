@@ -14,23 +14,18 @@ function init()
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
   ' m.header = m.top.findNode("header")
-  ' m.cellProvider = m.global.cellProvider
-  ' m.cellTracker = m.global.cellTracker
-  ' m.cellsById = {}
-  ' m.currentDirection = 0
-  ' m.previousscreenState = ""
-  ' m.content = invalid
+  m.cellProvider = m.global.cellProvider
+  m.cellTracker = m.global.cellTracker
   ' ListItemDelegateMixin.setDelegate()
 end function
 
-
 function createManagers()
-  m.logInfo("initialize")
+  m.logInfo("createManagers")
   isAnimatorsCreated = true
-  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup)
+  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents)
 
-  m.itemScroller = new RowItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller = new RowItemScroller(m.viewManager, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
 end function
 
@@ -44,10 +39,9 @@ function onContentChange(evt)
     m.content = m.top.content
     calculateHeight()
     ' createManagers()
-    'TODO - don'd do this if the row is hidden
     ' m.viewManager.setContent(m.top.content)
     ' m.itemScroller.reset()
-  
+
     ' if m.content.isHidden <> true
     '   ' configureHeader()
     '   ' if m.content.focusType <> invalid

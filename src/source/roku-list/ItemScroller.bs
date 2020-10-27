@@ -39,10 +39,7 @@ class ItemScroller extends BaseClass
 
   public function onViewManagerUpdate()
     m.components = m.viewManager.visibleComponents ' content items 
-    m.items = m.viewManager.visibleItems ' content items 
-    m.rects = m.viewManager.rects ' calculated views for the items
 
-    owner = m.viewManager.owner
     m.delegates = []
 
     if m.viewManager.delegate <> invalid
@@ -71,7 +68,6 @@ class ItemScroller extends BaseClass
   end function
 
   function move(offset, screenPos = invalid, animated = true, fast = false)
-
     index = m.index + offset
 
     if offset > 0
@@ -98,10 +94,10 @@ class ItemScroller extends BaseClass
       return m.getValidTargetIndex(m.viewManager.numberOfItems - 1, -1)
     end if
 
-    item = m.items[index]
-    while item <> invalid and item.isFocusable <> false and index < m.viewManager.numberOfItems - 1 and index > -1
+    item = m.viewManager.visibleItems[index]
+    while item <> invalid and item.isFocusable <> true and index < m.viewManager.numberOfItems - 1 and index > -1
       index += direction
-      item = m.items[index]
+      item = m.viewManager.visibleItems[index]
     end while
 
     return index
@@ -162,7 +158,7 @@ class ItemScroller extends BaseClass
   end function
 
   function getTargetTranslation(index, screenPos = invalid)
-    itemRect = m.rects[index]
+    itemRect = m.viewManager.rects[index]
 
     if itemRect = invalid
       stop
@@ -197,7 +193,7 @@ class ItemScroller extends BaseClass
       index = 0
     end if
     m.nextIndex = index
-    nextRect = m.rects[m.nextIndex]
+    nextRect = m.viewManager.rects[m.nextIndex]
     screenPos = m.getScreenPositionForItem(nextRect, m.direction, screenPos)
     nextTranslation = m.getTargetTranslation(index, screenPos)
 
@@ -238,8 +234,8 @@ class ItemScroller extends BaseClass
   end function
 
   function getIndexAtPosition(position, direction)
-    for i = 0 to m.rects.count() - 1
-      itemRect = m.rects[i]
+    for i = 0 to m.viewManager.rects.count() - 1
+      itemRect = m.viewManager.rects[i]
       screenPos = m.getScreenPositionForItem(itemRect, direction)
       itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
       ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
@@ -404,7 +400,7 @@ class ItemScroller extends BaseClass
 
   function updateItemFocus(index)
     m.logMethod("updateItemFocus", index)
-    m.focusedItem = m.items[index]
+    m.focusedItem = m.viewManager.visibleItems[index]
 
     if m.focusedItem <> invalid
       m.focusedIndex = index

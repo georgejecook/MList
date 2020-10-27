@@ -81,7 +81,11 @@ class ListItemViewManager extends ItemViewManager
 
         y += component.height + settings.space
 
-        m.rects.push({ translation: component.translation, size: [w, component.height] })
+        m.rects.push({ 
+          translation: component.translation
+          size: [w, component.height] 
+          index: component.index
+        })
         m.visibleComponents.push(component)
         m.visibleItems.push(component.content)
       else

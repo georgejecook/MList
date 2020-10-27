@@ -2,9 +2,14 @@ import "pkg:/source/roku-list/ItemViewManager.bs"
 
 class RowItemViewManager extends ItemViewManager
   public row = invalid
+  public cellsById = {}
+  public cellProvider
+  public cellTracker 
 
-  function new(list, row, container)
-    super("RowItemViewManager", row, container, 0)
+  function new(list, row, container, cellProvider, cellTracker)
+    super("RowItemViewManager", list, container, 0)
+    m.cellProvider = cellProvider
+    m.cellTracker = cellTracker
     m.row = row
   end function
 
@@ -12,37 +17,72 @@ class RowItemViewManager extends ItemViewManager
   '++ overridden
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
   override function createRenderers(content)
+    'renderers are created as needed
+    m.cellsById = {}
   end function
 
   override function updateLayout()
     translation = [0, 0]
-    for each item in content.getChildren(-1, 0)
+    index = 0
+    for each item in m.content.getChildren(-1, 0)
       settings = ListMixin.getCellSettings(m.owner, m.row, item)
-      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space[m.axes]
-      rects.push({ translation: translation, size: settings.size })
+      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
+      m.rects.push({ 
+        translation: translation, 
+        size: settings.size 
+        index: index
+      })
+      index++
     end for
   end function
 
 
   override function applyScreenStateMap(screenStateMap)
     for each id in screenStateMap
-      component = m.components[id.toInt()]
+      m.applyscreenStateForCell(id, screenStateMap[id])
+    end for
+  end function
 
-      if component <> invalid
-        component.screenState = screenStateMap[id]
-        if component.screenState = "onScreen"
-          m.renderedComponents.push(component)
+  function applyscreenStateForCell(id, screenState)
+    index = id.toInt()
+    isOnScreen = m.row.isOnScreen
+    ? "applyscreenStateForCell "; id ; " vs " ; screenState ; " isonScreen" ; isOnScreen
+    item = m.content.getChild(index)
+
+    if item <> invalid
+      if screenState = "onScreen"
+        if m.cellsById[id] = invalid
+          settings = ListMixin.getCellSettings(m.owner, m.row, item)
+          cell = m.cellProvider@.getCell(settings.compName)
+
+          if cell <> invalid
+            'TODO - work out what to do around setting content etc here
+            cell.visible = isOnScreen
+
+            if isOnScreen
+              cell.itemContent = item
+            end if
+
+            cell.translation = m.rects[index]
+            m.cellsGroup.appendChild(cell)
+            cell.index = m.top.index
+            m.cellsById[id] = cell
+          else 
+            ? ">>ERR no cell for " ; item.cellType
+          end if
         end if
       else
-        ' ? "ERROR could not find visible component for "; id
+        cell = m.cellsById[id]
+        if cell <> invalid
+          m.cellProvider@.releaseCell(cell) 
+          m.cellsById.delete(id)
+        end if
       end if
-    end for
-
+    end if
   end function
 
   override function getRenderer(index)
-    return invalid
+    return m.cellsById[str(index).trim()]
   end function
 end class

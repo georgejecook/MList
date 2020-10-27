@@ -11,8 +11,8 @@
         id='index'
         type='integer' />
     <field
-        id='rowSettings'
-        type='assocarray' />
+        id='settings'
+        type='node' />
     <field
         id='isHidden'
         type='boolean' />

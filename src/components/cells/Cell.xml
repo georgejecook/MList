@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 
 <component
-    name='ComplexCell'
+    name='Cell'
     extends='Group'>
 
   <!-- Note that target and rect are both set during the interpolation -->

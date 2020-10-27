@@ -4,16 +4,16 @@
     extends='mv_BaseView'>
 
   <interface>
-    <!-- content state -->
+    <!-- content - must be RowContent subtype -->
     <field
         id='content'
         type='node' />
     <field
-        id='owner'
-        type='node' />
-    <field
         id='index'
         type='integer' />
+    <field
+        id='owner'
+        type='node' />
 
     <!-- screen and selection state -->
     <field
