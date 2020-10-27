@@ -46,18 +46,20 @@ class ItemScroller extends BaseClass
     m.rects = m.viewManager.rects ' calculated views for the items
     m.numberOfItems = m.items.count()
     owner = m.viewManager.owner
-    m.delegates = [owner]
+    m.delegates = []
 
-    if owner.delegate <> invalid
-      m.delegates.push(owner.delegate)
+    if m.viewManager.delegate <> invalid
+      m.delegates.push(m.viewManager.delegate)
     end if
 
     'TODO - use bounds here
     m.screenRect = { translation: owner.translation, size: [owner.width, owner.height] }
+
+    'TODO
   end function
 
   public function reset()
-    'TODO
+    m.onViewManagerUpdate()
     m.moveToIndex(0, invalid, false)
   end function
 
@@ -117,15 +119,16 @@ class ItemScroller extends BaseClass
     targetTranslation = m.getTargetTranslation(index, screenPos)
 
     if targetTranslation = invalid
+      m.logError("cannot move! translation invalid for index", index)
       return false
     end if
 
     m.targetIndex = index
 
-    if m.targetIndex > m.index
-      m.direction = 1
-    else
+    if m.targetIndex < m.index
       m.direction = -1
+    else
+      m.direction = 1
     end if
 
     m.setNextIndex(m.index + m.direction)
@@ -137,7 +140,7 @@ class ItemScroller extends BaseClass
     end if
 
 
-    ' m.logInfo("moving to ", targetTranslation, animated)
+    m.logInfo("moving to ", targetTranslation, animated)
     if animated
       'TODO count visible rows between oldIndex and newIndex
       steps = abs(m.index - index)
@@ -168,8 +171,9 @@ class ItemScroller extends BaseClass
     itemRect = m.rects[index]
 
     if itemRect = invalid
+      stop
       m.logWarn("no itemRect for index", index)
-      return [-1,-1]
+      return [-1, -1]
     end if
 
     screenPos = m.getScreenPositionForItem(itemRect, m.direction)
@@ -195,6 +199,9 @@ class ItemScroller extends BaseClass
   end function
 
   function setNextIndex(index, screenPos = invalid)
+    if index < 0
+      index = 0
+    end if
     m.nextIndex = index
     nextRect = m.rects[m.nextIndex]
     screenPos = m.getScreenPositionForItem(nextRect, m.direction, screenPos)
@@ -258,18 +265,18 @@ class ItemScroller extends BaseClass
     ' m.logInfo("onAnimationFractionChange", fraction)
     position = m.container.translation[m.axes]
     index = m.getIndexAtPosition(position, m.direction)
-    
-    
+
+
     if fraction = 1
-      m.focusManager.onFocusAnimationUpdate(1)    
+      m.focusManager.onFocusAnimationUpdate(1) 
       if index <> m.index
         m.setFocusIndex(index, false)
       end if
       m.targetIndex = -1
     else
-      m.focusManager.onContainerPositionChange(position)    
+      m.focusManager.onContainerPositionChange(position) 
       if index <> m.index 
-        m.focusManager.onFocusAnimationUpdate(1)    
+        m.focusManager.onFocusAnimationUpdate(1) 
         m.setFocusIndex(index, true)
       end if
     end if
@@ -306,7 +313,7 @@ class ItemScroller extends BaseClass
       m.updateRenderedComponents()
     end if
 
-    m.notifyViewportEvents(isMoving)
+    m.notifyViewportEvents(true)
 
     m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
 

@@ -13,7 +13,7 @@ class ItemFocusManager extends BaseClass
   public didStart = false
   public didFinish = false
 
-  function new(viewManager, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate)
     super("ItemFocusManager")
     m.viewManager = viewManager
     m.container = viewManager.container
@@ -22,7 +22,7 @@ class ItemFocusManager extends BaseClass
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
     owner = viewManager.owner
-    m.delegates = [owner]
+    m.delegates = [ownerDelegate]
 
     if owner.delegate <> invalid
       m.delegates.push(owner.delegate)

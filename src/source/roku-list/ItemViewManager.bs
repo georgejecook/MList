@@ -4,6 +4,8 @@ class ItemViewManager extends BaseClass
   'owning views
   public container = invalid
   public owner = invalid
+  public delegate = invalid
+
   'content
   public content = invalid
   public components = []
@@ -24,19 +26,24 @@ class ItemViewManager extends BaseClass
   function setContent(content)
     m.content = content
     m.container.removeChildren(m.container.getChildren(-1, 0))
-    m.createRenderers(content)
-    index = 0
-    for each component in m.components
-      component.index = index
-      index++
-    end for
+    m._createRenderers(content)
+
+    m._updateLayout()
   end function
 
-  function getRenderer(index)
-    return invalid
+  function _createRenderers(items)
+    m.components = []
+    m.visibleComponents = []
+    m.visibleItems = []
+
+    m.createRenderers(items)
   end function
 
-  function createRenderers(items)
+  function _updateLayout()
+    m.visibleComponents = []
+    m.visibleItems = []
+    m.logInfo("_updateLayout")
+    m.updateLayout()
   end function
 
   function convertChildTranslationToOwner(containerTranslation)
@@ -45,5 +52,21 @@ class ItemViewManager extends BaseClass
 
   function convertOwnerTranslationToChild(ownerTranslation)
     return [m.container.translation[0] - ownerTranslation[0], m.container.translation[1] - ownerTranslation[1]]
+  end function
+
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ override
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function getRenderer(index)
+    return invalid
+  end function
+
+  function createRenderers(items)
+  end function
+
+
+  function updateLayout()
   end function
 end class

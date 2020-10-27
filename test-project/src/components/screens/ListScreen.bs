@@ -18,9 +18,6 @@ function init()
   mv_initializeView(m.list)
 
   
-  'delegate functions are implemented in this script
-  ml_ListDelegateMixin_setListDelegate(m.list) 
-
   'delegate functions are implemented on m.listVM class
   ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
 

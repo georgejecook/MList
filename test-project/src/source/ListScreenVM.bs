@@ -1,47 +1,47 @@
 class ListScreenVM
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ delegate
+  '++ Row delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function onWillEnter(index, direction)
-    ? "onWillEnter (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowWillEnter(index, direction)
+    ? "onRowWillEnter (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onWillExit(index, direction)
-    ? "onWillExit (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowWillExit(index, direction)
+    ? "onRowWillExit (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onDidEnter(index, direction)
-    ? "onDidEnter (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowDidEnter(index, direction)
+    ? "onRowDidEnter (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onDidExit(index, direction)
-    ? "onDidExit (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowDidExit(index, direction)
+    ? "onRowDidExit (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onWillGainFocus(index, direction)
-    ? "onWillGainFocus (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowWillGainFocus(index, direction)
+    ? "onRowWillGainFocus (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onWillLoseFocus(index, direction)
-    ? "onWillLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowWillLoseFocus(index, direction)
+    ? "onRowWillLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onDidGainFocus(index, direction)
-    ? "onDidGainFocus (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowDidGainFocus(index, direction)
+    ? "onRowDidGainFocus (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onDidLoseFocus(index, direction)
-    ? "onDidLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
+  function onRowDidLoseFocus(index, direction)
+    ? "onRowDidLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
   end function
 
-  function onGainingFocus(index, direction, fraction)
-    ? "onGainingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+  function onRowGainingFocus(index, direction, fraction)
+    ? "onRowGainingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
   end function
 
-  function onLosingFocus(index, direction, fraction)
-    ? "onLosingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+  function onRowLosingFocus(index, direction, fraction)
+    ? "onRowLosingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
   end function
 
 

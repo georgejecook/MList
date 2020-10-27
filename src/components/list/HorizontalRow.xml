@@ -56,8 +56,8 @@
         text='header'
         color='#cccccc' />
     <Group
-        id='cellHolder'
-        translation='[0,20]' />
+        id='cellsGroup'
+        translation='[0,0]' />
 
     <Animation
         id='moveAnimation'

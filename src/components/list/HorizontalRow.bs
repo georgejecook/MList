@@ -1,11 +1,24 @@
 import "pkg:/source/roku-list/ListMixin.bs"
-import "pkg:/source/roku-list/ListItemDelegateMixin.bs"
+import "pkg:/source/roku-list/ListDelegateMixin.bs"
+import "pkg:/source/roku-list/ListItemScroller.bs"
+import "pkg:/source/roku-list/RowItemViewManager.bs"
+import "pkg:/source/roku-list/ItemFocusManager.bs"
 
 function init()
   log_registerLogger("List")
   m.top.observeField("content", "onContentChange")
 
-  ' m.cellHolder = m.top.findNode("cellHolder")
+  m.cellsGroup = m.top.findNode("cellsGroup")
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation")
+
+  ' m.top.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  ' m.top.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
+  ' m.viewManager = new RowItemViewManager(m.top, m.rowsGroup)
+  ' m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator)
+  ' m.itemScroller = new ListItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  ' m.itemScroller.focusManager = m.focusManager
+
   ' m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   ' m.moveAnimation = m.top.findNode("moveAnimation") 
   ' m.moveAnimationInterpolator.observeField("fraction", "onAnimationFractionChange")
@@ -83,7 +96,7 @@ end function
 
 '   'create all the content 
 '   ' for i = 0 to numCells
-'   '   cell = m.cellHolder.createChild("DynamicCell")
+'   '   cell = m.cellsGroup.createChild("DynamicCell")
 '   '   cell.index = i
 '   '   cell.itemContent = content.getChild(i)
 '   '   currRect = m.rects[i]
@@ -109,7 +122,7 @@ end function
 '   if m.moveAnimation.state = "play"
 '     m.moveAnimation.control = "pause"
 '   end if
-'   m.moveAnimationInterpolator.keyValue = [[m.cellHolder.translation[0], 20], [- targetX, 20]]
+'   m.moveAnimationInterpolator.keyValue = [[m.cellsGroup.translation[0], 20], [- targetX, 20]]
 '   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
 
 
@@ -152,7 +165,7 @@ end function
 ' end function
 
 ' function onAnimationFractionChange()
-'   x = m.cellHolder.translation[0]
+'   x = m.cellsGroup.translation[0]
 '   index = getIndexAtX(x)
 '   ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
 
@@ -254,7 +267,7 @@ end function
 '           end if
 
 '           cell.translation = m.rects[index]
-'           m.cellHolder.appendChild(cell)
+'           m.cellsGroup.appendChild(cell)
 '           cell.index = m.top.index
 '           m.cellsById[id] = cell
 '         else 
@@ -341,7 +354,7 @@ end function
 '   if key = "left" or key = "right"
 '     'fixed focus 
 '     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
-'     index = getIndexAtX(m.cellHolder.translation[0])
+'     index = getIndexAtX(m.cellsGroup.translation[0])
 '     if m.currentDirection = -1
 '       nextIndex = index - 1
 '     else

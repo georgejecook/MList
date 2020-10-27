@@ -3,8 +3,9 @@ import "pkg:/source/roku-list/ListMixin.bs"
 
 class ListItemViewManager extends ItemViewManager
 
-  function new(owner, container)
-    super("ListItemViewManager", owner, container)
+  function new(list, container)
+    super("ListItemViewManager", list, container)
+    m.delegate = list.rowEvents
   end function
 
   override function getRenderer(index)
@@ -12,10 +13,6 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   override function createRenderers(content)
-    m.visibleComponents = []
-    m.hiddenComponents = []
-    m.components = []
-    m.rects = []
 
     'TODO remove/recycle views
 
@@ -36,22 +33,6 @@ class ListItemViewManager extends ItemViewManager
         component.screenState = "offScreen"
 
         m.components.push(component)
-
-        component.visible = item.isHidden <> true
-        if component.visible
-          component.translation = [0, y]
-
-          'TODO better handle the whole visibility
-
-          y += component.height + settings.space
-
-          m.rects.push({ translation: component.translation, size: [w, component.height] })
-          m.visibleComponents.push(component)
-          m.visibleItems.push(component.content)
-        else
-          m.hiddenComponents.push(component)
-        end if
-
         index++
       end for
     end if
@@ -85,5 +66,30 @@ class ListItemViewManager extends ItemViewManager
     return component
   end function
 
+  override function updateLayout()
+    y = 0
+    w = m.owner.width
+
+    for each component in m.components
+      settings = ListMixin.getRowSettings(m.owner, component.content)
+      component.visible = component.content.isHidden <> true
+
+      if component.visible
+        component.translation = [0, y]
+
+        'TODO better handle the whole visibility
+
+        y += component.height + settings.space
+
+        m.rects.push({ translation: component.translation, size: [w, component.height] })
+        m.visibleComponents.push(component)
+        m.visibleItems.push(component.content)
+      else
+        m.hiddenComponents.push(component)
+      end if
+
+    end for
+
+  end function
 
 end class

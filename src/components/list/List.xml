@@ -18,6 +18,12 @@
         id='rowSettings'
         type='node' />
 
+    <field
+        id='focusMoveAnimationInterpolator'
+        type='node' />
+    <field
+        id='focusMoveAnimation'
+        type='node' />
 
     <field
         id='width'
@@ -39,11 +45,11 @@
 
     <!-- screen and selection state -->
     <field
-        id='listEvent'
-        type='assocarray' />
+        id='cellEvents'
+        type='node' />
     <field
-        id='listEvents'
-        type='array' />
+        id='rowEvents'
+        type='node' />
     <!-- <field
         id='viewPortEvents'
         type='array' /> -->
