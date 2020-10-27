@@ -23,9 +23,6 @@ class ItemScroller extends BaseClass
   public animSpeed = 0.3
   public regularAnimSpeed = 0.3
   public fastAnimSpeed = 2
-  public componentBufferMode = "offScreen"
-  public numberOfItems = 0
-  public screenRect = { translation: [0, 0], size: [1920, 1080] }
 
   function new(viewManager, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
     super("ItemScroller")
@@ -44,16 +41,13 @@ class ItemScroller extends BaseClass
     m.components = m.viewManager.visibleComponents ' content items 
     m.items = m.viewManager.visibleItems ' content items 
     m.rects = m.viewManager.rects ' calculated views for the items
-    m.numberOfItems = m.items.count()
+
     owner = m.viewManager.owner
     m.delegates = []
 
     if m.viewManager.delegate <> invalid
       m.delegates.push(m.viewManager.delegate)
     end if
-
-    'TODO - use bounds here
-    m.screenRect = { translation: owner.translation, size: [owner.width, owner.height] }
 
     'TODO
   end function
@@ -71,7 +65,7 @@ class ItemScroller extends BaseClass
     if direction = -1
       index = 0
     else
-      index = m.numberOfItems - 1
+      index = m.viewManager.numberOfItems - 1
     end if
     m.moveToIndex(index, screenPos, animated, fast)
   end function
@@ -100,12 +94,12 @@ class ItemScroller extends BaseClass
       return 0
     end if
 
-    if index > m.numberOfItems - 1
-      return m.getValidTargetIndex(m.numberOfItems - 1, -1)
+    if index > m.viewManager.numberOfItems - 1
+      return m.getValidTargetIndex(m.viewManager.numberOfItems - 1, -1)
     end if
 
     item = m.items[index]
-    while item <> invalid and item.isFocusable <> false and index < m.numberOfItems - 1 and index > -1
+    while item <> invalid and item.isFocusable <> false and index < m.viewManager.numberOfItems - 1 and index > -1
       index += direction
       item = m.items[index]
     end while
@@ -162,7 +156,7 @@ class ItemScroller extends BaseClass
     else
       m.container.translation = targetTranslation
       'TODO -check if jump is bigger than a certain amount
-      m.updateRenderedComponents()
+      m.viewManager.updateRenderedComponents(m.direction, m.index)
       m.setFocusIndex(index, false)
     end if
   end function
@@ -309,8 +303,8 @@ class ItemScroller extends BaseClass
     'things that need to happen in here:
     '1. update the screen state
     ' this should be based on the look aheads/look behinds.. 
-    if ((index mod 10) = 0 or index < 10 or index < m.numberOfItems - 10)
-      m.updateRenderedComponents()
+    if ((index mod 10) = 0 or index < 10 or index < m.viewManager.numberOfItems - 10)
+      m.viewManager.updateRenderedComponents(m.direction, m.index)
     end if
 
     m.notifyViewportEvents(true)
@@ -321,7 +315,7 @@ class ItemScroller extends BaseClass
 
   function notifyViewportEvents(isMoving)
     'maintain a collection of controls that are in bounds right now:
-    m.onScreenCompMap = m.getComoponentsInViewPort(- m.container.translation[m.axes])
+    m.onScreenCompMap = m.viewManager.getComoponentsInViewPort(- m.container.translation[m.axes])
 
     'we assign events to each component AND send them to the owner, so it can choose what to do
     events = []
@@ -358,7 +352,7 @@ class ItemScroller extends BaseClass
     'notify what WILL come into view
     if isMoving and m.nextIndex <> m.index
       nextTranslation = m.getTargetTranslation(m.nextIndex, screenPos)
-      nextOnScreenCompMap = m.getComoponentsInViewPort(nextTranslation[m.axes])
+      nextOnScreenCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
       ' m.logInfo("nextOnScreenCompMap", nextOnScreenCompMap)
       for each id in nextOnScreenCompMap
         comp = m.components[id.toInt()]
@@ -379,90 +373,6 @@ class ItemScroller extends BaseClass
 
     for each delegate in m.delegates
       delegate.listEvents = events
-    end for
-  end function
-
-  function getComoponentsInViewPort(startOffset)
-    compStates = {}
-
-    sStart = m.screenRect.translation[m.axes] + startOffset
-    sEnd = sStart + m.screenRect.size[m.axes]
-
-    for each comp in m.renderedComponents
-      cRect = m.rects[comp.index]
-      cStart = cRect.translation[m.axes]
-      cEnd = cStart + cRect.size[m.axes]
-      if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
-        compStates[comp.id] = true
-      else 
-        compStates[comp.id] = false
-      end if
-      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd) 
-    end for
-
-    return compStates
-  end function
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ visibility state management
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  function updateRenderedComponents()
-
-    'TODO make these settings
-    beforeCount = 5
-    afterCount = 10
-
-    ' ? "new Index" ; newIndex; " direction "; direction
-    if m.direction < 0
-      numberOfItemsToShowBefore = beforeCount
-      numberOfItemsToShowAfter = afterCount
-    else
-      numberOfItemsToShowBefore = beforeCount
-      numberOfItemsToShowAfter = afterCount
-    end if
-
-    m.updateComponentScreenStates(numberOfItemsToShowBefore, numberOfItemsToShowAfter)
-  end function
-
-  function updateComponentScreenStates(numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3) as void
-    ' m.logMethod("updateComponentScreenStates newIndex", newIndex, "old", oldIndex)
-    screenStateMap = {}
-
-    if m.numberOfItems = 0
-      return 
-    end if
-
-    m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
-    m.updateScreenStateMap(screenStateMap, m.index - numberOfItemsToShowBefore, m.index + numberOfItemsToShowAfter, "onScreen")
-    m.renderedComponents = []
-    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
-    for each id in screenStateMap
-      component = m.components[id.toInt()]
-
-      if component <> invalid
-        component.screenState = screenStateMap[id]
-        if component.screenState = "onScreen"
-          m.renderedComponents.push(component)
-        end if
-      else
-        ' ? "ERROR could not find visible component for "; id
-      end if
-    end for
-
-    m.lastStates = screenStateMap
-  end function
-
-  function updateScreenStateMap(screenStateMap, startIndex, endIndex, state)
-    for i = startIndex to endIndex
-
-      if i >= 0 and i < m.rects.count()
-        component = m.components[i]
-
-        if component <> invalid
-          screenStateMap[component.id] = state
-        end if
-      end if
     end for
   end function
 

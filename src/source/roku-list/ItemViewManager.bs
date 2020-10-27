@@ -1,6 +1,10 @@
 import "pkg:/source/roku-list/BaseClass.bs"
 
 class ItemViewManager extends BaseClass
+
+  public screenRect = { translation: [0, 0], size: [1920, 1080] }
+  public componentBufferMode = "offScreen"
+
   'owning views
   public container = invalid
   public owner = invalid
@@ -11,24 +15,33 @@ class ItemViewManager extends BaseClass
   public components = []
   public rects = []
 
-
   'tracking
   public visibleItems = []
   public visibleComponents = []
   public hiddenComponents = []
+  public numberOfItems = 0
+  public axes = 0
 
-  function new(name, owner, container)
+  function new(name, owner, container, axes)
     super(name)
     m.container = container
     m.owner = owner
+    m.axes = axes
+    m.updateScreenRect()
+  end function
+
+  private function updateScreenRect()
+    m.screenRect = { translation: m.owner.translation, size: [m.owner.width, m.owner.height] }
   end function
 
   function setContent(content)
     m.content = content
+
     m.container.removeChildren(m.container.getChildren(-1, 0))
     m._createRenderers(content)
-
     m._updateLayout()
+
+    m.numberOfItems = m.visibleItems.count()
   end function
 
   function _createRenderers(items)
@@ -40,11 +53,19 @@ class ItemViewManager extends BaseClass
   end function
 
   function _updateLayout()
+    m.logInfo("_updateLayout")
+    m.updateScreenRect()
+
     m.visibleComponents = []
     m.visibleItems = []
-    m.logInfo("_updateLayout")
+    m.rects = []
+
     m.updateLayout()
   end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ util
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function convertChildTranslationToOwner(containerTranslation)
     return [m.container.translation[0] + containerTranslation[0], m.container.translation[1] + containerTranslation[1]]
@@ -54,19 +75,92 @@ class ItemViewManager extends BaseClass
     return [m.container.translation[0] - ownerTranslation[0], m.container.translation[1] - ownerTranslation[1]]
   end function
 
+  function getComoponentsInViewPort(startOffset)
+    compStates = {}
+
+    sStart = m.screenRect.translation[m.axes] + startOffset
+    sEnd = sStart + m.screenRect.size[m.axes]
+
+    for each comp in m.renderedComponents
+      cRect = m.rects[comp.index]
+      cStart = cRect.translation[m.axes]
+      cEnd = cStart + cRect.size[m.axes]
+      if (cStart >= sStart and cStart <= sEnd) or (cEnd >= sStart and cEnd <= sEnd)
+        compStates[comp.id] = true
+      else 
+        compStates[comp.id] = false
+      end if
+      ' m.logInfo(compStates[comp.id], "sStart", sStart, "sEnd", sENd, "cStart", cStart, "cEnd", cENd) 
+    end for
+
+    return compStates
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ visibility state management
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function updateRenderedComponents(direction, index)
+
+    'TODO make these settings
+    beforeCount = 5
+    afterCount = 10
+
+    ' ? "new Index" ; newIndex; " direction "; direction
+    if direction < 0
+      numberOfItemsToShowBefore = beforeCount
+      numberOfItemsToShowAfter = afterCount
+    else
+      numberOfItemsToShowBefore = beforeCount
+      numberOfItemsToShowAfter = afterCount
+    end if
+
+    screenStateMap = m.createScreenStateMap(direction, index, numberOfItemsToShowBefore, numberOfItemsToShowAfter)
+    m.renderedComponents = []
+    m.applyScreenStateMap(screenStateMap)
+  end function
+
+  function createScreenStateMap(direction, index, numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3)
+    ' m.logMethod("createScreenStateMap newIndex", newIndex, "old", oldIndex)
+    screenStateMap = {}
+
+    if m.numberOfItems = 0
+      return {}
+    end if
+
+    m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
+    m.updateScreenStateMap(screenStateMap, index - numberOfItemsToShowBefore, index + numberOfItemsToShowAfter, "onScreen")
+    return screenStateMap
+  end function
+
+  function updateScreenStateMap(screenStateMap, startIndex, endIndex, state)
+    for i = startIndex to endIndex
+
+      if i >= 0 and i < m.rects.count()
+        component = m.components[i]
+
+        if component <> invalid
+          screenStateMap[component.id] = state
+        end if
+      end if
+    end for
+  end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ override
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+  function createRenderers(items)
+  end function
+
+  function updateLayout()
+  end function
+
+  function applyScreenStateMap(screenStateMap)
+  end function
+
   function getRenderer(index)
     return invalid
   end function
 
-  function createRenderers(items)
-  end function
-
-
-  function updateLayout()
-  end function
 end class

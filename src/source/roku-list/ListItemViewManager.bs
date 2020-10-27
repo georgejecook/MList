@@ -4,7 +4,7 @@ import "pkg:/source/roku-list/ListMixin.bs"
 class ListItemViewManager extends ItemViewManager
 
   function new(list, container)
-    super("ListItemViewManager", list, container)
+    super("ListItemViewManager", list, container, 1)
     m.delegate = list.rowEvents
   end function
 
@@ -92,4 +92,20 @@ class ListItemViewManager extends ItemViewManager
 
   end function
 
+  override function applyScreenStateMap(screenStateMap)
+    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
+    for each id in screenStateMap
+      component = m.components[id.toInt()]
+
+      if component <> invalid
+        component.screenState = screenStateMap[id]
+        if component.screenState = "onScreen"
+          m.renderedComponents.push(component)
+        end if
+      else
+        ' ? "ERROR could not find visible component for "; id
+      end if
+    end for
+
+  end function
 end class

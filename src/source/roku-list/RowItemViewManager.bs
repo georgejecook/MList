@@ -1,65 +1,50 @@
 import "pkg:/source/roku-list/ItemViewManager.bs"
 
 class RowItemViewManager extends ItemViewManager
+  public row = invalid
 
-function new(owner, container)
-  super("RowItemViewManager", owner, container)
+  function new(list, row, container)
+    super("RowItemViewManager", row, container, 0)
+    m.row = row
   end function
 
-  override function getRenderer(index)
-    return invalid
-  end function
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ overridden
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
   override function createRenderers(content)
   end function
 
+  override function updateLayout()
+    translation = [0, 0]
+    for each item in content.getChildren(-1, 0)
+      settings = ListMixin.getCellSettings(m.owner, m.row, item)
+      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space[m.axes]
+      rects.push({ translation: translation, size: settings.size })
+    end for
+  end function
 
-  function layoutLists()
-    y = 0
 
-    w = m.owner.width
-    for each list in m.lists
-      list.visible = not list.isHidden
-      if list.visible
-        list.translation = [0, y]
-        'TODO get rect for item..
-        m.itemRects.push({ translation: list.translation, size: [w, list.height + 40] })
+  override function applyScreenStateMap(screenStateMap)
+    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
+    for each id in screenStateMap
+      component = m.components[id.toInt()]
 
-        if list.subType() = "Rectangle"
-          y += list.height + 40
-        else
-          y += m.owner.cellSize[1] + m.owner.cellSpacing[1] + 40
+      if component <> invalid
+        component.screenState = screenStateMap[id]
+        if component.screenState = "onScreen"
+          m.renderedComponents.push(component)
         end if
-        m.visibleViews.push(list)
-        m.visibleContent.push(list.content)
       else
-        m.hiddenViews.push(list)
+        ' ? "ERROR could not find visible component for "; id
       end if
     end for
 
-    m.itemScroller.updateItems(m.visibleContent, m.itemRects)
-  end function
-
-  function layoutCells()
-    cw = m.owner.cellSize[0]
-    ch = m.owner.cellSize[1]
-    csw = m.owner.cellSpacing[0]
-    csh = m.owner.cellSpacing[1]
-    m.rects = []
-    'rects.push({ x: - cw, y: 0, width: cw, height: ch })
-    content = m.owner.content
-    numCells = content.getChildCount()
-    m.createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
-  end function
-
-  function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
-    w = sx
-    y = csh
-    for i = 0 to numberOfCols
-      rects.push({ x: w, y: y, width: cw, height: ch })
-      w += cw + csw
-    end for
   end function
 
 
+  override function getRenderer(index)
+    return invalid
+  end function
 end class
