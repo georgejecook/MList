@@ -27,7 +27,6 @@ class RowItemViewManager extends ItemViewManager
 
 
   override function applyScreenStateMap(screenStateMap)
-    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
     for each id in screenStateMap
       component = m.components[id.toInt()]
 
@@ -42,7 +41,6 @@ class RowItemViewManager extends ItemViewManager
     end for
 
   end function
-
 
   override function getRenderer(index)
     return invalid

@@ -101,26 +101,28 @@ class ItemViewManager extends BaseClass
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function updateRenderedComponents(direction, index)
+    rendererCounts = m.getRendererCounts(direction, index)
 
-    'TODO make these settings
-    beforeCount = 5
-    afterCount = 10
-
-    ' ? "new Index" ; newIndex; " direction "; direction
-    if direction < 0
-      numberOfItemsToShowBefore = beforeCount
-      numberOfItemsToShowAfter = afterCount
-    else
-      numberOfItemsToShowBefore = beforeCount
-      numberOfItemsToShowAfter = afterCount
-    end if
-
-    screenStateMap = m.createScreenStateMap(direction, index, numberOfItemsToShowBefore, numberOfItemsToShowAfter)
+    screenStateMap = m.createScreenStateMap(direction, index, rendererCounts)
     m.renderedComponents = []
     m.applyScreenStateMap(screenStateMap)
   end function
 
-  function createScreenStateMap(direction, index, numberOfItemsToShowBefore = 1, numberOfItemsToShowAfter = 3)
+  function getRendererCounts(direction, index)
+    if direction < 0
+      return {
+        before: 10
+        after: 5
+      }
+    else
+      return {
+        before: 5
+        after: 10
+      }
+    end if
+  end function
+
+  function createScreenStateMap(direction, index, rendererCounts)
     ' m.logMethod("createScreenStateMap newIndex", newIndex, "old", oldIndex)
     screenStateMap = {}
 
@@ -129,7 +131,7 @@ class ItemViewManager extends BaseClass
     end if
 
     m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
-    m.updateScreenStateMap(screenStateMap, index - numberOfItemsToShowBefore, index + numberOfItemsToShowAfter, "onScreen")
+    m.updateScreenStateMap(screenStateMap, index - rendererCounts.before, index + rendererCounts.after, "onScreen")
     return screenStateMap
   end function
 

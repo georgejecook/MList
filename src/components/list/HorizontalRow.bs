@@ -5,20 +5,14 @@ import "pkg:/source/roku-list/RowItemViewManager.bs"
 import "pkg:/source/roku-list/ItemFocusManager.bs"
 
 function init()
-  log_registerLogger("List")
+  log_registerLogger("Row")
+  m.isAnimatorsCreated = false
   m.top.observeField("content", "onContentChange")
-
   m.cellsGroup = m.top.findNode("cellsGroup")
-  ' m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
-  ' m.moveAnimation = m.top.findNode("moveAnimation")
-
-  ' m.top.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
-  ' m.top.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
-  ' m.viewManager = new RowItemViewManager(m.top, m.rowsGroup)
-  ' m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator)
-  ' m.itemScroller = new RowItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
-  ' m.itemScroller.focusManager = m.focusManager
-
+  m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
+  m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
+  m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
+  m.moveAnimation = m.top.findNode("moveAnimation")
   ' m.header = m.top.findNode("header")
   ' m.cellProvider = m.global.cellProvider
   ' m.cellTracker = m.global.cellTracker
@@ -30,6 +24,15 @@ function init()
 end function
 
 
+function createManagers()
+  m.logInfo("initialize")
+  isAnimatorsCreated = true
+  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup)
+  m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents)
+
+  m.itemScroller = new RowItemScroller(m.viewManager, 1, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller.focusManager = m.focusManager
+end function
 
 ' function onContentIsHiddenChange()
 '   m.top.isHidden = m.content.isHidden = true
@@ -40,6 +43,11 @@ function onContentChange(evt)
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
     calculateHeight()
+    ' createManagers()
+    'TODO - don'd do this if the row is hidden
+    ' m.viewManager.setContent(m.top.content)
+    ' m.itemScroller.reset()
+  
     ' if m.content.isHidden <> true
     '   ' configureHeader()
     '   ' if m.content.focusType <> invalid
@@ -62,123 +70,6 @@ function calculateHeight()
   end if
 end function
 
-' function configureHeader()
-'   if m.content <> invalid
-'     m.header.text = m.content.title
-'   else
-'     m.header.text = ""
-'   end if
-' end function
-
-' function createHorizontalRects(rects, sx, cw, ch, csw, csh, numberOfCols)
-'   w = sx
-'   y = csh
-'   for i = 0 to numberOfCols
-'     rects.push({ translation: [w,y], size: [cw, ch] })
-'     w += cw + csw
-'   end for
-' end function
-
-' function layoutCells()
-'   cw = m.top.cellSize[0]
-'   ch = m.top.cellSize[1]
-'   csw = m.top.cellSpacing[0]
-'   csh = m.top.cellSpacing[1]
-'   m.rects = []
-'   'rects.push({ x: - cw, y: 0, width: cw, height: ch })
-'   content = m.top.content
-'   numCells = content.getChildCount()
-'   createHorizontalRects(m.rects, 0, cw, ch, csw, csh, numCells)
-
-'   'create all the content 
-'   ' for i = 0 to numCells
-'   '   cell = m.cellsGroup.createChild("DynamicCell")
-'   '   cell.index = i
-'   '   cell.itemContent = content.getChild(i)
-'   '   currRect = m.rects[i]
-'   '   cell.currRect = currRect
-'   '   cell.translation = [currRect.x, currRect.y]
-'   ' end for
-'   m.top.currTargetSet = m.rects
-'   'updateListVisibility(m.top.screenState)
-' end function
-
-' function animateToIndex(oldIndex, index, fastAnimationSpeed = 1)
-'   m.logMethod("animateToIndex from", oldIndex, "to", index)
-'   nextCell = m.rects[index]
-
-'   if nextCell = invalid
-'     m.logError("could not idenitfy next cell with index", index)
-'     return invalid
-'   end if
-
-'   targetX = getItemFocusXPosition(index)
-'   'TODO count visible rows between oldIndex and newIndex
-'   steps = abs(oldIndex - index)
-'   if m.moveAnimation.state = "play"
-'     m.moveAnimation.control = "pause"
-'   end if
-'   m.moveAnimationInterpolator.keyValue = [[m.cellsGroup.translation[0], 20], [- targetX, 20]]
-'   m.moveAnimation.duration = (steps * m.top.animSpeed) / fastAnimationSpeed
-
-
-'   if m.top.screenState <> "onScreen"
-'     m.top.screenState = "onScreen"
-'   end if
-
-'   if m.moveAnimation.state = "pause"
-'     m.moveAnimation.control = "resume"
-'   else
-'     m.moveAnimation.control = "start"
-'   end if
-
-' end function
-
-' function onAnimateToItemChange()
-'   if m.content <> invalid
-'     ' m.logInfo("onAnimateToItemChange", m.top.animateToItem)
-'     animateToIndex(m.top.itemFocused, m.top.animateToItem, m.top.fastAnimationSpeed)
-'   end if
-' end function
-
-' function getIndexAtX(xPos)
-'   for i = 0 to m.rects.count() - 1
-'     x = getItemFocusXPosition(i)
-'     if abs(x) >= abs(xPos)
-'       return i
-'     end if
-'   end for
-
-'   return -1
-' end function
-
-' function getItemFocusXPosition(index) 
-'   rect = m.rects[index] 
-'   if rect <> invalid
-'     return rect.translation[0]
-'   end if
-'   return 0
-' end function
-
-' function onAnimationFractionChange()
-'   x = m.cellsGroup.translation[0]
-'   index = getIndexAtX(x)
-'   ' m.logInfo("onAnimationFractionChange", m.moveAnimationInterpolator.fraction, "x", x, "index", index)
-
-'   if m.moveAnimationInterpolator.fraction = 1
-'     if index = -1
-'       index = 0
-'     end if
-'     m.top.itemFocused = index
-'     if m.top.screenState = "onScreen"
-'       m.top.screenState = "buffer"
-'     end if
-'   els
-'     'updating horizontal list efficiency while scrolling..
-'     if index <> -1 and index <> m.top.rowFocused
-'       updateListVisibility("onScreen")
-'     end if
-'     m.top.itemFocused = index
 
 '   end if
 
