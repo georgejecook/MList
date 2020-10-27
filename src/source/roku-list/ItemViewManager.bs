@@ -139,10 +139,10 @@ class ItemViewManager extends BaseClass
     for i = startIndex to endIndex
 
       if i >= 0 and i < m.rects.count()
-        component = m.components[i]
+        rect = m.rects[i]
 
-        if component <> invalid
-          screenStateMap[component.id] = state
+        if rect <> invalid
+          screenStateMap[str(rect.index).trim()] = state
         end if
       end if
     end for

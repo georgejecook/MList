@@ -10,12 +10,14 @@
         id='index'
         type='int' />
     <field
-        id='itemContent'
+        id='content'
         type='node' />
     <field
-        id='focusPercent'
-        type='float' />
-
+        id='listEvent'
+        type='assocarray' />
+    <field
+        id='size'
+        type='array' />
   </interface>
 
 

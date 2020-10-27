@@ -1,5 +1,5 @@
 import "pkg:/source/roku-list/ListMixin.bs"
-import "pkg:/source/roku-list/ListDelegateMixin.bs"
+import "pkg:/source/roku-list/ListItemDelegateMixin.bs"
 import "pkg:/source/roku-list/RowItemScroller.bs"
 import "pkg:/source/roku-list/RowItemViewManager.bs"
 import "pkg:/source/roku-list/ItemFocusManager.bs"
@@ -16,7 +16,7 @@ function init()
   ' m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  ' ListItemDelegateMixin.setDelegate()
+  ListItemDelegateMixin.setDelegate()
 end function
 
 function createManagers()
@@ -38,20 +38,9 @@ function onContentChange(evt)
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
     calculateHeight()
-    ' createManagers()
-    ' m.viewManager.setContent(m.top.content)
-    ' m.itemScroller.reset()
-
-    ' if m.content.isHidden <> true
-    '   ' configureHeader()
-    '   ' if m.content.focusType <> invalid
-    '   '   m.top.focusType = m.content.focusType
-    '   ' end if
-    '   ' toggleContentListener(true)
-    '   ' layoutCells()
-    '   ' onscreenStateChange()
-    ' else
-    ' end if
+    createManagers()
+    m.viewManager.setContent(m.top.content)
+    m.itemScroller.reset()
   end if
 end function
 
@@ -64,198 +53,57 @@ function calculateHeight()
   end if
 end function
 
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'++ KeyPress
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-'   end if
+function onKeyPressLeft() as boolean
+  m.logMethod("onKeyPressLeft")
+  m.itemScroller.move(-1)
+  return true
+end function
 
-' end function
+function onKeyPressRight() as boolean
+  m.logMethod("onKeyPressRight")
+  m.itemScroller.move(1)
+  return true
+end function
 
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-' '++ flyweight heuristics (i.e. cell reuse)
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function getLongPressIntervalForKey(key) as float
+  m.logMethod("getLongPressIntervalForKey", key)
+  if key = "left" or key = "right"
+    return 0.5
+  else
+    return 0
+  end if
+end function
 
-' function onscreenStateChange()
-'   ' m.logInfo("onscreenStateChange", m.top.index, m.top.screenState)
-'   if m.top.screenState <> m.previousscreenState 
-'     m.previousscreenState = m.top.screenState
-'     updateListVisibility(m.top.screenState)
-'   end if
-' end function
+function onLongPressStart(key) as boolean
+  m.logMethod(">>>>onLongPressStart", key)
 
-' function updateListVisibility(state)
-'   if m.content <> invalid
-'     ' m.logMethod("updateListVisibility", m.top.index, state)
-'     states = {}
+  if key = "left" or key = "right"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    if key = "left"
+      m.itemScroller.moveToEnd(-1)
+    else
+      m.itemScroller.moveToEnd(1)
+    end if
 
-'     if state = "offScreen" or state = "buffer"
-'       setListStateMap(states, 0, m.content.getChildCount(), "offScreen")
-'     end if
+    return true
+  end if
 
-'     if state = "onScreen"
-'       ' setListStateMap(states, 0, m.content.getChildCount(), "onScreen")
-'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "onScreen")
-'     else if state = "buffer"
-'       'TODO - calcculate this!
-'       setListStateMap(states, m.top.itemFocused - 1, m.top.itemFocused + 4, "onScreen")
-'     end if
+  return false
+end function
 
-'     toggleCellStates(states)
-'   end if
-' end function
+function onLongPressFinish(key) as boolean
+  if key = "left" or key = "right"
+    m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
+    m.itemScroller.finishAnimating()
+    return true
+  end if
 
-' function setListStateMap(states, startIndex, endIndex, state)
-'   ' m.logMethod("setListStateMap", startIndex, endIndex, state)
-'   for i = startIndex to endIndex
-
-'     if i >= 0 and i < m.content.getChildCount()
-'       states[str(i).trim()] = state
-'     end if
-'   end for
-' end function
-
-' function toggleCellStates(states)
-'   'm.cellTracker.callFunc("setscreenStates", states)
-'   for each id in states
-'     applyscreenStateForCell(id, states[id])
-'   end for
-' end function
-
-' function onIsOnScreenChange()
-'   ' m.logMethod("onIsOnScreenChange")
-'   isOnScreen = m.top.isOnScreen
-'   for each id in m.cellsById
-'     cell = m.cellsById[id]
-'     if isOnScreen
-'       cell.itemContent = m.content.getChild(id.toInt())
-'     end if
-'     cell.visible = isOnScreen
-'   end for
-' end function
-
-' function applyscreenStateForCell(id, screenState)
-'   index = id.toInt()
-'   isOnScreen = m.top.isOnScreen
-'   ' ? "applyscreenStateForCell "; id ; " vs " ; screenState ; " isonScreen" ; isOnScreen
-'   item = m.content.getChild(index)
-'   if item <> invalid
-'     if screenState = "onScreen"
-'       if m.cellsById[id] = invalid
-'         cell = m.cellProvider@.getCell(item.cellType)
-'         if cell <> invalid
-'           cell.visible = isOnScreen
-
-'           if isOnScreen
-'             cell.itemContent = item
-'           end if
-
-'           cell.translation = m.rects[index]
-'           m.cellsGroup.appendChild(cell)
-'           cell.index = m.top.index
-'           m.cellsById[id] = cell
-'         else 
-'           ? ">>ERR no cell for " ; item.cellType
-'         end if
-'       end if
-'     else
-'       cell = m.cellsById[id]
-'       if cell <> invalid
-'         m.cellProvider@.releaseCell(cell) 
-'         m.cellsById.delete(id)
-'       end if
-'     end if
-'   end if
-' end function
-
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-' '++ lifecycle
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-' function onCurrFocusItemIndexChange()
-' end function
-
-' function onIsFocusedChange()
-' end function
-
-' function moveXFocus(direction)
-'   nextIndex = m.top.itemFocused + direction
-
-'   if nextIndex < 0
-'     nextIndex = 0
-'   else if nextIndex > m.rects.count() - 1
-'     nextIndex = m.rects.count() - 1
-'   end if
-'   animateToIndex(m.top.itemFocused, nextIndex)
-'   m.top.itemFocused = nextIndex
-
-' end function
-
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-' '++ KeyPress
-' '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-' function onKeyPressLeft() as boolean
-'   m.logMethod("onKeyPressLeft")
-'   moveXFocus(-1)
-'   return true
-' end function
-
-' function onKeyPressRight() as boolean
-'   m.logMethod("onKeyPressRight")
-'   moveXFocus(1)
-'   return true
-' end function
-
-
-' function getLongPressIntervalForKey(key) as float
-'   m.logMethod("getLongPressIntervalForKey", key)
-'   if key = "left" or key = "right"
-'     return 0.5
-'   else
-'     return 0
-'   end if
-' end function
-
-' function onLongPressStart(key) as boolean
-'   m.logMethod(">>>>onLongPressStart", key)
-
-'   if key = "left" or key = "right"
-'     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
-'     if key = "left"
-'       targetIndex = 0 
-'     else
-'       targetIndex = m.content.getChildCount() - 1
-'     end if
-'     animateToIndex(m.top.itemFocused, targetIndex)
-'     return true
-'   end if
-
-'   return false
-' end function
-
-' function onLongPressFinish(key) as boolean
-'   if key = "left" or key = "right"
-'     'fixed focus 
-'     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
-'     index = getIndexAtX(m.cellsGroup.translation[0])
-'     if m.currentDirection = -1
-'       nextIndex = index - 1
-'     else
-'       nextIndex = index
-'       index -= m.currentDirection
-'     end if
-
-'     if nextIndex < 0
-'       nextIndex = 0
-'     else if index > m.rects.count() - 1
-'       nextIndex = m.rects.count() - 1
-'     end if
-
-'     animateToIndex(index, nextIndex)
-'     return true
-'   end if
-
-'   return false
-' end function
-
+  return false
+end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ delegate
@@ -269,34 +117,34 @@ function onWillExit(index, direction)
   ? "onWillExit " ; index ; " " ; direction
 end function
 
-function onDidEnter(index, direction)
-  ? "onDidEnter " ; index ; " " ; direction
-end function
+' function onDidEnter(index, direction)
+'   ? "onDidEnter " ; index ; " " ; direction
+' end function
 
-function onDidExit(index, direction)
-  ? "onDidExit " ; index ; " " ; direction
-end function
+' function onDidExit(index, direction)
+'   ? "onDidExit " ; index ; " " ; direction
+' end function
 
-function onWillGainFocus(index, direction)
-  ? "onWillGainFocus " ; index ; " " ; direction
-end function
+' function onWillGainFocus(index, direction)
+'   ? "onWillGainFocus " ; index ; " " ; direction
+' end function
 
-function onWillListFocus(index, direction)
-  ? "onWillListFocus " ; index ; " " ; direction
-end function
+' function onWillListFocus(index, direction)
+'   ? "onWillListFocus " ; index ; " " ; direction
+' end function
 
-function onDidGainFocus(index, direction)
-  ? "onDidGainFocus " ; index ; " " ; direction
-end function
+' function onDidGainFocus(index, direction)
+'   ? "onDidGainFocus " ; index ; " " ; direction
+' end function
 
-function onDidLoseFocus(index, direction)
-  ? "onDidLoseFocus " ; index ; " " ; direction
-end function
+' function onDidLoseFocus(index, direction)
+'   ? "onDidLoseFocus " ; index ; " " ; direction
+' end function
 
-function onGainingFocus(index, direction, fraction)
-  ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
-end function
+' function onGainingFocus(index, direction, fraction)
+'   ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
+' end function
 
-function onLosingFocus(index, direction, fraction)
-  ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
-end function
+' function onLosingFocus(index, direction, fraction)
+'   ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
+' end function

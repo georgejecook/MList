@@ -27,49 +27,79 @@ class RowItemViewManager extends ItemViewManager
     index = 0
     for each item in m.content.getChildren(-1, 0)
       settings = ListMixin.getCellSettings(m.owner, m.row, item)
+      translation = [translation[0], translation[1]]
       translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
       m.rects.push({ 
         translation: translation, 
         size: settings.size 
         index: index
       })
+      m.visibleItems.push(item)
+      'TODO - for now, no vis options for rows..
       index++
     end for
   end function
 
+  override function getRendererCounts(direction, index)
+    'TODO - put heuristics here to take into account:
+    ' screen size
+    ' cellsizes in the index range
+    ' floating vs fixed focus
+    if direction < 0
+      return {
+        before: 5
+        after: 2
+      }
+    else
+      return {
+        before: 2
+        after: 5
+      }
+    end if
+  end function
 
   override function applyScreenStateMap(screenStateMap)
-    for each id in screenStateMap
-      m.applyscreenStateForCell(id, screenStateMap[id])
-    end for
+    ' m.logInfo("applyScreenStateMap", screenStateMap)
+    if m.row.isOnScreen
+      for each id in screenStateMap
+        m.applyscreenStateForCell(id, screenStateMap[id])
+      end for
+    else
+      for each id in screenStateMap
+        m.applyscreenStateForCell(id, "offScreen")
+      end for
+    end if
   end function
 
   function applyscreenStateForCell(id, screenState)
     index = id.toInt()
     isOnScreen = m.row.isOnScreen
-    ? "applyscreenStateForCell "; id ; " vs " ; screenState ; " isonScreen" ; isOnScreen
     item = m.content.getChild(index)
 
     if item <> invalid
       if screenState = "onScreen"
         if m.cellsById[id] = invalid
           settings = ListMixin.getCellSettings(m.owner, m.row, item)
+          ' ? "GETTING CELL " ; settings.compName
           cell = m.cellProvider@.getCell(settings.compName)
 
           if cell <> invalid
             'TODO - work out what to do around setting content etc here
             cell.visible = isOnScreen
 
+            ? ">>>>>>>> " ; isOnScreen
+
             if isOnScreen
-              cell.itemContent = item
+              cell.content = item
             end if
 
-            cell.translation = m.rects[index]
-            m.cellsGroup.appendChild(cell)
-            cell.index = m.top.index
+            cell.translation = m.rects[index].translation
+            cell.size = m.rects[index].size
+            m.container.appendChild(cell)
+            cell.index = index
             m.cellsById[id] = cell
           else 
-            ? ">>ERR no cell for " ; item.cellType
+            ? ">>ERR no cell for " ; settings.compName
           end if
         end if
       else

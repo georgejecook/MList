@@ -16,7 +16,7 @@
     <field
         id='_defaultCellType'
         type='string'
-        value='Imagecell' />
+        value='Cell' />
         <!-- value='ComplexCell' /> -->
     <field
         id='_numberOfRows'

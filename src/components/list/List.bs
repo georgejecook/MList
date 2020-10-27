@@ -6,7 +6,8 @@ import "pkg:/source/roku-list/ListMixin.bs"
 
 function init()
   log_registerLogger("List")
-  m.top.rowSettings = ListMixin.createRowSettings()
+  cellSettings = ListMixin.createCellSettings("ml_Cell")
+  m.top.rowSettings = ListMixin.createRowSettings(cellSettings)
   m.top.focusSettings = ListMixin.createFocusSettings()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToRow", "onAnimateToRowChange")
@@ -226,7 +227,6 @@ end function
 
 function onLongPressFinish(key) as boolean
   if key = "up" or key = "down"
-    'fixed focus 
     m.logVerbose("long press finished on key", key, "going to animate to final scroll position")
     m.itemScroller.finishAnimating()
     return true

@@ -35,7 +35,7 @@ namespace ListMixin
     return settings
   end function
 
-  function createCellSettings(compName = "SimpleTile", size = [300, 500], space = 30, screenPos = 0)
+  function createCellSettings(compName = "Cell", size = [300, 500], space = 30, screenPos = 0)
     settings = createObject("roSGNode", "CellSettings")
 
     settings.update({
@@ -81,13 +81,13 @@ namespace ListMixin
   ' content = createObjecT("roSGnode", "ContentNode")
   ' content.appendChild(makeHeroRow(json.hero))
   ' content.appendChild(makeFavesRow(json.faves))
-  ' moviesGridSettings = createGridRowSettings("SimpleTile")
+  ' moviesGridSettings = createGridRowSettings("Cell")
   ' myGridRowContent = createGridRowContent(makeGridItems(json.showsGrid), moviesGridSettings)
   ' for each show in json.shows
   ' content.appendChild(makeShowRow(show))
   ' end for
 
-  function setTileSettings(compName = "SimpleTile", cellSize = [300, 500])
+  function setTileSettings(compName = "Cell", cellSize = [300, 500])
   end function
 
   function getRowSettings(list, row = invalid)

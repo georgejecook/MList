@@ -5,11 +5,11 @@ function init()
   m.poster3 = m.top.findNode("poster3")
   m.label = m.top.findNode("label")
   m.label3 = m.top.findNode("label3")
-  m.top.observeField("itemContent", "itemContentChanged")
+  m.top.observeField("content", "onContentChanged")
   m.top.observeField("focusPercent", "focusPercentChanged")
 end function
 
-function itemContentChanged()
+function onContentChanged()
   m.label.text = "C" + m.top.itemContent.title
   ' m.label2.text = m.top.itemContent.description
   m.label3.text = m.top.itemContent.description + " " + m.top.itemContent.description
@@ -18,6 +18,3 @@ function itemContentChanged()
   m.poster3.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
 end function
 
-function focusPercentChanged()
-  ' print "focusPercent for item "; m.top.index; " changed to "; m.top.focusPercent
-end function
