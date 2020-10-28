@@ -128,6 +128,7 @@ class ItemScroller extends BaseClass
     m.logInfo("moving to ", targetTranslation, animated)
     if animated
       m.viewManager.isScrolling = true
+      m.viewManager.owner.isScrolling = true
       m.viewManager.updateRenderedComponents(m.direction, m.index)
 
       'TODO count visible rows between oldIndex and newIndex
@@ -182,6 +183,12 @@ class ItemScroller extends BaseClass
     end if
   end function
 
+  function stopAnimating()
+    m.moveAnimation.control = "stop"
+    m.viewManager.isScrolling = false
+    m.viewManager.owner.isScrolling = false
+
+  end function
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ animation callbacks
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -193,6 +200,9 @@ class ItemScroller extends BaseClass
 
     if fraction = 1
       m.focusManager.onFocusAnimationUpdate(1) 
+      m.viewManager.isScrolling = false
+      m.viewManager.owner.isScrolling = false
+
       if index <> m.index
         m.setFocusIndex(index, false)
       end if

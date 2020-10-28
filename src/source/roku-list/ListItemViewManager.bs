@@ -116,10 +116,10 @@ class ListItemViewManager extends ItemViewManager
 
   end function
 
-  ' override function getRenderedIndexes(direction, index)
-  '   return {
-  '     startIndex: index - 5
-  '     endIndex: index + 10
-  '   }
-  ' end function
+  override function getRenderedIndexes(direction, index)
+    return {
+      startIndex: 0
+      endIndex: m.visibleItems.count()
+    }
+  end function
 end class

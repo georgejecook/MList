@@ -21,6 +21,10 @@
         type='node' />
 
     <field
+        id='isScrolling'
+        type='boolean' />
+
+    <field
         id='focusMoveAnimationInterpolator'
         type='node' />
     <field

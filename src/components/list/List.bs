@@ -189,13 +189,21 @@ end function
 
 function onKeyPressUp() as boolean
   m.logMethod("onKeyPressUp")
-  m.itemScroller.move(-1)
+  if (m.top.isScrolling)
+    m.itemScroller.move(-2)
+  else
+    m.itemScroller.move(-1)
+  end if
   return true
 end function
 
 function onKeyPressDown() as boolean
   m.logMethod("onKeyPressDown")
-  m.itemScroller.move(1)
+  if (m.top.isScrolling)
+    m.itemScroller.move(2)
+  else
+    m.itemScroller.move(1)
+  end if
   return true
 end function
 

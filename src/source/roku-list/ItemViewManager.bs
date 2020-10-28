@@ -136,10 +136,10 @@ class ItemViewManager extends BaseClass
       end if
     end if
 
-    if m.row = invalid
-      ? " RI " ; renderedIndexes
-      ? " LRI " ; m.lastRenderedIndexes
-    end if
+    ' if m.row = invalid
+    '   ? " RI " ; renderedIndexes
+    '   ? " LRI " ; m.lastRenderedIndexes
+    ' end if
     m.lastRenderedIndexes = renderedIndexes
     ' m.logInfo("renderedIndexes index", index, renderedIndexes)
     renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
@@ -225,9 +225,9 @@ class ItemViewManager extends BaseClass
       endIndex = m.numberOfItems
     end if
 
-    if m.row <> invalid
-      ? " UPDATE STATE MAP ROW  "; m.row.index ; " isR" ; m.row.isRendered 
-    end if
+    ' if m.row <> invalid
+    '   ? " UPDATE STATE MAP ROW  "; m.row.index ; " isR" ; m.row.isRendered 
+    ' end if
 
     for i = startIndex to endIndex - 1
       rect = m.rects[i]

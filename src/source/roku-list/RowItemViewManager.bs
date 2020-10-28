@@ -94,7 +94,7 @@ class RowItemViewManager extends ItemViewManager
   ' end function
 
   override function applyRenderStateMap(renderStateMap)
-    m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
+    ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
     if m.row.isRendered
       for each id in renderStateMap
         m.applyrenderStateForCell(id, renderStateMap[id])
