@@ -60,7 +60,7 @@ class RowItemViewManager extends ItemViewManager
 
   override function applyScreenStateMap(screenStateMap)
     ' m.logInfo("applyScreenStateMap", screenStateMap)
-    if m.row.isOnScreen
+    if true or m.row.isOnScreen
       for each id in screenStateMap
         m.applyscreenStateForCell(id, screenStateMap[id])
       end for
@@ -85,13 +85,14 @@ class RowItemViewManager extends ItemViewManager
 
           if cell <> invalid
             'TODO - work out what to do around setting content etc here
-            cell.visible = isOnScreen
+            cell.visible = true
+            ' cell.visible = isOnScreen
 
             ? ">>>>>>>> " ; isOnScreen
 
-            if isOnScreen
-              cell.content = item
-            end if
+            ' if isOnScreen
+            cell.content = item
+            ' end if
 
             cell.translation = m.rects[index].translation
             cell.size = m.rects[index].size

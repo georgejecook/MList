@@ -65,7 +65,6 @@ namespace ListItemDelegateMixin
       end if
     end if
 
-    stop
     m.isObservingListEvents = m.listEventMap.count() > 0
     if m.isObservingListEvents
       m.listEventInstance = instance
@@ -76,9 +75,9 @@ namespace ListItemDelegateMixin
   function onListEventBridge(sgEvent) as void
     event = sgEvent.getData()
     eventName = event.name
-    ? eventName
+    ' ? eventName
     if not m.isObservingListEvents or m.listEventMap[eventName] <> true
-      ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
+      ' ? "LE(skipped) " ; eventName ; " " ; event.direction ; " I " ; "" ; event.index ; " " ; event.fraction
       return
     end if
     ' ? "onListEventBridge OBSERVED " ; eventName

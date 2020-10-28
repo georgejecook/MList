@@ -60,32 +60,19 @@
         height='50'
         loadDisplayMode='scaleToFit' />
     <Label
-        id='theLabel'
+        id='label'
         width='350'
         horizAlign='center'
         translation='[10, 10]' />
-    <!-- <Label
-        id='theLabel2'
-        text='Description test in here with wrap'
-        wrap='true'
-        maxLines='3'
-        width='350'
-        color='#ff00ff'
-        translation='[10, 50]' /> -->
 
     <Label
-        id='theLabel3'
+        id='label2'
         text='Summary text in here'
         wrap='true'
         maxLines='2'
         width='360'
         color='#000000'
         translation='[10, 300]' />
-
-    <!-- <ColorFieldInterpolator
-        id='focusColorInterp'
-        key='[0.0, 1.0]'
-        keyValue='[0x00002080, 0x000080FF]' /> -->
 
   </children>
 

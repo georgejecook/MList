@@ -4,16 +4,16 @@ function init()
   m.poster2 = m.top.findNode("poster2")
   m.poster3 = m.top.findNode("poster3")
   m.label = m.top.findNode("label")
-  m.label3 = m.top.findNode("label3")
+  m.label2 = m.top.findNode("label2")
   m.top.observeField("content", "onContentChanged")
   m.top.observeField("focusPercent", "focusPercentChanged")
 end function
 
 function onContentChanged()
-  m.label.text = "C" + m.top.itemContent.title
-  ' m.label2.text = m.top.itemContent.description
-  m.label3.text = m.top.itemContent.description + " " + m.top.itemContent.description
-  m.poster.uri = m.top.itemContent.HDGRIDPOSTERURL
+  m.label.text = "C" + m.top.content.title
+  ' m.label2.text = m.top.content.description
+  m.label2.text = m.top.content.description + " " + m.top.content.description
+  m.poster.uri = m.top.content.HDGRIDPOSTERURL
   ' m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
   m.poster3.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
 end function
