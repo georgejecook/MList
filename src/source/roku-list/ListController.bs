@@ -59,8 +59,8 @@ class ListController
   '   m.logMethod(">>onSetInitialTimerFire")
   '   layoutLists()
   '   for each row in m.visibleLists
-  '     ' row.screenState = "buffer"
-  '     row.screenState = "offScreen"
+  '     ' row.renderState = "buffer"
+  '     row.renderState = "none"
   '   end for
   '   updateRowStates(0, 0, 5, 10)
   ' end function
@@ -108,9 +108,9 @@ class ListController
   '   list.numCols = m.top.numCols
   '   list.unfocusCellScale = m.top.unfocusCellScale
   '   list.unfocusCount = m.top.unfocusCount
-  '   list.screenState = "offScreen"
+  '   list.renderState = "none"
   '   list.content = rowContent
-  '   list.isOnScreen = m.listIndex < 5
+  '   list.isrendered = m.listIndex < 5
   '   m.listIndex++
 
   '   return list
@@ -198,7 +198,7 @@ class ListController
   '     end if
   '     nextIndex = getListAtY(y - 1400)
   '     'TODO - actually run this propertly
-  '     m.visibleLists[nextIndex].isOnScreen = true
+  '     m.visibleLists[nextIndex].isrendered = true
   '   end if
 
   ' end function
@@ -361,8 +361,8 @@ class ListController
   '   ' ? "updating states: " ; formatJson(states)
   '   for each rowId in states
   '     list = m.visibleLists[rowId.toInt()]
-  '     if list <> invalid and list.hasField("screenState")
-  '       list.screenState = states[rowId]
+  '     if list <> invalid and list.hasField("renderState")
+  '       list.renderState = states[rowId]
   '     else
   '       ' ? "ERROR could not find visible list for "; rowId
   '     end if
@@ -416,7 +416,7 @@ class ListController
   '     for each rowId in m.laststates
   '       list = m.visibleLists[rowId.toInt()]
   '       if list <> invalid
-  '         list.screenState = "offScreen"
+  '         list.renderState = "none"
   '       else
   '         ? "ERROR could not find visible list for "; rowId
   '       end if
@@ -425,7 +425,7 @@ class ListController
   '     for each rowId in m.laststates
   '       list = m.visibleLists[rowId.toInt()]
   '       if list <> invalid
-  '         list.screenState = m.laststates[rowId]
+  '         list.renderState = m.laststates[rowId]
   '       else
   '         ? "ERROR could not find visible list for "; rowId
   '       end if

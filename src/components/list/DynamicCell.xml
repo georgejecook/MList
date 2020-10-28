@@ -15,7 +15,7 @@
         id='trackingId'
         type='string' />
     <field
-        id='screenState'
+        id='renderState'
         type='string'
         value='hidden' />
     <field

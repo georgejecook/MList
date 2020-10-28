@@ -4,14 +4,26 @@ function init()
   m.poster2 = m.top.findNode("poster2")
   m.label = m.top.findNode("label")
   m.label2 = m.top.findNode("label2")
-  m.top.observeField("content", "onContentChanged")
-  m.top.observeField("focusPercent", "focusPercentChanged")
+  m.top.observeField("content", "onContentChange")
+  ' m.top.observeField("listEvent", "onListEvent")
+  m.content = invalid
 end function
 
-function onContentChanged()
-  m.label.text = "C" + m.top.content.title
-  m.label2.text = m.top.content.description + " " + m.top.content.description
-  m.poster.uri = m.top.content.HDGRIDPOSTERURL
-  m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+function onContentChange()
+  if m.content = invalid or not m.content.isSamenode(m.top.content)
+    m.content = m.top.content
+
+    m.label.text = "C" + m.content.title
+    m.label2.text = m.content.description + " " + m.content.description
+    m.poster.uri = m.content.HDGRIDPOSTERURL
+    m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+  end if
 end function
 
+function onListEvent(evt)
+  event = evt.getData()
+  ' ? "OLE " ; event
+  ' if event.name = "willEnter" or event.name = "didEnter"
+  '   onContentChange()
+  ' end if
+end function

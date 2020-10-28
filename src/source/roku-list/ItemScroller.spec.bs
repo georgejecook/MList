@@ -64,7 +64,7 @@ namespace Tests
       m.scroller.setFocusIndex(0, false)
       'TODO test me
       comps = m.scroller.components
-      m.checkOnScreenComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
+      m.checkrenderedComps(comps, [0, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10])
     end function
 
     '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -159,7 +159,7 @@ namespace Tests
 
       for i = first to last step direction
         comp = comps[i]
-        ? comp.id ; " " ; comp.listEvent.name ; " " ; comp.isOnScreen
+        ? comp.id ; " " ; comp.listEvent.name ; " " ; comp.isInViewport
       end for
     end function
 
@@ -169,13 +169,13 @@ namespace Tests
       end for
     end function
 
-    function checkOnScreenComps(comps, onScreenIds, offScreenIds)
-      for each id in onScreenIds
-        m.assertTrue(comps[id].isOnScreen)
+    function checkrenderedComps(comps, renderedIds, offScreenIds)
+      for each id in renderedIds
+        m.assertTrue(comps[id].isInViewport)
       end for
 
       for each id in offScreenIds
-        m.assertFalse(comps[id].isOnScreen)
+        m.assertFalse(comps[id].isInViewport)
       end for
     end function
 

@@ -8,7 +8,7 @@ class ItemScroller extends BaseClass
   public viewManager = invalid
   public focusManager = invalid
   public renderedComponents = []
-  public onScreenCompMap = []
+  public renderedCompMap = []
   public index = 0
   public indexPosition = 0
   public focusedIndex = 0
@@ -125,9 +125,11 @@ class ItemScroller extends BaseClass
       m.animSpeed = m.regularAnimSpeed
     end if
 
-
     m.logInfo("moving to ", targetTranslation, animated)
     if animated
+      m.viewManager.isScrolling = true
+      m.viewManager.updateRenderedComponents(m.direction, m.index)
+
       'TODO count visible rows between oldIndex and newIndex
       steps = abs(m.index - index)
       if steps = 0
@@ -148,7 +150,7 @@ class ItemScroller extends BaseClass
     else
       m.container.translation = targetTranslation
       'TODO -check if jump is bigger than a certain amount
-      m.viewManager.updateRenderedComponents(m.direction, m.index)
+      ' m.viewManager.updateRenderedComponents(m.direction, m.index)
       m.setFocusIndex(index, false)
     end if
   end function
@@ -231,9 +233,9 @@ class ItemScroller extends BaseClass
     'things that need to happen in here:
     '1. update the screen state
     ' this should be based on the look aheads/look behinds.. 
-    if ((index mod 10) = 0 or index < 10 or index < m.viewManager.numberOfItems - 10)
-      m.viewManager.updateRenderedComponents(m.direction, m.index)
-    end if
+    ' if ((index mod 10) = 0 )
+    m.viewManager.updateRenderedComponents(m.direction, m.index)
+    ' end if
 
     m.notifyViewportEvents(true)
 
@@ -243,15 +245,15 @@ class ItemScroller extends BaseClass
 
   function notifyViewportEvents(isMoving)
     'maintain a collection of controls that are in bounds right now:
-    m.onScreenCompMap = m.viewManager.getComoponentsInViewPort(- m.container.translation[m.axes])
+    m.renderedCompMap = m.viewManager.getComoponentsInViewPort(- m.container.translation[m.axes])
 
     'we assign events to each component AND send them to the owner, so it can choose what to do
     events = []
 
-    for each id in m.onScreenCompMap
+    for each id in m.renderedCompMap
       comp = m.components[id.toInt()]
       if comp <> invalid
-        if m.onScreenCompMap[id] = true and comp.isOnScreen = false
+        if m.renderedCompMap[id] = true and comp.isInViewport = false
           'ensure clients always get willEnter before didEnter
           if comp.listEvent = invalid or comp.listEvent.name <> "willEnter" 
             event = { name: "willEnter", direction: m.direction, index: comp.index }
@@ -261,8 +263,9 @@ class ItemScroller extends BaseClass
           event = { name: "didEnter", direction: m.direction, index: comp.index }
           comp.listEvent = event
           events.push(event)
-          comp.isOnScreen = true
-        else if m.onScreenCompMap[id] = false and comp.isOnScreen = true
+          comp.isInViewport = true
+          ' comp.visible = true
+        else if m.renderedCompMap[id] = false and comp.isInViewport = true
           'ensure clients always get willExit before didExit
           if comp.listEvent = invalid or comp.listEvent.name <> "willExit" 
             event = { name: "willExit", direction: m.direction, index: comp.index }
@@ -272,7 +275,8 @@ class ItemScroller extends BaseClass
           event = { name: "didExit", direction: m.direction, index: comp.index }
           comp.listEvent = event
           events.push(event)
-          comp.isOnScreen = false
+          comp.isInViewport = false
+          ' comp.visible = false
         end if
       end if 
     end for
@@ -280,17 +284,17 @@ class ItemScroller extends BaseClass
     'notify what WILL come into view
     if isMoving and m.nextIndex <> m.index
       nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, screenPos)
-      nextOnScreenCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
-      ' m.logInfo("nextOnScreenCompMap", nextOnScreenCompMap)
-      for each id in nextOnScreenCompMap
+      nextrenderedCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
+      ' m.logInfo("nextrenderedCompMap", nextrenderedCompMap)
+      for each id in nextrenderedCompMap
         comp = m.components[id.toInt()]
         if comp <> invalid
-          ' m.logInfo(id, comp.isOnScreen, nextOnScreenCompMap[id])
-          if nextOnScreenCompMap[id] = true and comp.isOnScreen = false
+          ' m.logInfo(id, comp.isInViewport, nextrenderedCompMap[id])
+          if nextrenderedCompMap[id] = true and comp.isInViewport = false
             event = { name: "willEnter", direction: m.direction, index: comp.index }
             comp.listEvent = event
             events.push(event)
-          else if nextOnScreenCompMap[id] = false and comp.isOnScreen = true
+          else if nextrenderedCompMap[id] = false and comp.isInViewport = true
             event = { name: "willExit", direction: m.direction, index: comp.index }
             comp.listEvent = event
             events.push(event)
@@ -302,62 +306,6 @@ class ItemScroller extends BaseClass
     for each delegate in m.delegates
       delegate.listEvents = events
     end for
-  end function
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ focus management
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ focus progres
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  ' /**
-  '  * @member updateItemFocuses
-  '  * @memberof module:nameOfClass
-  '  * @instance
-  '  * @function
-  '  * @description description
-  '  * @param {paramType} paramDescription
-  '  * @returns {returnType} returnDescription
-  '  */
-
-  function updateItemFocuses()
-    if m.direction = 1
-    else
-    end if
-    sPos = m.container.translation[m.axes]
-  end function
-
-  function updateItemFocus(index)
-    m.logMethod("updateItemFocus", index)
-    m.focusedItem = m.viewManager.visibleItems[index]
-
-    if m.focusedItem <> invalid
-      m.focusedIndex = index
-
-      'this shoudl be enough to ge the machinery going
-      m.focusedItem.isFocused = m.focusedItem.isFocusable
-
-
-      ' if m.focusedItem.content <> invalid and m.focusedItem.subType() = "HorizontalRow"
-      '   focusedItem = m.content.getChild(m.focusedItem.itemFocused)
-
-      '   if focusedItem <> invalid
-      '     m._focusedRenderer = m.cellTracker@.getCellForContentId(focusedItem.id)
-      '   else
-      '     m._focusedRenderer = invalid
-      '   end if
-      '   m.logWarn("focusing on list ", m.focusedItem.content.title)
-      '   m.focusedItem.setFocus(true)
-
-      ' end if
-    else
-      m.rowFocused = -1
-    end if
-
-    m.updateComponentScreenStates(0, m.index)
   end function
 
 end class

@@ -8,15 +8,17 @@ function init()
   log_registerLogger("Row")
   m.isAnimatorsCreated = false
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("isRendered", "onIsRenderedChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
   m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
   m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
-  ' m.header = m.top.findNode("header")
+  m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  ListItemDelegateMixin.setDelegate()
+  ' ListItemDelegateMixin.setDelegate()
+  m.top.observeField("listEvent", "onListEvent")
 end function
 
 function createManagers()
@@ -29,14 +31,11 @@ function createManagers()
   m.itemScroller.focusManager = m.focusManager
 end function
 
-' function onContentIsHiddenChange()
-'   m.top.isHidden = m.content.isHidden = true
-' end function
-
 function onContentChange(evt)
   ' m.logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
+    m.header.text = "ROW " + m.top.id
     calculateHeight()
     createManagers()
     m.viewManager.setContent(m.top.content)
@@ -53,6 +52,22 @@ function calculateHeight()
   end if
 end function
 
+function onIsRenderedChange()
+  ' ? "onIsRenderedChange " ; m.top.isRendered
+  if m.viewManager <> invalid
+    m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
+  end if
+end function
+
+function onListEvent(evt)
+  event = evt.getData()
+
+  if event.name = "willEnter" or event.name = "didEnter"
+    for each component in m.cellsGroup.getChildren(-1, 0)
+      component.listEvent = event
+    end for
+  end if
+end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

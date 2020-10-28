@@ -30,8 +30,8 @@ class TestItemViewManager extends ItemViewManager
         component = { 
           id: str(index).trim()
           content: item
-          isOnScreen: false
-          screenState: "offScreen"
+          isrendered: false
+          renderState: "none"
           visible: item.isHidden <> true
         }
 

@@ -17,9 +17,9 @@ function init()
   onResetChange()
   mv_initializeView(m.list)
 
-  
+
   'delegate functions are implemented on m.listVM class
-  ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
+  ' ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
 
   m.list.observeField("itemSelected", "itemSelcetedChanged")
   m.list.observeField("itemFocused", "itemFocusedChanged")
@@ -39,7 +39,7 @@ function createData()
   content = createObject("roSGNode", "ContentNode")
 
   for i = 0 to m.top._numberOfRows
-  ' for i = 0 to 1
+    ' for i = 0 to 1
     row = content.createChild("ml_HorizontalRowContent")
     row.title = "ROW " + str(i)
     if i <> 0
@@ -139,7 +139,7 @@ function makeItems(cellType, number)
     child.title = "Item " + child.id.tostr()
 
     'TODO use the new mechansim for this...
-    
+
     ' if m.contentId mod 5 = 0
     '   cellType = "ml_SimpleCell"
     ' else if m.contentId mod 7 = 0
@@ -170,8 +170,8 @@ function toggleCellState(items, state)
     if item <> invalid
       dynamicCell = m.cellTracker.callFunc("getCellForContentId", item.id)
       if dynamicCell <> invalid
-        ' ? "setting screenState on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
-        dynamicCell.screenState = state
+        ' ? "setting renderState on dynamic cell " ; dynamicCell.trackingId ; " content Id " ; item.id
+        dynamicCell.renderState = state
       end if
     end if
   end for
@@ -182,7 +182,7 @@ function onHideRow()
   ? "onHide" 
 
   row = m.list.content.getChild(focusedRow)
-  toggleCellState(getRowItems(row, m.top._hideRowItems), "offScreen")
+  toggleCellState(getRowItems(row, m.top._hideRowItems), "none")
 end function
 
 
@@ -190,7 +190,7 @@ function onShowRow()
   ? "onShow"
 
   row = m.list.content.getChild(focusedRow)
-  toggleCellState(getRowItems(row, m.top._showRowItems), "onScreen")
+  toggleCellState(getRowItems(row, m.top._showRowItems), "rendered")
 end function
 
 function getRowItems(row, number)
@@ -206,7 +206,7 @@ function onHideItems()
   for i = 0 to m.top._hideItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
-      dynamicCell.screenState = "offScreen"
+      dynamicCell.renderState = "none"
     end if
   end for
 end function
@@ -215,7 +215,7 @@ function onShowItems()
   for i = 0 to m.top._showItems
     dynamicCell = m.cellTracker.callFunc("getCellForContentId", str(i).trim())
     if dynamicCell <> invalid
-      dynamicCell.screenState = "onScreen"
+      dynamicCell.renderState = "rendered"
     end if
   end for
 end function

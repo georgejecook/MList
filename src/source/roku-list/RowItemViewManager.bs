@@ -5,6 +5,8 @@ class RowItemViewManager extends ItemViewManager
   public cellsById = {}
   public cellProvider
   public cellTracker 
+  public isScrolling = false
+  public lastRowIsRendered = "none"
 
   function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
     super("RowItemViewManager", list, container, 0, minPos, maxPos)
@@ -27,59 +29,92 @@ class RowItemViewManager extends ItemViewManager
     index = 0
     for each item in m.content.getChildren(-1, 0)
       settings = ListMixin.getCellSettings(m.owner, m.row, item)
-      translation = [translation[0], translation[1]]
-      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
       m.rects.push({ 
         translation: translation, 
         size: settings.size 
         index: index
       })
       m.visibleItems.push(item)
+
       'TODO - for now, no vis options for rows..
+      translation = [translation[0], translation[1]]
+      translation[m.axes] = translation[m.axes] + settings.size[m.axes] + settings.space
       index++
     end for
   end function
 
-  override function getRendererCounts(direction, index)
-    'TODO - put heuristics here to take into account:
-    ' screen size
-    ' cellsizes in the index range
-    ' floating vs fixed focus
-    
-    startPos = 0
-    if direction < 0
-      return {
-        before: 10
-        after: 2 
-      }
-    else
-      return {
-        before: 2
-        after: 10
-      }
-    end if
+  override function getRenderedIndexes(direction, index)
+    return {
+      startIndex: index - 2
+      endIndex: index + 7
+    }
   end function
 
-  override function applyScreenStateMap(screenStateMap)
-    m.logInfo("applyScreenStateMap", screenStateMap)
-    if true or m.row.isOnScreen
-      for each id in screenStateMap
-        m.applyscreenStateForCell(id, screenStateMap[id])
+  ' override function getRenderedIndexes(direction, index)
+  '   ' indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
+
+  '   ' if m.isScrolling
+  '   '   lookBehindDistance = m.maxPos / 2
+  '   '   lookAheadDistance = m.maxPos * 2
+  '   ' else
+  '   '   lookBehindDistance = m.minPos / 3
+  '   '   lookAheadDistance = m.maxPos * 1.25
+  '   ' end if
+
+  '   ' if direction < 0
+  '   '   beforePos = indexPos - lookAheadDistance
+  '   '   afterPos = indexPos + lookBehindDistance
+  '   ' else
+  '   '   afterPos = indexPos + lookAheadDistance
+  '   '   beforePos = indexPos - lookBehindDistance
+  '   ' end if
+
+  '   ' if beforePos < 0
+  '   '   beforePos = 0
+  '   ' end if
+
+  '   ' if afterPos < 0
+  '   '   afterPos = 0
+  '   ' end if
+
+  '   return {
+  '     startIndex: m.getIndexAtPosition(beforePos, direction)
+  '     endIndex: m.getIndexAtPosition(afterPos, direction)
+  '   }
+  ' end function
+
+  ' override function shouldUpdateRenderedIndexes(direction, index)
+  '   m.logInfo("shouldUpdateRenderedIndexes", m.row.index, m.row.renderState, m.lastRowIsRendered)
+  '   if m.row.renderState <> m.lastRowIsRendered
+  '     ? "change of state on row", m.row.index
+  '     m.lastRenderedIndexes = invalid
+  '     return true
+  '   end if 
+  '   return false
+  ' end function
+
+  override function applyRenderStateMap(renderStateMap)
+    m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
+    if m.row.isRendered
+      for each id in renderStateMap
+        m.applyrenderStateForCell(id, renderStateMap[id])
       end for
     else
-      for each id in screenStateMap
-        m.applyscreenStateForCell(id, "offScreen")
+      for each id in renderStateMap
+        m.applyrenderStateForCell(id, "none")
       end for
     end if
+
+    m.lastRowIsRendered = m.row.isRendered
   end function
 
-  function applyscreenStateForCell(id, screenState)
+  function applyrenderStateForCell(id, renderState)
     index = id.toInt()
-    isOnScreen = m.row.isOnScreen
+    isrendered = m.row.isrendered
     item = m.content.getChild(index)
 
     if item <> invalid
-      if screenState = "onScreen"
+      if renderState = "rendered"
         if m.cellsById[id] = invalid
           settings = ListMixin.getCellSettings(m.owner, m.row, item)
           ' ? "GETTING CELL " ; settings.compName
@@ -88,11 +123,11 @@ class RowItemViewManager extends ItemViewManager
           if cell <> invalid
             'TODO - work out what to do around setting content etc here
             cell.visible = true
-            ' cell.visible = isOnScreen
+            ' cell.visible = isrendered
 
-            ? ">>>>>>>> " ; isOnScreen
+            ' ? ">>>>>>>> " ; isrendered
 
-            ' if isOnScreen
+            ' if isrendered
             cell.content = item
             ' end if
 

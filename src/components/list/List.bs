@@ -160,7 +160,7 @@ end function
 '     for each rowId in m.laststates
 '       list = m.visibleLists[rowId.toInt()]
 '       if list <> invalid
-'         list.screenState = "offScreen"
+'         list.renderState = "none"
 '       else
 '         ? "ERROR could not find visible list for "; rowId
 '       end if
@@ -169,7 +169,7 @@ end function
 '     for each rowId in m.laststates
 '       list = m.visibleLists[rowId.toInt()]
 '       if list <> invalid
-'         list.screenState = m.laststates[rowId]
+'         list.renderState = m.laststates[rowId]
 '       else
 '         ? "ERROR could not find visible list for "; rowId
 '       end if

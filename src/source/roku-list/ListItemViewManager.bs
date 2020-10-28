@@ -6,6 +6,8 @@ class ListItemViewManager extends ItemViewManager
   function new(list, container, minPos = 0, maxPos = 1080)
     super("ListItemViewManager", list, container, 1, minPos, maxPos)
     m.delegate = list.rowEvents
+    m.lookAheadDistance = maxPos * 10
+    m.lookBehindDistance = maxPos / 2
   end function
 
   override function getRenderer(index)
@@ -30,7 +32,7 @@ class ListItemViewManager extends ItemViewManager
           component = m.createHorizontalRow(item, index, settings)
         end if
         component.index = index
-        component.screenState = "offScreen"
+        component.renderState = "none"
 
         m.components.push(component)
         index++
@@ -41,10 +43,10 @@ class ListItemViewManager extends ItemViewManager
   function createHorizontalRow(rowContent, index, settings)
     component = m.container.createChild("HorizontalRow")
     component.id = str(index).trim()
-    component.screenState = "offScreen"
+    component.renderState = "none"
     component.owner = m.owner
     component.content = rowContent
-    component.isOnScreen = index < 5
+    component.isInViewport = index < 5
 
     return component
   end function
@@ -96,20 +98,28 @@ class ListItemViewManager extends ItemViewManager
 
   end function
 
-  override function applyScreenStateMap(screenStateMap)
-    ' ? "updating screenStateMap: " ; formatJson(screenStateMap)
-    for each id in screenStateMap
+  override function applyRenderStateMap(renderStateMap)
+    ' ? "updating renderStateMap: " ; formatJson(renderStateMap)
+    for each id in renderStateMap
       component = m.components[id.toInt()]
 
       if component <> invalid
-        component.screenState = screenStateMap[id]
-        if component.screenState = "onScreen"
+        component.renderState = renderStateMap[id]
+        if component.renderState = "rendered"
           m.renderedComponents.push(component)
         end if
+        component.isRendered = component.renderState = "rendered"
       else
         ' ? "ERROR could not find visible component for "; id
       end if
     end for
 
   end function
+
+  ' override function getRenderedIndexes(direction, index)
+  '   return {
+  '     startIndex: index - 5
+  '     endIndex: index + 10
+  '   }
+  ' end function
 end class

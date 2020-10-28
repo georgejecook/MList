@@ -3,7 +3,7 @@ import "pkg:/source/roku-list/BaseClass.bs"
 class ItemViewManager extends BaseClass
 
   public screenRect = { translation: [0, 0], size: [1920, 1080] }
-  public componentBufferMode = "offScreen"
+  public componentBufferMode = "none"
 
   'owning views
   public container = invalid
@@ -23,9 +23,11 @@ class ItemViewManager extends BaseClass
   public axes = 0
   public minPos = 0
   public maxPos = 1080
+  public lookAheadDistance = 1000
+  public lookBehindDistance = 500
+  public lastRenderedIndexes = { startIndex: -1, endIndex: -1 }
 
-
-  function new(name, owner, container, axes,  minPos, maxPos)
+  function new(name, owner, container, axes, minPos, maxPos)
     super(name)
     m.container = container
     m.owner = owner
@@ -69,6 +71,10 @@ class ItemViewManager extends BaseClass
     m.updateLayout()
   end function
 
+  function onFocusIndexChange(direction, index)
+    m.updateRenderedComponents(direction, index)
+  end function
+
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ util
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -106,60 +112,129 @@ class ItemViewManager extends BaseClass
   '++ visibility state management
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function updateRenderedComponents(direction, index)
-    rendererCounts = m.getRendererCounts(direction, index)
+  function updateRenderedComponents(direction, index) as void
+    if not m.shouldUpdateRenderedIndexes(direction, index)
+      ' ? "not updating rendered indexes - shouldUpdateRenderedIndexes: false"
+      return
+    end if
 
-    screenStateMap = m.createScreenStateMap(direction, index, rendererCounts)
+    ' if m.lastRenderedIndex <> invalid
+    '   if direction = 1 and index <= m.lastRenderedIndex.endIndex
+    '     ? "STILL GOT ENOUGH 1"
+    '     return
+    '   else if direction = -1 and index >= m.lastRenderedIndex.endIndex
+    '     ? "STILL GOT ENOUGH -1"
+    '     return
+    '   end if
+    ' end if
+
+    renderedIndexes = m.getRenderedIndexes(direction, index)
+
+    if (m.lastRenderedIndexes <> invalid) and m.lastRenderedIndexes.startIndex = renderedIndexes.startIndex and m.lastRenderedIndexes.endIndex = renderedIndexes.endIndex
+      if m.renderedComponents.count() > 0
+        return
+      end if
+    end if
+
+    if m.row = invalid
+      ? " RI " ; renderedIndexes
+      ? " LRI " ; m.lastRenderedIndexes
+    end if
+    m.lastRenderedIndexes = renderedIndexes
+    ' m.logInfo("renderedIndexes index", index, renderedIndexes)
+    renderedStateMap = m.createRenderedStateMap(direction, index, renderedIndexes)
     m.renderedComponents = []
-    m.applyScreenStateMap(screenStateMap)
+    m.applyRenderStateMap(renderedStateMap)
   end function
 
-  function getRendererCounts(direction, index)
+  function shouldUpdateRenderedIndexes(direction, indexes)
+    return true
+  end function
+
+  ' function getRenderedIndexes(direction, index)
+  '   indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
+
+  '   if direction < 0
+  '     beforePos = indexPos - m.lookAheadDistance
+  '     afterPos = indexPos + m.lookBehindDistance
+  '   else
+  '     afterPos = indexPos + m.lookAheadDistance
+  '     beforePos = indexPos - m.lookBehindDistance
+  '   end if
+
+  '   if beforePos < 0
+  '     beforePos = 0
+  '   end if
+
+  '   if afterPos < 0
+  '     afterPos = 0
+  '   end if
+
+  '   return {
+  '     startIndex: m.getIndexAtPosition(beforePos, direction)
+  '     endIndex: m.getIndexAtPosition(afterPos, direction)
+  '   }
+  ' end function
+
+  function getRenderedIndexes(direction, index)
+
     if direction < 0
+      startIndex = index - 10
+      if startIndex < 0
+        startIndex = 0
+      end if
+
       return {
-        before: 10
-        after: 5
+        startIndex: startIndex
+        endIndex: startIndex + 2
       }
     else
+      startIndex = index - 2
+      if startIndex < 0
+        startIndex = 0
+      end if
+
       return {
-        before: 5
-        after: 10
+        startIndex: startIndex
+        endIndex: startIndex + 10
       }
     end if
+
+
   end function
 
-  function createScreenStateMap(direction, index, rendererCounts)
-    m.logMethod("createScreenStateMap", index, rendererCounts)
-    screenStateMap = {}
+  function createRenderedStateMap(direction, index, renderedIndexes)
+    ' m.logMethod("createRenderedStateMap", index, renderedIndexes)
+    renderedStateMap = {}
 
     if m.numberOfItems = 0
       return {}
     end if
 
-    m.updateScreenStateMap(screenStateMap, 0, m.numberOfItems, m.componentBufferMode)
-    m.updateScreenStateMap(screenStateMap, index - rendererCounts.before, index + rendererCounts.after, "onScreen")
-    return screenStateMap
+    m.updateRenderStateMap(renderedStateMap, 0, m.numberOfItems, m.componentBufferMode)
+    m.updateRenderStateMap(renderedStateMap, renderedIndexes.startIndex, index + renderedIndexes.endIndex, "rendered")
+    return renderedStateMap
   end function
 
-  function updateScreenStateMap(screenStateMap, startIndex, endIndex, state)
+  function updateRenderStateMap(renderedStateMap, startIndex, endIndex, state)
     if startIndex < 0
       startIndex = 0
     end if
-    
+
     if endIndex > m.numberOfItems
       endIndex = m.numberOfItems
+    end if
+
+    if m.row <> invalid
+      ? " UPDATE STATE MAP ROW  "; m.row.index ; " isR" ; m.row.isRendered 
     end if
 
     for i = startIndex to endIndex - 1
       rect = m.rects[i]
       if rect <> invalid
-        ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
-        screenStateMap[str(rect.index).trim()] = state
+        ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
+        renderedStateMap[str(rect.index).trim()] = state
       else
-        if i > 0
-          stop
-          ? "WTF"
-        end if
         ? " NO RECT "; i
       end if
     end for
@@ -216,6 +291,8 @@ class ItemViewManager extends BaseClass
   end function
 
   function getIndexAtPosition(position, direction)
+    'TODO - this will get fiddly when we have wrapping
+
     for i = 0 to m.numberOfItems
       itemRect = m.rects[i]
       screenPos = m.getScreenPositionForItem(itemRect, direction)
@@ -239,7 +316,7 @@ class ItemViewManager extends BaseClass
   function updateLayout()
   end function
 
-  function applyScreenStateMap(screenStateMap)
+  function applyRenderStateMap(renderedStateMap)
   end function
 
   function getRenderer(index)

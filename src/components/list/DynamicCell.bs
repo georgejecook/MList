@@ -4,9 +4,9 @@ function init()
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.cellTracker@.bindCellToContent(m.top)
-  m.screenState = "offScreen"
+  m.renderState = "none"
   m.itemContent = invalid
-  m.top.observeField("screenState", "onscreenStateChange")
+  m.top.observeField("renderState", "onrenderStateChange")
 end function
 
 function itemContentChanged()
@@ -14,13 +14,13 @@ function itemContentChanged()
   m.itemContent = m.top.itemContent
   m.cellTracker@.bindCellToContent(m.top, m.itemContent)
   if m.itemContent <> invalid
-    m.screenState = m.cellTracker@.getStateForContentId(m.itemContent.id)
+    m.renderState = m.cellTracker@.getStateForContentId(m.itemContent.id)
   end if
   updateCell() 
 end function
 
 function updateCell() as void
-  if m.screenState <> "onScreen"
+  if m.renderState <> "rendered"
     ? "DC cell not shown: RI" ; m.top.index ; " CI "; m.top.trackingId
     return
   end if
@@ -48,10 +48,10 @@ function updateCell() as void
 
 end function
 
-function onscreenStateChange(evt) 
-  ' ? "onscreenStateChange"; evt.getData()
-  m.screenState = evt.getData()
-  if m.screenState = "onScreen"
+function onrenderStateChange(evt) 
+  ' ? "onrenderStateChange"; evt.getData()
+  m.renderState = evt.getData()
+  if m.renderState = "rendered"
     updateCell()
     if m.cell <> invalid 
       m.cell.index = m.top.index
@@ -60,7 +60,7 @@ function onscreenStateChange(evt)
       m.cell.focusPercent = m.top.focusPercent
       m.cell.groupHasFocus = m.top.groupHasFocus
     end if
-  else if m.screenState = "offScreen" and m.cell <> invalid
+  else if m.renderState = "none" and m.cell <> invalid
     m.cellProvider@.releaseCell(m.cell) 
     m.cell = invalid
     m.top.cell = invalid
