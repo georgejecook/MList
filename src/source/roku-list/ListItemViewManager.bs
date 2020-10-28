@@ -8,6 +8,8 @@ class ListItemViewManager extends ItemViewManager
     m.delegate = list.rowEvents
     m.lookAheadDistance = maxPos * 10
     m.lookBehindDistance = maxPos / 2
+    m.lastScrollDirection = 0
+    m.lastScrollIndex = 0
   end function
 
   override function getRenderer(index)
@@ -117,9 +119,23 @@ class ListItemViewManager extends ItemViewManager
   end function
 
   override function getRenderedIndexes(direction, index)
+    ' return {
+    '   startIndex: 0
+    '   endIndex: m.visibleItems.count()
+    ' }
     return {
-      startIndex: 0
-      endIndex: m.visibleItems.count()
+      startIndex: index
+      endIndex: index + 10
     }
   end function
+
+  override function shouldUpdateRenderedIndexes(direction, index)
+    if direction <> m.lastScrollDirection or abs(index - m.lastScrollIndex) > 5
+      m.lastCrollIndex = index
+      m.lastScrollDirection = direction
+      return true
+    end if
+    return false
+  end function
+
 end class

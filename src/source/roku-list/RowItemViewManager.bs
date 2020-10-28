@@ -117,11 +117,16 @@ class RowItemViewManager extends ItemViewManager
       if renderState = "rendered"
         if m.cellsById[id] = invalid
           settings = ListMixin.getCellSettings(m.owner, m.row, item)
-          ? "GETTING CELL " ; id
+          ' ? "GETTING CELL " ; id
           cell = m.cellProvider@.getCell(settings.compName)
 
           if cell <> invalid
             'TODO - work out what to do around setting content etc here
+            cell.initialState = {
+              row: m.row
+              list: m.owner
+            } 
+
             cell.visible = true
             ' cell.visible = isrendered
 
@@ -144,7 +149,7 @@ class RowItemViewManager extends ItemViewManager
       else
         cell = m.cellsById[id]
         if cell <> invalid
-          ? "RELEASING " ; id
+          ' ? "RELEASING " ; id
           m.cellProvider@.releaseCell(cell) 
           m.cellsById.delete(id)
         else
@@ -157,4 +162,17 @@ class RowItemViewManager extends ItemViewManager
   override function getRenderer(index)
     return m.cellsById[str(index).trim()]
   end function
+
+  override function setIsScrolling(isScrolling)
+    m.isScrolling = isScrolling
+    for each id in m.cellsById
+      comp = m.cellsById[id]
+      if isScrolling
+        comp.listEvent = { name: "scrollStart" }
+      else
+        comp.listEvent = { name: "scrollStop" }
+      end if
+    end for
+  end function
+
 end class

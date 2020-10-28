@@ -45,6 +45,10 @@
         id='isHidden'
         type='boolean'
         value='false' />
+    <field
+        id='isScrolling'
+        type='boolean'
+        value='false' />
 
 
     <!-- conver to size -->

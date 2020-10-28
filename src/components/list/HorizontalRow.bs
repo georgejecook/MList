@@ -8,6 +8,7 @@ function init()
   log_registerLogger("Row")
   m.isAnimatorsCreated = false
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("isScrolling", "onIsScrollingChange")
   m.top.observeField("isRendered", "onIsRenderedChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
   m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
@@ -57,6 +58,13 @@ function onIsRenderedChange()
   ' ? "onIsRenderedChange " ; m.top.isRendered
   if m.viewManager <> invalid
     m.viewManager.updateRenderedComponents(m.itemScroller.direction, m.itemScroller.index)
+  end if
+end function
+
+function onIsScrollingChange()
+  ? ">>>>>>> onIsScrollingChange " ; m.top.isScrolling
+  if m.viewManager <> invalid
+    m.viewManager.setIsScrolling(m.top.isScrolling)
   end if
 end function
 
@@ -140,34 +148,34 @@ function onWillExit(index, direction)
   ? "onWillExit " ; index ; " " ; direction
 end function
 
-' function onDidEnter(index, direction)
-'   ? "onDidEnter " ; index ; " " ; direction
-' end function
+function onDidEnter(index, direction)
+  ? "onDidEnter " ; index ; " " ; direction
+end function
 
-' function onDidExit(index, direction)
-'   ? "onDidExit " ; index ; " " ; direction
-' end function
+function onDidExit(index, direction)
+  ? "onDidExit " ; index ; " " ; direction
+end function
 
-' function onWillGainFocus(index, direction)
-'   ? "onWillGainFocus " ; index ; " " ; direction
-' end function
+function onWillGainFocus(index, direction)
+  ? "onWillGainFocus " ; index ; " " ; direction
+end function
 
-' function onWillListFocus(index, direction)
-'   ? "onWillListFocus " ; index ; " " ; direction
-' end function
+function onWillListFocus(index, direction)
+  ? "onWillListFocus " ; index ; " " ; direction
+end function
 
-' function onDidGainFocus(index, direction)
-'   ? "onDidGainFocus " ; index ; " " ; direction
-' end function
+function onDidGainFocus(index, direction)
+  ? "onDidGainFocus " ; index ; " " ; direction
+end function
 
-' function onDidLoseFocus(index, direction)
-'   ? "onDidLoseFocus " ; index ; " " ; direction
-' end function
+function onDidLoseFocus(index, direction)
+  ? "onDidLoseFocus " ; index ; " " ; direction
+end function
 
-' function onGainingFocus(index, direction, fraction)
-'   ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
-' end function
+function onGainingFocus(index, direction, fraction)
+  ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
+end function
 
-' function onLosingFocus(index, direction, fraction)
-'   ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
-' end function
+function onLosingFocus(index, direction, fraction)
+  ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
+end function

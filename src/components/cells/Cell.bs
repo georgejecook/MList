@@ -6,6 +6,7 @@ function init()
   m.label2 = m.top.findNode("label2")
   ' m.top.observeField("content", "onContentChange")
   m.top.observeField("listEvent", "onListEvent")
+  m.top.observeField("initialState", "onInitialStateChange")
   m.content = invalid
 end function
 
@@ -17,13 +18,26 @@ function onContentChange()
     m.label2.text = m.content.description + " " + m.content.description
     m.poster.uri = m.content.HDGRIDPOSTERURL
     m.poster2.uri = "https://p1.hiclipart.com/preview/484/533/90/random-movie-collection-folder-icon-part-3-2-guns-256x256-2-guns-movie-poster-art-png-clipart.jpg"
+    onScrollChange()
   end if
+end function
+
+function onScrollChange()
+  isScrolling = m.row.isScrolling or m.list.isScrolling
+  m.label.visible = not isScrolling
+  m.label2.visible = not isScrolling
+end function
+
+function onInitialStateChange()
+  m.list = m.top.initialState.list
+  m.row = m.top.initialState.row
 end function
 
 function onListEvent(evt)
   event = evt.getData()
-  ' ? "OLE " ; event
   if event.name = "willEnter" or event.name = "didEnter"
     onContentChange()
+  else if event.name = "scrollStart" or event.name = "scrollStop"
+    onScrollChange()
   end if
 end function

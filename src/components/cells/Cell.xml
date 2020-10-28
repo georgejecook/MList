@@ -18,6 +18,9 @@
     <field
         id='size'
         type='array' />
+    <field
+        id='initialState'
+        type='assocarray' />
   </interface>
 
 

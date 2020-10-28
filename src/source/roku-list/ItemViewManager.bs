@@ -147,8 +147,19 @@ class ItemViewManager extends BaseClass
     m.applyRenderStateMap(renderedStateMap)
   end function
 
-  function shouldUpdateRenderedIndexes(direction, indexes)
+  function shouldUpdateRenderedIndexes(direction, index)
     return true
+  end function
+
+  function setIsScrolling(isScrolling)
+    m.isScrolling = isScrolling
+    for each comp in m.visibleComponents
+      if isScrolling
+        comp.listEvent = { name: "scrollStart" }
+      else
+        comp.listEvent = { name: "scrollStop" }
+      end if
+    end for
   end function
 
   ' function getRenderedIndexes(direction, index)
