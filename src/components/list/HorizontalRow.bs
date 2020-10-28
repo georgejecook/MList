@@ -25,7 +25,7 @@ function createManagers()
   m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents)
 
-  m.itemScroller = new RowItemScroller(m.viewManager, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
 end function
 

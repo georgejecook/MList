@@ -18,19 +18,15 @@ class ItemScroller extends BaseClass
   public container = invalid
   public direction = 0
   public axes = 0 'x = 0, y =1
-  public minPos = 0
-  public maxPos = 1080
   public animSpeed = 0.3
   public regularAnimSpeed = 0.3
   public fastAnimSpeed = 2
 
-  function new(viewManager, axes, minPos, maxPos, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, axes, moveAnimation, moveAnimationInterpolator)
     super("ItemScroller")
     m.viewManager = viewManager
     m.container = m.viewManager.container
     m.axes = axes
-    m.minPos = minPos
-    m.maxPos = maxPos
     m.moveAnimation = moveAnimation
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
@@ -106,7 +102,7 @@ class ItemScroller extends BaseClass
   function moveToIndex(index, screenPos = invalid, animated = true, fast = false)
     m.logInfo("moveToIndex", index, screenPos, animated)
 
-    targetTranslation = m.getTargetTranslation(index, screenPos)
+    targetTranslation = m.viewManager.getTargetTranslation(index, m.direction, screenPos)
 
     if targetTranslation = invalid
       m.logError("cannot move! translation invalid for index", index)
@@ -157,26 +153,6 @@ class ItemScroller extends BaseClass
     end if
   end function
 
-  function getTargetTranslation(index, screenPos = invalid)
-    itemRect = m.viewManager.rects[index]
-
-    if itemRect = invalid
-      stop
-      m.logWarn("no itemRect for index", index)
-      return [-1, -1]
-    end if
-
-    screenPos = m.getScreenPositionForItem(itemRect, m.direction)
-    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-    ' ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
-
-    if m.axes = 0
-      return [- targetPos, m.container.translation[1]]
-    else
-      return [m.container.translation[0], - targetPos]
-    end if
-
-  end function
 
   function finishAnimating()
     ' ? "stop ci " ; m.index ; " ni " ; m.nextIndex
@@ -194,8 +170,8 @@ class ItemScroller extends BaseClass
     end if
     m.nextIndex = index
     nextRect = m.viewManager.rects[m.nextIndex]
-    screenPos = m.getScreenPositionForItem(nextRect, m.direction, screenPos)
-    nextTranslation = m.getTargetTranslation(index, screenPos)
+    screenPos = m.viewManager.getScreenPositionForItem(nextRect, m.direction, screenPos)
+    nextTranslation = m.viewManager.getTargetTranslation(index, m.index, screenPos)
 
     if nextTranslation <> invalid
       m.nextPosition = nextTranslation[m.axes]
@@ -205,57 +181,13 @@ class ItemScroller extends BaseClass
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  '++ itemRect positions
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
-    if itemRect <> invalid
-      if screenPos <> invalid
-        return screenPos
-      else if itemRect.screenPos <> invalid
-        return itemRect.screenPos
-      else if m.direction = -1
-        return m.minPos
-      else if m.direction = 1
-        'TODO - calculate position that can fit on screen
-        return m.minPos ' fixed focus
-        ' return m.maxPos - itemRect.width
-      end if
-    end if
-    return m.minPos
-  end function
-
-  function getOffsetForScreenPosition(itemRect, screenPos)
-    if itemRect <> invalid
-      return itemRect.translation[m.axes] + screenPos
-    else
-      return m.minPos
-    end if
-  end function
-
-  function getIndexAtPosition(position, direction)
-    for i = 0 to m.viewManager.rects.count() - 1
-      itemRect = m.viewManager.rects[i]
-      screenPos = m.getScreenPositionForItem(itemRect, direction)
-      itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-      ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
-      if itemPos > abs(position)
-        return i - 1
-      end if
-    end for
-
-    return -1
-  end function
-
-  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ animation callbacks
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   function onAnimationFractionChange(fraction)
     ' m.logInfo("onAnimationFractionChange", fraction)
     position = m.container.translation[m.axes]
-    index = m.getIndexAtPosition(position, m.direction)
-
+    index = m.viewManager.getIndexAtPosition(position, m.direction)
 
     if fraction = 1
       m.focusManager.onFocusAnimationUpdate(1) 
@@ -294,7 +226,7 @@ class ItemScroller extends BaseClass
     end if
 
     'TODO -note - we need to know what screenPos WAS in a floating scenario!!
-    m.indexPosition = m.getTargetTranslation(m.index, screenPos)[m.axes]
+    m.indexPosition = m.viewManager.getTargetTranslation(m.index, m.direction, screenPos)[m.axes]
 
     'things that need to happen in here:
     '1. update the screen state
@@ -347,7 +279,7 @@ class ItemScroller extends BaseClass
 
     'notify what WILL come into view
     if isMoving and m.nextIndex <> m.index
-      nextTranslation = m.getTargetTranslation(m.nextIndex, screenPos)
+      nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, screenPos)
       nextOnScreenCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
       ' m.logInfo("nextOnScreenCompMap", nextOnScreenCompMap)
       for each id in nextOnScreenCompMap

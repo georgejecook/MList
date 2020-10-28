@@ -3,8 +3,8 @@ import "pkg:/source/roku-list/ListMixin.bs"
 
 class ListItemViewManager extends ItemViewManager
 
-  function new(list, container)
-    super("ListItemViewManager", list, container, 1)
+  function new(list, container, minPos = 0, maxPos = 1080)
+    super("ListItemViewManager", list, container, 1, minPos, maxPos)
     m.delegate = list.rowEvents
   end function
 

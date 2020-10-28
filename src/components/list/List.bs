@@ -21,7 +21,7 @@ function init()
   m.top.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.viewManager = new ListItemViewManager(m.top, m.rowsGroup)
   m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator, m.top.rowEvents)
-  m.itemScroller = new ListItemScroller(m.viewManager, 0, 1080, m.moveAnimation, m.moveAnimationInterpolator)
+  m.itemScroller = new ListItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
 
   ' m.top.clippingRect = [0,0,1920,550]
@@ -36,7 +36,7 @@ end function
 function createEventsBroker(id)
   node = createObject("roSGNode", "Node")
   node.id = id
-  node.addFields({"listEvent": {}, "listEvents": []})
+  node.addFields({ "listEvent": {}, "listEvents": [] })
   return node
 end function
 

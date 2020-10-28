@@ -21,12 +21,18 @@ class ItemViewManager extends BaseClass
   public hiddenComponents = []
   public numberOfItems = 0
   public axes = 0
+  public minPos = 0
+  public maxPos = 1080
 
-  function new(name, owner, container, axes)
+
+  function new(name, owner, container, axes,  minPos, maxPos)
     super(name)
     m.container = container
     m.owner = owner
     m.axes = axes
+    m.minPos = minPos
+    m.maxPos = maxPos
+
     m.updateScreenRect()
   end function
 
@@ -123,7 +129,7 @@ class ItemViewManager extends BaseClass
   end function
 
   function createScreenStateMap(direction, index, rendererCounts)
-    ' m.logMethod("createScreenStateMap newIndex", newIndex, "old", oldIndex)
+    m.logMethod("createScreenStateMap", index, rendererCounts)
     screenStateMap = {}
 
     if m.numberOfItems = 0
@@ -136,16 +142,91 @@ class ItemViewManager extends BaseClass
   end function
 
   function updateScreenStateMap(screenStateMap, startIndex, endIndex, state)
-    for i = startIndex to endIndex
+    if startIndex < 0
+      startIndex = 0
+    end if
+    
+    if endIndex > m.numberOfItems
+      endIndex = m.numberOfItems
+    end if
 
-      if i >= 0 and i < m.rects.count()
-        rect = m.rects[i]
-
-        if rect <> invalid
-          screenStateMap[str(rect.index).trim()] = state
+    for i = startIndex to endIndex - 1
+      rect = m.rects[i]
+      if rect <> invalid
+        ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state
+        screenStateMap[str(rect.index).trim()] = state
+      else
+        if i > 0
+          stop
+          ? "WTF"
         end if
+        ? " NO RECT "; i
       end if
     end for
+  end function
+
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  '++ itemRect positions
+  '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  function getTargetTranslation(index, direction, screenPos = invalid)
+    itemRect = m.rects[index]
+
+    if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
+      return [-1, -1]
+    end if
+
+    screenPos = m.getScreenPositionForItem(itemRect, direction)
+    targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+    ' ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+
+    if m.axes = 0
+      return [- targetPos, m.container.translation[1]]
+    else
+      return [m.container.translation[0], - targetPos]
+    end if
+
+  end function
+
+
+  function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
+    if itemRect <> invalid
+      if screenPos <> invalid
+        return screenPos
+      else if itemRect.screenPos <> invalid
+        return itemRect.screenPos
+      else if m.direction = -1
+        return m.minPos
+      else if m.direction = 1
+        'TODO - calculate position that can fit on screen
+        return m.minPos ' fixed focus
+        ' return m.maxPos - itemRect.width
+      end if
+    end if
+    return m.minPos
+  end function
+
+  function getOffsetForScreenPosition(itemRect, screenPos)
+    if itemRect <> invalid
+      return itemRect.translation[m.axes] + screenPos
+    else
+      return m.minPos
+    end if
+  end function
+
+  function getIndexAtPosition(position, direction)
+    for i = 0 to m.numberOfItems
+      itemRect = m.rects[i]
+      screenPos = m.getScreenPositionForItem(itemRect, direction)
+      itemPos = m.getOffsetForScreenPosition(itemRect, screenPos)
+      ' ? "i "; i ; " pos "; abs(position) ; " ip " ; itemPos ; " sp " ; screenPos
+      if itemPos > abs(position)
+        return i - 1
+      end if
+    end for
+
+    return -1
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
