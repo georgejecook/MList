@@ -57,7 +57,7 @@ function prebakeCells()
   ' m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellOnes, "ml_SimpleCell")
   ' m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellTwos, "ml_SimpleCell2")
   ' m.cellProvider.callfunc("addPreBakedCells", m.top._prebakeCellComplex, "ml_Cell")
-  m.cellProvider.callfunc("addPreBakedCells", 200, "ml_Cell")
+  m.cellProvider.callfunc("addPreBakedCells", 300, "ml_Cell")
 
   ? "finished adding prebaked cells"
 end function

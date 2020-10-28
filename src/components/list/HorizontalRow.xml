@@ -82,7 +82,7 @@
           id='moveAnimationInterpolator'
           key='[0.0, 1.0]'
           keyValue='[ [0, 20], [0, 20] ]'
-          fieldToInterp='cellHolder.translation' />
+          fieldToInterp='cellsGroup.translation' />
     </Animation>
   </children>
 

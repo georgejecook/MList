@@ -4,8 +4,8 @@ function init()
   m.poster2 = m.top.findNode("poster2")
   m.label = m.top.findNode("label")
   m.label2 = m.top.findNode("label2")
-  m.top.observeField("content", "onContentChange")
-  ' m.top.observeField("listEvent", "onListEvent")
+  ' m.top.observeField("content", "onContentChange")
+  m.top.observeField("listEvent", "onListEvent")
   m.content = invalid
 end function
 
@@ -23,7 +23,7 @@ end function
 function onListEvent(evt)
   event = evt.getData()
   ' ? "OLE " ; event
-  ' if event.name = "willEnter" or event.name = "didEnter"
-  '   onContentChange()
-  ' end if
+  if event.name = "willEnter" or event.name = "didEnter"
+    onContentChange()
+  end if
 end function

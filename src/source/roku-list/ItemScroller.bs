@@ -89,12 +89,13 @@ class ItemScroller extends BaseClass
     if index > m.viewManager.numberOfItems - 1
       return m.getValidTargetIndex(m.viewManager.numberOfItems - 1, -1)
     end if
-
-    item = m.viewManager.visibleItems[index]
-    while item <> invalid and item.isFocusable <> true and index < m.viewManager.numberOfItems - 1 and index > -1
-      index += direction
-      item = m.viewManager.visibleItems[index]
-    end while
+    'TODO - check if the item is focusable.. 
+    'this logic below is broken
+    ' item = m.viewManager.visibleItems[index]
+    ' while item <> invalid and (item.isFocusable = true or item.isFocusable = invalid)  and index < m.viewManager.numberOfItems - 1 and index > -1
+    '   index += direction
+    '   item = m.viewManager.visibleItems[index]
+    ' end while
 
     return index
   end function
@@ -125,8 +126,9 @@ class ItemScroller extends BaseClass
       m.animSpeed = m.regularAnimSpeed
     end if
 
-    m.logInfo("moving to ", targetTranslation, animated)
+
     if animated
+      m.logInfo("moving to ", targetTranslation[m.axes], animated)
       m.viewManager.isScrolling = true
       m.viewManager.owner.isScrolling = true
       m.viewManager.updateRenderedComponents(m.direction, m.index)
@@ -250,7 +252,10 @@ class ItemScroller extends BaseClass
     m.notifyViewportEvents(true)
 
     m.focusManager.setFocusPosition(m.index, m.indexPosition, m.nextIndex, m.nextPosition, m.direction)
+    m.setFocusOnRenderer(isMoving)
+  end function
 
+  function setFocusOnRenderer(isMoving)
   end function
 
   function notifyViewportEvents(isMoving)

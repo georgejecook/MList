@@ -14,6 +14,7 @@ function init()
   m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
+  m.top.observeField("animateToRow", "onAnimateToRowChange")
   m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
@@ -68,6 +69,13 @@ function onListEvent(evt)
     end for
   end if
 end function
+
+function onAnimateToRowChange()
+  if m.content <> invalid
+    m.itemScroller.moveToIndex(m.top.animateToRow)
+  end if
+end function
+
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

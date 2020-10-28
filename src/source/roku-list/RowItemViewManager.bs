@@ -117,7 +117,7 @@ class RowItemViewManager extends ItemViewManager
       if renderState = "rendered"
         if m.cellsById[id] = invalid
           settings = ListMixin.getCellSettings(m.owner, m.row, item)
-          ' ? "GETTING CELL " ; settings.compName
+          ? "GETTING CELL " ; id
           cell = m.cellProvider@.getCell(settings.compName)
 
           if cell <> invalid
@@ -129,6 +129,7 @@ class RowItemViewManager extends ItemViewManager
 
             ' if isrendered
             cell.content = item
+            cell.listEvent = { "name": "didEnter" }
             ' end if
 
             cell.translation = m.rects[index].translation
@@ -143,8 +144,11 @@ class RowItemViewManager extends ItemViewManager
       else
         cell = m.cellsById[id]
         if cell <> invalid
+          ? "RELEASING " ; id
           m.cellProvider@.releaseCell(cell) 
           m.cellsById.delete(id)
+        else
+          ' ? " COULD NOT FIND CELL TO RELEASE"
         end if
       end if
     end if

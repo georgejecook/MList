@@ -211,8 +211,12 @@ class ItemViewManager extends BaseClass
       return {}
     end if
 
+    ' if m.row <> invalid
+    '   ? " render state map " ; " index " ; index ; " " ; renderedIndexes
+    ' end if
+
     m.updateRenderStateMap(renderedStateMap, 0, m.numberOfItems, m.componentBufferMode)
-    m.updateRenderStateMap(renderedStateMap, renderedIndexes.startIndex, index + renderedIndexes.endIndex, "rendered")
+    m.updateRenderStateMap(renderedStateMap, renderedIndexes.startIndex, renderedIndexes.endIndex, "rendered")
     return renderedStateMap
   end function
 
@@ -221,15 +225,16 @@ class ItemViewManager extends BaseClass
       startIndex = 0
     end if
 
+    ' ? " endindex " ; endIndex ; " m.numberOfItems "; m.numberOfItems
     if endIndex > m.numberOfItems
       endIndex = m.numberOfItems
     end if
 
     ' if m.row <> invalid
-    '   ? " UPDATE STATE MAP ROW  "; m.row.index ; " isR" ; m.row.isRendered 
+    '   ? " UPDATE STATE MAP ROW  "; m.row.index ; " start " ; startIndex ; " end "; endIndex
     ' end if
 
-    for i = startIndex to endIndex - 1
+    for i = startIndex to endIndex 
       rect = m.rects[i]
       if rect <> invalid
         ' ? "ROW "; i ; " rect idx "; rect.index ; " state " ; state

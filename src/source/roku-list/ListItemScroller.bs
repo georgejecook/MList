@@ -5,4 +5,13 @@ class ListItemScroller extends ItemScroller
     super(group, 1, moveAnimation, moveAnimationInterpolator)
   end function
 
+  override function setFocusOnRenderer(isMoving)
+    if not isMoving
+      m.logInfo("stopped scrolling on row", m.index)
+      row = m.viewManager.getRenderer(m.index)
+      if row <> invalid
+        row.setFocus(true)
+      end if
+    end if
+  end function
 end class
