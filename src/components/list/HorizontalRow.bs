@@ -10,12 +10,12 @@ function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("isScrolling", "onIsScrollingChange")
   m.top.observeField("isRendered", "onIsRenderedChange")
+  m.top.observeField("animateToItem", "onAnimateToItemChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
   m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
   m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
-  m.top.observeField("animateToRow", "onAnimateToRowChange")
   m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
@@ -78,9 +78,9 @@ function onListEvent(evt)
   end if
 end function
 
-function onAnimateToRowChange()
+function onAnimateToItemChange()
   if m.content <> invalid
-    m.itemScroller.moveToIndex(m.top.animateToRow)
+    m.itemScroller.moveToIndex(m.top.animateToItem)
   end if
 end function
 

@@ -1,5 +1,5 @@
 namespace ListMixin
-  function createRowSettings(cellSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
+  function createRowSettings(cellSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1, focusSettings = invalid)
     settings = createObject("roSGNode", "RowSettings")
 
     if cellSettings = invalid
@@ -8,6 +8,10 @@ namespace ListMixin
 
     if headerSettings = invalid
       headerSettings = ListMixin.createHeaderSettings()
+    end if
+
+    if focusSettings = invalid
+      focusSettings = ListMixin.createFocusSettings()
     end if
 
     settings.update({
@@ -66,7 +70,7 @@ namespace ListMixin
   ' end function
 
   function createFocusSettings(animSpeed = 0.3, fastAnimSpeed = 0.1, animStyle = "fixed")
-    settings = createObject("roSGNode", "CellSettings")
+    settings = createObject("roSGNode", "FocusSettings")
     settings.update({
       animSpeed: animSpeed
       fastAnimSpeed: fastAnimSpeed
@@ -109,8 +113,8 @@ namespace ListMixin
   end function
 
   function getFocusSettings(list, row = invalid)
-    if row <> invalid and row.focusSettings <> invalid
-      return row.focusSettings
+    if row <> invalid and row.settings <> invalid
+      return row.settings.focusSettings
     else
       return list.focusSettings
     end if

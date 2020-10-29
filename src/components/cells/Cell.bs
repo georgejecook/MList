@@ -1,5 +1,5 @@
 function init()
-  m.rect = m.top.findNode("rect")
+  m.backgroundRect = m.top.findNode("backgroundRect")
   m.poster = m.top.findNode("poster")
   m.poster2 = m.top.findNode("poster2")
   m.label = m.top.findNode("label")
@@ -13,6 +13,7 @@ end function
 function onContentChange()
   if m.content = invalid or not m.content.isSamenode(m.top.content)
     m.content = m.top.content
+    ? " UPDATE "; m.row.id; ", " m.content.id
 
     m.label.text = "C" + m.content.title
     m.label2.text = m.content.description + " " + m.content.description
@@ -24,6 +25,8 @@ end function
 
 function onScrollChange()
   isScrolling = m.row.isScrolling or m.list.isScrolling
+  ' ? "onScrollChange row " ; m.row.isScrolling
+  ' ? "onScrollChange list " ; m.list.isScrolling
   m.label.visible = not isScrolling
   m.label2.visible = not isScrolling
 end function

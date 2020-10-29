@@ -18,9 +18,6 @@ class ItemScroller extends BaseClass
   public container = invalid
   public direction = 0
   public axes = 0 'x = 0, y =1
-  public animSpeed = 0.3
-  public regularAnimSpeed = 0.3
-  public fastAnimSpeed = 2
 
   function new(viewManager, axes, moveAnimation, moveAnimationInterpolator)
     super("ItemScroller")
@@ -41,8 +38,11 @@ class ItemScroller extends BaseClass
     if m.viewManager.delegate <> invalid
       m.delegates.push(m.viewManager.delegate)
     end if
+    m.settings = m.getSettings()
+  end function
 
-    'TODO
+  function getSettings()
+    return ListMixin.getFocusSettings(m.viewManager.owner)
   end function
 
   public function reset()
@@ -119,11 +119,11 @@ class ItemScroller extends BaseClass
     end if
 
     m.setNextIndex(m.index + m.direction)
-
+    
     if fast
-      m.animSpeed = m.regularAnimSpeed / m.fastAnimSpeed
+      m.animSpeed = m.settings.fastAnimSpeed
     else 
-      m.animSpeed = m.regularAnimSpeed
+      m.animSpeed = m.settings.animSpeed
     end if
 
 
@@ -165,7 +165,7 @@ class ItemScroller extends BaseClass
     else
       nextIndex = m.nextIndex
     end if
-    m.moveToIndex(nextIndex, invalid, true, m.fastAnimSpeed)
+    m.moveToIndex(nextIndex, invalid, true, true)
   end function
 
   function setNextIndex(index, screenPos = invalid)
@@ -190,8 +190,7 @@ class ItemScroller extends BaseClass
   end function
 
   function toggleScrolling(active)
-    m.viewManager.isScrolling = true
-    m.viewManager.owner.isScrolling = true
+    m.viewManager.setIsScrolling(active)
   end function
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   '++ animation callbacks
@@ -243,12 +242,7 @@ class ItemScroller extends BaseClass
     'TODO -note - we need to know what screenPos WAS in a floating scenario!!
     m.indexPosition = m.viewManager.getTargetTranslation(m.index, m.direction, screenPos)[m.axes]
 
-    'things that need to happen in here:
-    '1. update the screen state
-    ' this should be based on the look aheads/look behinds.. 
-    ' if ((index mod 10) = 0 )
     m.viewManager.updateRenderedComponents(m.direction, m.index)
-    ' end if
 
     m.notifyViewportEvents(true)
 

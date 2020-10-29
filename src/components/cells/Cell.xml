@@ -26,29 +26,30 @@
 
   <children>
     <Rectangle
-        id='theRect'
+        id='backgroundRect'
         color='#8034eb'
-        width='300'
-        height='300'>
+        width='480'
+        height='320'>
     </Rectangle>
     <Poster
         id='poster'
         translation='[0,0]'
         loadingBitmapUri='http://via.placeholder.com/370x300'
+        failedBitmapUri='http://via.placeholder.com/370x300'
         uri='http://via.placeholder.com/370x300'
-        loadWidth='370'
-        loadHeight='300'
-        width='370'
-        height='300'
+        loadWidth='480'
+        loadHeight='320'
+        width='480'
+        height='320'
         loadDisplayMode='scaleToFit' />
     <Rectangle
         opacity='0.4'
         color='#000000'
-        width='370'
+        width='480'
         height='70' />
     <Poster
         id='poster2'
-        translation='[300,10]'
+        translation='[420,10]'
         loadWidth='50'
         loadHeight='50'
         width='50'
@@ -56,7 +57,7 @@
         loadDisplayMode='scaleToFit' />
     <Label
         id='label'
-        width='350'
+        width='460'
         horizAlign='center'
         translation='[10, 10]' />
 
@@ -65,9 +66,9 @@
         text='Summary text in here'
         wrap='true'
         maxLines='2'
-        width='360'
+        width='460'
         color='#000000'
-        translation='[10, 300]' />
+        translation='[10, 320]' />
 
   </children>
 

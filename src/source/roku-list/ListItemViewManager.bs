@@ -6,10 +6,8 @@ class ListItemViewManager extends ItemViewManager
   function new(list, container, minPos = 0, maxPos = 1080)
     super("ListItemViewManager", list, container, 1, minPos, maxPos)
     m.delegate = list.rowEvents
-    m.lookAheadDistance = maxPos * 10
-    m.lookBehindDistance = maxPos / 2
-    m.lastScrollDirection = 0
-    m.lastScrollIndex = 0
+    m.lookAheadDistance = maxPos * 5
+    m.lookBehindDistance = maxPos * 2
   end function
 
   override function getRenderer(index)
@@ -105,7 +103,7 @@ class ListItemViewManager extends ItemViewManager
     for each id in renderStateMap
       component = m.components[id.toInt()]
 
-      if component <> invalid
+      if component <> invalid and component.renderState <> renderStateMap[id]
         component.renderState = renderStateMap[id]
         if component.renderState = "rendered"
           m.renderedComponents.push(component)
@@ -118,24 +116,28 @@ class ListItemViewManager extends ItemViewManager
 
   end function
 
-  override function getRenderedIndexes(direction, index)
-    ' return {
-    '   startIndex: 0
-    '   endIndex: m.visibleItems.count()
-    ' }
-    return {
-      startIndex: index
-      endIndex: index + 10
-    }
-  end function
+  ' override function getRenderedIndexes(direction, index)
+  '   ' return {
+  '   '   startIndex: 0
+  '   '   endIndex: m.visibleItems.count()
+  '   ' }
+  '   return {
+  '     startIndex: index
+  '     endIndex: index + 10
+  '   }
+  ' end function
 
-  override function shouldUpdateRenderedIndexes(direction, index)
-    if direction <> m.lastScrollDirection or abs(index - m.lastScrollIndex) > 5
-      m.lastCrollIndex = index
-      m.lastScrollDirection = direction
-      return true
-    end if
-    return false
-  end function
+
+  ' override function shouldUpdateRenderedIndexes(direction, index)
+  '   return true
+  ' end function
+
+  ' override function getRenderedIndexes(direction, index)
+  '   return {
+  '     startIndex: 0
+  '     endIndex: 20
+  '   }
+  ' end function
+
 
 end class

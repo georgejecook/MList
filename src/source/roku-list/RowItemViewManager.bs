@@ -13,6 +13,9 @@ class RowItemViewManager extends ItemViewManager
     m.cellProvider = cellProvider
     m.cellTracker = cellTracker
     m.row = row
+    m.lookAheadDistance = maxPos * 1.5
+    m.lookBehindDistance = maxPos / 2
+
   end function
 
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -43,12 +46,12 @@ class RowItemViewManager extends ItemViewManager
     end for
   end function
 
-  override function getRenderedIndexes(direction, index)
-    return {
-      startIndex: index - 2
-      endIndex: index + 7
-    }
-  end function
+  ' override function getRenderedIndexes(direction, index)
+  '   return {
+  '     startIndex: index - 1
+  '     endIndex: index + 3
+  '   }
+  ' end function
 
   ' override function getRenderedIndexes(direction, index)
   '   ' indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
@@ -83,16 +86,10 @@ class RowItemViewManager extends ItemViewManager
   '   }
   ' end function
 
-  ' override function shouldUpdateRenderedIndexes(direction, index)
-  '   m.logInfo("shouldUpdateRenderedIndexes", m.row.index, m.row.renderState, m.lastRowIsRendered)
-  '   if m.row.renderState <> m.lastRowIsRendered
-  '     ? "change of state on row", m.row.index
-  '     m.lastRenderedIndexes = invalid
-  '     return true
-  '   end if 
-  '   return false
-  ' end function
-
+  override function shouldUpdateRenderedIndexes(direction, index)
+    return true
+  end function
+  
   override function applyRenderStateMap(renderStateMap)
     ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
     if m.row.isRendered
@@ -164,6 +161,8 @@ class RowItemViewManager extends ItemViewManager
   end function
 
   override function setIsScrolling(isScrolling)
+    m.row.isScrolling = isScrolling
+    m.owner.isScrolling = isScrolling
     m.isScrolling = isScrolling
     for each id in m.cellsById
       comp = m.cellsById[id]

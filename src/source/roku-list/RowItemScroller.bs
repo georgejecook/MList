@@ -1,14 +1,18 @@
 import "pkg:/source/roku-list/ItemScroller.bs"
 
 class RowItemScroller extends ItemScroller
-  function new(group, moveAnimation, moveAnimationInterpolator)
-    super(group, 0, moveAnimation, moveAnimationInterpolator)
+  function new(viewManager, moveAnimation, moveAnimationInterpolator)
+    super(viewManager, 0, moveAnimation, moveAnimationInterpolator)
   end function
 
   override function setFocusOnRenderer(isMoving)
-  if not isMoving
-    m.logInfo("stopped scrolling on item", m.index)
-    
-  end if
-end function
+    if not isMoving
+      m.logInfo("stopped scrolling on item", m.index)
+    end if
+  end function
+
+  override function getSettings()
+    return ListMixin.getFocusSettings(m.viewManager.owner, m.viewManager.row)
+  end function
+
 end class

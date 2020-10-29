@@ -6,7 +6,7 @@ import "pkg:/source/roku-list/ListMixin.bs"
 
 function init()
   log_registerLogger("List")
-  cellSettings = ListMixin.createCellSettings("ml_Cell")
+  cellSettings = ListMixin.createCellSettings("ml_Cell", [480,400], 100)
   m.top.rowSettings = ListMixin.createRowSettings(cellSettings)
   m.top.focusSettings = ListMixin.createFocusSettings()
   m.top.observeField("content", "onContentChange")
