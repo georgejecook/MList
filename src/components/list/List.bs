@@ -210,7 +210,7 @@ end function
 function getLongPressIntervalForKey(key) as float
   m.logMethod("getLongPressIntervalForKey", key)
   if key = "up" or key = "down"
-    return 0.5
+    return 0.2
   else
     return 0
   end if

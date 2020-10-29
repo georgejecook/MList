@@ -15,8 +15,7 @@
     "mv": "file:../maestro-roku-view"
   },
   "devDependencies": {
-    "brighterscript": "file:/home/george/hope/open-source/vsc/brighterscript",
-    "ropm": "file:../../vsc/ropm",
+    "brighterscript": "file:../../vsc/brighterscript",
     "source-map": "^0.7.3"
   },
   "repository": {

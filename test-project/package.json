@@ -11,11 +11,7 @@
     "ml": "file:..",
     "mv": "file:../../maestro-roku-view"
   },
-  "devDependencies": {
-    "brighterscript": "file:/home/george/hope/open-source/vsc/brighterscript",
-    "ropm": "file:../../../vsc/ropm",
-    "vscode-languageserver": "^6.1.1"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/georgejecook/maestro-roku-list.git"

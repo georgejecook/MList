@@ -66,6 +66,7 @@ namespace ListItemDelegateMixin
     end if
 
     m.isObservingListEvents = m.listEventMap.count() > 0
+
     if m.isObservingListEvents
       m.listEventInstance = instance
       mc_toggleObserver(m.top, "listEvent", mc_getFunctionName(onListEventBridge))
@@ -124,10 +125,10 @@ namespace ListItemDelegateMixin
 
     else if eventName = "willLoseFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onWillListFocus(event.index, event.direction)
+        m.listEventInstance.onWillLoseFocus(event.index, event.direction)
       else
         'bs:disable-next-line
-        onWillListFocus(event.index, event.direction)
+        onWillLoseFocus(event.index, event.direction)
       end if
 
     else if eventName = "didGainFocus"

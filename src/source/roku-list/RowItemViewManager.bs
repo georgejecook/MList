@@ -46,46 +46,6 @@ class RowItemViewManager extends ItemViewManager
     end for
   end function
 
-  ' override function getRenderedIndexes(direction, index)
-  '   return {
-  '     startIndex: index - 1
-  '     endIndex: index + 3
-  '   }
-  ' end function
-
-  ' override function getRenderedIndexes(direction, index)
-  '   ' indexPos = abs(m.getTargetTranslation(index, direction)[m.axes])
-
-  '   ' if m.isScrolling
-  '   '   lookBehindDistance = m.maxPos / 2
-  '   '   lookAheadDistance = m.maxPos * 2
-  '   ' else
-  '   '   lookBehindDistance = m.minPos / 3
-  '   '   lookAheadDistance = m.maxPos * 1.25
-  '   ' end if
-
-  '   ' if direction < 0
-  '   '   beforePos = indexPos - lookAheadDistance
-  '   '   afterPos = indexPos + lookBehindDistance
-  '   ' else
-  '   '   afterPos = indexPos + lookAheadDistance
-  '   '   beforePos = indexPos - lookBehindDistance
-  '   ' end if
-
-  '   ' if beforePos < 0
-  '   '   beforePos = 0
-  '   ' end if
-
-  '   ' if afterPos < 0
-  '   '   afterPos = 0
-  '   ' end if
-
-  '   return {
-  '     startIndex: m.getIndexAtPosition(beforePos, direction)
-  '     endIndex: m.getIndexAtPosition(afterPos, direction)
-  '   }
-  ' end function
-
   override function shouldUpdateRenderedIndexes(direction, index)
     return true
   end function

@@ -119,7 +119,7 @@ class ItemScroller extends BaseClass
     end if
 
     m.setNextIndex(m.index + m.direction)
-    
+
     if fast
       m.animSpeed = m.settings.fastAnimSpeed
     else 
@@ -127,8 +127,8 @@ class ItemScroller extends BaseClass
     end if
 
 
+    m.logInfo("moving to ", targetTranslation[m.axes], animated)
     if animated
-      m.logInfo("moving to ", targetTranslation[m.axes], animated)
       m.toggleScrolling(true)
       m.viewManager.updateRenderedComponents(m.direction, m.index)
 
@@ -137,18 +137,21 @@ class ItemScroller extends BaseClass
       if steps = 0
         steps = 1
       end if
-
+      ? "AAAAAAAAAAAAAAAAAA"
       if m.moveAnimation.state = "play"
         m.moveAnimation.control = "pause"
       end if
+      ? "BBBBBBBBBBBBBBBBBBBBB"
       m.moveAnimationInterpolator.keyValue = [m.container.translation, targetTranslation]
       m.moveAnimation.duration = steps * m.animSpeed
 
+      ? "CCCCCCCCCCCCC"
       if m.moveAnimation.state = "pause"
         m.moveAnimation.control = "resume"
       else
         m.moveAnimation.control = "start"
       end if
+      ? "DDDDDDDDDDDDD"
     else
       m.container.translation = targetTranslation
       'TODO -check if jump is bigger than a certain amount
@@ -186,6 +189,7 @@ class ItemScroller extends BaseClass
 
   function stopAnimating()
     m.moveAnimation.control = "stop"
+    ? "STOP ANIMAGING TOG SCROLL FALSE"
     m.toggleScrolling(false)
   end function
 
@@ -203,6 +207,7 @@ class ItemScroller extends BaseClass
 
     if fraction = 1
       m.focusManager.onFocusAnimationUpdate(1) 
+      ? "FRACTIN 1 TOG SCROLL FALSE"
       m.toggleScrolling(false)
 
       if index <> m.index

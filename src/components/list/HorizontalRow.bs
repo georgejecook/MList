@@ -19,7 +19,7 @@ function init()
   m.header = m.top.findNode("header")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
-  ' ListItemDelegateMixin.setDelegate()
+  ListItemDelegateMixin.setDelegate()
   m.top.observeField("listEvent", "onListEvent")
 end function
 
@@ -103,7 +103,7 @@ end function
 function getLongPressIntervalForKey(key) as float
   m.logMethod("getLongPressIntervalForKey", key)
   if key = "left" or key = "right"
-    return 0.5
+    return 0.2
   else
     return 0
   end if
@@ -160,8 +160,8 @@ function onWillGainFocus(index, direction)
   ? "onWillGainFocus " ; index ; " " ; direction
 end function
 
-function onWillListFocus(index, direction)
-  ? "onWillListFocus " ; index ; " " ; direction
+function onWillLoseFocus(index, direction)
+  ? "onWillLoseFocus " ; index ; " " ; direction
 end function
 
 function onDidGainFocus(index, direction)
