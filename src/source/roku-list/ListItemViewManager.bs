@@ -23,13 +23,13 @@ class ListItemViewManager extends ItemViewManager
 
     if content <> invalid
       index = 0
-      for each item in content.getChildren(-1, 0)
-        settings = ListMixin.getRowSettings(m.owner, item)
+      for each rowContent in content.getChildren(-1, 0)
+        settings = ListMixin.getRowSettings(m.content, rowContent)
 
-        if item.rowCompName <> invalid and item.rowCompName = "RectComp"
-          component = m.creatRectangle(item, index, settings)
+        if rowContent.rowCompName <> invalid and rowContent.rowCompName = "RectComp"
+          component = m.creatRectangle(rowContent, index, settings)
         else
-          component = m.createHorizontalRow(item, index, settings)
+          component = m.createHorizontalRow(rowContent, index, settings)
         end if
         component.index = index
         component.renderState = "none"
@@ -73,7 +73,7 @@ class ListItemViewManager extends ItemViewManager
     w = m.owner.width
 
     for each component in m.components
-      settings = ListMixin.getRowSettings(m.owner, component.content)
+      settings = ListMixin.getRowSettings(m.content, component.content)
       component.visible = component.content.isHidden <> true
 
       if component.visible

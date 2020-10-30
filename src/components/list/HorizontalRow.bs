@@ -27,7 +27,7 @@ function createManagers()
   m.logInfo("createManagers")
   isAnimatorsCreated = true
   m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
-  m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents)
+  m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
 
   m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
@@ -46,7 +46,7 @@ function onContentChange(evt)
 end function
 
 function calculateHeight()
-  settings = ListMixin.getRowSettings(m.top.owner, m.content)
+  settings = ListMixin.getRowSettings(m.top.owner.content, m.content)
   if settings.height <> -1
     m.top.height = settings.height
   else
@@ -62,7 +62,6 @@ function onIsRenderedChange()
 end function
 
 function onIsScrollingChange()
-  ? ">>>>>>> onIsScrollingChange " ; m.top.isScrolling
   if m.viewManager <> invalid
     m.viewManager.setIsScrolling(m.top.isScrolling)
   end if
@@ -83,6 +82,11 @@ function onAnimateToItemChange()
     m.itemScroller.moveToIndex(m.top.animateToItem)
   end if
 end function
+
+function getRenderer(index)
+  return m.viewManager.getRenderer(index)
+end function
+
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress
@@ -140,42 +144,55 @@ end function
 '++ delegate
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function onWillEnter(index, direction)
-  ? "onWillEnter " ; index ; " " ; direction
-end function
+' function onWillEnter(index, direction)
+'   ' ? "onWillEnter " ; index ; " " ; direction
+'   ' m.top.opacity = 1
+'   ' if direction = 1
+'   ' else
+'   '   m.top.opacity = 0
+'   ' end if
+' end function
 
-function onWillExit(index, direction)
-  ? "onWillExit " ; index ; " " ; direction
-end function
+' function onWillExit(index, direction)
+'   ? "onWillExit " ; index ; " " ; direction
+' end function
 
-function onDidEnter(index, direction)
-  ? "onDidEnter " ; index ; " " ; direction
-end function
+' function onDidEnter(index, direction)
+'   ? "onDidEnter " ; index ; " " ; direction
+' end function
 
-function onDidExit(index, direction)
-  ? "onDidExit " ; index ; " " ; direction
-end function
+' function onDidExit(index, direction)
+'   ? "onDidExit " ; index ; " " ; direction
+' end function
 
-function onWillGainFocus(index, direction)
-  ? "onWillGainFocus " ; index ; " " ; direction
-end function
+' function onWillGainFocus(index, direction)
+'   ? "onWillGainFocus " ; index ; " " ; direction
+' end function
 
-function onWillLoseFocus(index, direction)
-  ? "onWillLoseFocus " ; index ; " " ; direction
-end function
+' function onWillLoseFocus(index, direction)
+'   ? "onWillLoseFocus " ; index ; " " ; direction
+' end function
 
-function onDidGainFocus(index, direction)
-  ? "onDidGainFocus " ; index ; " " ; direction
-end function
+' function onDidGainFocus(index, direction)
+'   ? "onDidGainFocus " ; index ; " " ; direction
+'   ' m.top.opacity = 1
+' end function
 
-function onDidLoseFocus(index, direction)
-  ? "onDidLoseFocus " ; index ; " " ; direction
-end function
+' function onDidLoseFocus(index, direction)
+'   ? "onDidLoseFocus " ; index ; " " ; direction
+'   ' m.top.opacity = 0
+' end function
 
-function onGainingFocus(index, direction, fraction)
-  ? "onGainingFocus " ; index ; " " ; direction ; " f " ; fraction
-end function
+' function onGainingFocus(index, direction, fraction)
+'   if direction = -1 and m.top.opacity < 1
+'     ? " ROW GAINING " ; fraction
+'     m.top.opacity = fraction
+'   end if
+' end function
 
-function onLosingFocus(index, direction, fraction)
-  ? "onLosingFocus " ; index ; " " ; direction ; " f " ; fraction
-end function
+' function onLosingFocus(index, direction, fraction)
+'   ' ? " ROW LOSING " ; direction ; " " ; fraction
+'   if direction = 1
+'     m.top.opacity = 1 - fraction
+'   end if
+' end function

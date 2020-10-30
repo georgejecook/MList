@@ -12,7 +12,7 @@ class RowItemScroller extends ItemScroller
   end function
 
   override function getSettings()
-    return ListMixin.getFocusSettings(m.viewManager.owner, m.viewManager.row)
+    return ListMixin.getFocusSettings(m.viewManager.owner.content, m.viewManager.content)
   end function
 
 end class

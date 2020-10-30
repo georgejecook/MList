@@ -13,12 +13,13 @@ class ItemFocusManager extends BaseClass
   public didStart = false
   public didFinish = false
 
-  function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate)
+  function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate, rowIndex = -1)
     super("ItemFocusManager")
     m.viewManager = viewManager
     m.container = viewManager.container
     m.delegate = viewManager.owner
     m.moveAnimation = moveAnimation
+    m.rowIndex = rowIndex
     m.moveAnimationInterpolator = moveAnimationInterpolator
     m.observeNodeField(moveAnimationInterpolator, "fraction", m.onAnimationFractionChange, "value", false, m)
     owner = viewManager.owner
@@ -98,6 +99,9 @@ class ItemFocusManager extends BaseClass
       name: nextName
       index: m.nextIndex
     }
+
+    event.rowIndex = m.rowIndex
+    nextEvent.rowIndex = m.rowIndex
 
     'let components know, so they can react
     if m.component <> invalid

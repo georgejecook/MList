@@ -8,19 +8,7 @@
         type='node'
         value='invalid' />
 
-    <field
-        id='focusSettings'
-        type='node' />
-
-    <field
-        id='settings'
-        type='node' />
-
-    <field
-        id='rowSettings'
-        type='node' />
-
-    <field
+        <field
         id='isScrolling'
         type='boolean' />
 
@@ -84,12 +72,11 @@
         onChange='isHiddenChange' />
     <function name='getBoundsForIndex' />
     <function name='getFocusedBounds' />
+    <function name='getRowRenderer' />
+    <function name='getCellRenderer' />
 
   </interface>
   <children>
-    <Timer
-        id='setInitialTimer'
-        duration='0.1' />
     <Timer
         id='focusTimer'
         duration='0.01'

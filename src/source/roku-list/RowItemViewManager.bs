@@ -31,7 +31,7 @@ class RowItemViewManager extends ItemViewManager
     translation = [0, 0]
     index = 0
     for each item in m.content.getChildren(-1, 0)
-      settings = ListMixin.getCellSettings(m.owner, m.row, item)
+      settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
       m.rects.push({ 
         translation: translation, 
         size: settings.size 
@@ -73,7 +73,7 @@ class RowItemViewManager extends ItemViewManager
     if item <> invalid
       if renderState = "rendered"
         if m.cellsById[id] = invalid
-          settings = ListMixin.getCellSettings(m.owner, m.row, item)
+          settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
           ' ? "GETTING CELL " ; id
           cell = m.cellProvider@.getCell(settings.compName)
 

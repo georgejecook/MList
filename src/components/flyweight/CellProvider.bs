@@ -1,5 +1,5 @@
 import "pkg:/source/roku_modules/mc/Utils.brs"
-import "pkg:/source/roku_modules/log/LogMixin.brs"
+import "pkg:/source/roku_modules/log/LogMixin.brs" 
 
 function init()
   log_registerLogger("CellProvider")

@@ -34,6 +34,7 @@
     <Poster
         id='poster'
         translation='[0,0]'
+        scaleRotateCenter='[0, 320]'
         loadingBitmapUri='http://via.placeholder.com/370x300'
         failedBitmapUri='http://via.placeholder.com/370x300'
         uri='http://via.placeholder.com/370x300'

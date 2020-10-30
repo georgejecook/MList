@@ -42,7 +42,7 @@ class ItemScroller extends BaseClass
   end function
 
   function getSettings()
-    return ListMixin.getFocusSettings(m.viewManager.owner)
+    return ListMixin.getFocusSettings(m.viewManager.content)
   end function
 
   public function reset()
@@ -137,21 +137,17 @@ class ItemScroller extends BaseClass
       if steps = 0
         steps = 1
       end if
-      ? "AAAAAAAAAAAAAAAAAA"
       if m.moveAnimation.state = "play"
         m.moveAnimation.control = "pause"
       end if
-      ? "BBBBBBBBBBBBBBBBBBBBB"
       m.moveAnimationInterpolator.keyValue = [m.container.translation, targetTranslation]
       m.moveAnimation.duration = steps * m.animSpeed
 
-      ? "CCCCCCCCCCCCC"
       if m.moveAnimation.state = "pause"
         m.moveAnimation.control = "resume"
       else
         m.moveAnimation.control = "start"
       end if
-      ? "DDDDDDDDDDDDD"
     else
       m.container.translation = targetTranslation
       'TODO -check if jump is bigger than a certain amount

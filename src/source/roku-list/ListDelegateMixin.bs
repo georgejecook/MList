@@ -106,13 +106,13 @@ namespace ListDelegateMixin
     m.isObservingCellEvents = m.listCellEventMap.count() > 0
   end function
 
-  function onListCellEventBridge(sgEvent) as void
+  function onCellEventBridge(sgEvent) as void
     if m.isObservingCellEvents 
       ListDelegateMixin.handleCellEvent(sgEvent.getData())
     end if
   end function
 
-  function onListCellEventsBridge(sgEvent) as void
+  function onCellEventsBridge(sgEvent) as void
     if m.isObservingCellEvents 
       for each event in sgEvent.getData() 
         ListDelegateMixin.handleCellEvent(event)
@@ -130,81 +130,81 @@ namespace ListDelegateMixin
 
     if eventName = "willEnter"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellWillEnter(event.index, event.direction)
+        m.listEventInstance.onCellWillEnter(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellWillEnter(event.index, event.direction)
+        onCellWillEnter(event.rowIndex, event.index, event.direction)
       end if
     else if eventName = "willExit"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellWillExit(event.index, event.direction)
+        m.listEventInstance.onCellWillExit(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellWillExit(event.index, event.direction)
+        onCellWillExit(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "didEnter"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellDidEnter(event.index, event.direction)
+        m.listEventInstance.onCellDidEnter(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellDidEnter(event.index, event.direction)
+        onCellDidEnter(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "didExit"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellDidExit(event.index, event.direction)
+        m.listEventInstance.onCellDidExit(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellDidExit(event.index, event.direction)
+        onCellDidExit(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "willGainFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellWillGainFocus(event.index, event.direction)
+        m.listEventInstance.onCellWillGainFocus(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellWillGainFocus(event.index, event.direction)
+        onCellWillGainFocus(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "willLoseFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellWillLoseFocus(event.index, event.direction)
+        m.listEventInstance.onCellWillLoseFocus(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellWillLoseFocus(event.index, event.direction)
+        onCellWillLoseFocus(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "didGainFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellDidGainFocus(event.index, event.direction)
+        m.listEventInstance.onCellDidGainFocus(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellDidGainFocus(event.index, event.direction)
+        onCellDidGainFocus(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "didLoseFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellDidLoseFocus(event.index, event.direction)
+        m.listEventInstance.onCellDidLoseFocus(event.rowIndex, event.index, event.direction)
       else
         'bs:disable-next-line
-        onCellDidLoseFocus(event.index, event.direction)
+        onCellDidLoseFocus(event.rowIndex, event.index, event.direction)
       end if
 
     else if eventName = "gainingFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellGainingFocus(event.index, event.direction, event.fraction)
+        m.listEventInstance.onCellGainingFocus(event.rowIndex, event.index, event.direction, event.fraction)
       else
         'bs:disable-next-line
-        onCellGainingFocus(event.index, event.direction, event.fraction)
+        onCellGainingFocus(event.rowIndex, event.index, event.direction, event.fraction)
       end if
 
     else if eventName = "losingFocus"
       if m.listEventInstance <> invalid
-        m.listEventInstance.onCellLosingFocus(event.index, event.direction, event.fraction)
+        m.listEventInstance.onCellLosingFocus(event.rowIndex, event.index, event.direction, event.fraction)
       else
         'bs:disable-next-line
-        onCellLosingFocus(event.index, event.direction, event.fraction)
+        onCellLosingFocus(event.rowIndex, event.index, event.direction, event.fraction)
       end if
 
     end if

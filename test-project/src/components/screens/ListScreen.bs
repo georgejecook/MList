@@ -1,4 +1,5 @@
 import "pkg:/source/roku_modules/ml/roku-list/ListDelegateMixin.brs"
+import "pkg:/source/roku_modules/ml/roku-list/ListMixin.brs"
 import "pkg:/source/ListScreenVM.bs"
 
 function init()
@@ -12,35 +13,42 @@ function init()
   m.cellTracker = m.global.cellTracker
   m.top._cellTracker = m.global.cellTracker
   m.contentId = 0
-  m.listVM = new ListScreenVM()
+  m.listVM = new ListScreenVM(m.list)
 
   onResetChange()
   mv_initializeView(m.list)
 
 
   'delegate functions are implemented on m.listVM class
-  ' ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
+  ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
 
-  m.list.observeField("itemSelected", "itemSelcetedChanged")
-  m.list.observeField("itemFocused", "itemFocusedChanged")
-  m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
-  m.list.observeField("itemSelected", "itemSelectedChanged")
-  m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
+  ' m.list.observeField("itemSelected", "itemSelcetedChanged")
+  ' m.list.observeField("itemFocused", "itemFocusedChanged")
+  ' m.list.observeField("itemUnfocused", "itemUnfocusedChanged")
+  ' m.list.observeField("itemSelected", "itemSelectedChanged")
+  ' m.list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
 end function
 
 function onResetChange()
   ? "resetting"
   m.list.content = invalid
-  m.list.content = createData()
+
+  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480,600], 100, 200)
+  rowFocusSettings = ml_ListMixin_createFocusSettings(0.2, 0.1)
+  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings)
+  focusSettings = ml_ListMixin_createFocusSettings(0.5)
+
+  rows = createData()
+  m.list.content = ml_ListMixin_createListContent(rows, focusSettings, rowSettings)
 end function
 
 function createData()
 
-  content = createObject("roSGNode", "ContentNode")
-
+  rows = []
   for i = 0 to m.top._numberOfRows
     ' for i = 0 to 1
-    row = content.createChild("ml_HorizontalRowContent")
+    row = createObject("roSGNode", "ml_HorizontalRowContent")
+    rows.push(row)
     row.title = "ROW " + str(i)
     if i <> 0
       if i mod 9 = 0
@@ -76,7 +84,8 @@ function createData()
 
     row.appendChildren(makeItems(m.top._defaultCellType, 60))
   end for
-  return content
+
+  return rows
 end function
 
 function itemFocusedChanged()

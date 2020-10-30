@@ -6,9 +6,6 @@ import "pkg:/source/roku-list/ListMixin.bs"
 
 function init()
   log_registerLogger("List")
-  cellSettings = ListMixin.createCellSettings("ml_Cell", [480,400], 100)
-  m.top.rowSettings = ListMixin.createRowSettings(cellSettings)
-  m.top.focusSettings = ListMixin.createFocusSettings()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToRow", "onAnimateToRowChange")
   m.top.cellEvents = createEventsBroker("cells")
@@ -30,7 +27,6 @@ function init()
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.content = invalid
-  ' m.lastStates = {}
 end function
 
 function createEventsBroker(id)
@@ -43,19 +39,12 @@ end function
 function resetState()
   m.viewManager.setContent(m.top.content)
   m.itemScroller.reset()
-  ' m.itemScroller.onViewManagerUpdate()
-  ' m.itemScroller.moveToEnd(-1)
-  ' m.itemScroller.updateItemStates(0, 0, 5, 10)
-end function
-
-function onSetInitialTimerFire()
-  m.logMethod(">>onSetInitialTimerFire")
-  ' m.viewManager.layoutLists()
 end function
 
 function onContentChange()
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
+  
     resetState()
   end if
 end function
@@ -67,121 +56,19 @@ function onAnimateToRowChange()
   end if
 end function
 
-' function addListListeners()
-'   for each list in m.visibleLists
-'     list.observeField("itemFocused", "itemFocusedChanged")
-'     list.observeField("itemUnfocused", "itemUnfocusedChanged")
-'     list.observeField("itemSelected", "itemSelectedChanged")
-'     ' list.observeField("currFocusItemIndex", "currFocusItemIndexChanged")
-'     list.observeField("isHidden", "onListIsHiddenChange")
-'     list.observeField("isFocusable", "onListIsFocuableChange")
-'     list.observeField("currTarget", "onCurrTargetChange")
-'   end for
-' end function
+function getRowRenderer(index)
+  return m.viewManager.getRenderer(index)
+end function
 
-' function itemFocusedChanged()
-'   m.top.itemFocused = m.currentList.itemFocused
-' end function
+function getCellRenderer(rowIndex, cellIndex)
+  row = getRowRenderer(rowIndex)
 
-' function itemUnfocusedChanged()
-'   m.top.itemUnfocused = m.currentList.itemUnfocused
-' end function
+  if row <> invalid
+    return row@.getRenderer(cellIndex)
+  end if
 
-' function itemSelectedChanged()
-'   m.top.itemSelected = m.currentList.itemSelected
-' end function
-
-' function currFocusItemIndexChanged() 
-'   ' ? "currFocusItemIndexChanged " ; 
-'   list = m.visibleLists[m.top.rowFocused]
-'   if list <> invalid and list.subType() = "HorizontalRow"
-'     index = list.currFocusItemIndex
-'     m.top.currFocusItemIndex = index
-'     rect = getBoundsForIndex(m.top.rowFocused, int(index))
-
-'     if rect <> invalid
-'       ' ? " rect is "; formatJson(rect)
-'       m.overlay.width = rect.height
-'       m.overlay.height = rect.width
-'       yOffset = list.translation[1] + m.rowsGroup.translation[1]
-
-'       'floating
-'       ' if m.list.content.yOffset <> invalid
-'       '   yOffset -= m.currentList.content.yOffset 
-'       ' end if
-'       m.overlay.translation = [rect.x, rect.y + yOffset]
-'     else
-'       ? " no rect for focused item"
-'     end if
-'   end if
-' end function
-
-' function onListIsHiddenChange(evt)
-'   m.viewManager.layoutLists()
-' end function
-
-' function onListIsFocuableChange(evt)
-'   'TODO update focus if we're currently focused on the list
-' end function
-
-' function onCurrTargetChange(evt)
-'   currTarget = m.currentList.currTarget
-'   ' ? "currTargetSet"; formatJson(currTarget)
-' end function
-
-' function getBoundsForIndex(rowIndex, index)
-'   rect = invalid
-'   list = m.visibleLists[rowIndex]
-'   if list <> invalid and list.subType() = "HorizontalRow"
-'     set = list.currTargetSet
-'     ' ? " set.focusIndex " ; set.focusIndex + list.focusIndexOffset
-'     if set <> invalid
-'       return set[index]
-'     end if
-'   end if
-
-'   if rect <> invalid
-'     ' ? "INDEX" ; index ; " " ; formatJson(dynamicCell.boundingRect()); "  " ; formatJson(dynamicCell.localBoundingRect()); "  " ; formatJson(dynamicCell.sceneBoundingRect()); "  " 
-'     return rect
-'   else
-'     ? "could not find target "
-'     return {
-'       width: 0
-'       height: 0
-'       translation: [0, 0]
-'     }
-'   end if
-
-' end function
-
-' function isHiddenChange()
-'   ? "ishiddenchange"
-'   if m.top.isHidden
-'     for each rowId in m.laststates
-'       list = m.visibleLists[rowId.toInt()]
-'       if list <> invalid
-'         list.renderState = "none"
-'       else
-'         ? "ERROR could not find visible list for "; rowId
-'       end if
-'     end for
-'   else
-'     for each rowId in m.laststates
-'       list = m.visibleLists[rowId.toInt()]
-'       if list <> invalid
-'         list.renderState = m.laststates[rowId]
-'       else
-'         ? "ERROR could not find visible list for "; rowId
-'       end if
-'     end for
-
-'   end if
-
-' end function
-
-' function getFocusedBounds()
-'   return getBoundsForIndex(m.top.rowFocused, int(m.currentList.currFocusItemIndex))
-' end function
+  return invalid
+end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress

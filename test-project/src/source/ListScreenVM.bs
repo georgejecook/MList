@@ -4,44 +4,98 @@ class ListScreenVM
   '++ Row delegate
   '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  function onRowWillEnter(index, direction)
-    ? "onRowWillEnter (index: " ; index ; " direction: " ; direction ; ")"
+  public list = invalid
+
+  function new(list)
+    m.list = list
   end function
 
-  function onRowWillExit(index, direction)
-    ? "onRowWillExit (index: " ; index ; " direction: " ; direction ; ")"
-  end function
+  ' function onRowWillEnter(rowIndex, index, direction)
+  '   ? "onRowWillEnter (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
 
-  function onRowDidEnter(index, direction)
-    ? "onRowDidEnter (index: " ; index ; " direction: " ; direction ; ")"
-  end function
+  ' function onRowWillExit(rowIndex, index, direction)
+  '   ? "onRowWillExit (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
 
-  function onRowDidExit(index, direction)
-    ? "onRowDidExit (index: " ; index ; " direction: " ; direction ; ")"
-  end function
+  ' function onRowDidEnter(rowIndex, index, direction)
+  '   ? "onRowDidEnter (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
 
-  function onRowWillGainFocus(index, direction)
-    ? "onRowWillGainFocus (index: " ; index ; " direction: " ; direction ; ")"
-  end function
+  ' function onRowDidExit(rowIndex, index, direction)
+  '   ? "onRowDidExit (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
 
-  function onRowWillLoseFocus(index, direction)
-    ? "onRowWillLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
-  end function
+  ' function onRowWillGainFocus(rowIndex, index, direction)
+  '   ? "onRowWillGainFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
+
+  ' function onRowWillLoseFocus(rowIndex, index, direction)
+  '   ? "onRowWillLoseFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
+
+  ' function onRowDidGainFocus(rowIndex, index, direction)
+  '   ? "onRowDidGainFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
+
+  ' function onRowDidLoseFocus(rowIndex, index, direction)
+  '   ? "onRowDidLoseFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
+
+  ' function onRowGainingFocus(rowIndex, index, direction, fraction)
+  '   ? "onRowGainingFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+  ' end function
+
+  ' function onRowLosingFocus(rowIndex, index, direction, fraction)
+  '   ? "onRowLosingFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+  ' end function
+
+  ' function onCellDidLoseFocus(rowIndex, index, direction)
+  '   ? "onCellDidLoseFocus (rowIndex: " ; rowIndex ; " index: " ; index ; " direction: " ; direction ; ")"
+  ' end function
+
+
 
   function onRowDidGainFocus(index, direction)
-    ? "onRowDidGainFocus (index: " ; index ; " direction: " ; direction ; ")"
+    ? "onRowDidGainFocus " ; index ; " " ; direction
+    ' m.top.opacity = 1
   end function
 
   function onRowDidLoseFocus(index, direction)
-    ? "onRowDidLoseFocus (index: " ; index ; " direction: " ; direction ; ")"
+    ? "onRowDidLoseFocus " ; index ; " " ; direction
+    ' m.top.opacity = 0
   end function
 
   function onRowGainingFocus(index, direction, fraction)
-    ? "onRowGainingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+    row = m.list@.getRowRenderer(index)
+    if direction = -1 and row.opacity < 1
+      row = m.list@.getRowRenderer(index)
+      row.opacity = fraction
+    end if
   end function
 
   function onRowLosingFocus(index, direction, fraction)
-    ? "onRowLosingFocus (index: " ; index ; " direction: " ; direction ; ", % " ; fraction ; ")"
+    if direction = 1
+      row = m.list@.getRowRenderer(index)
+      row.opacity = 1 - (fraction * 1.5)
+    end if
+  end function
+
+  function onCellGainingFocus(rowIndex, index, direction, fraction)
+    ' cell = m.list@.getCellRenderer(rowIndex, index)
+    ' x = index * 510
+    ' cell.translation = [x + (fraction * 510), cell.translation[1]]
+    ' width = ((1 + fraction) * 510) + 80
+    ' for i = 0 to 3
+    '   x += width
+    '   cell = m.list@.getCellRenderer(rowIndex, index + i)
+    '   if cell <> invalid
+    '     cell.translation = [x, cell.translation[1]]
+    '   end if
+    ' end for
+  end function
+
+  function onCellLosingFocus(rowIndex, index, direction, fraction)
   end function
 
 

@@ -1,5 +1,25 @@
 namespace ListMixin
-  function createRowSettings(cellSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1, focusSettings = invalid)
+  function createListContent(rowContent = [], focusSettings = invalid, rowSettings = invalid)
+    content = createObject("roSGNode", "ListContent")
+    content.appendChildren(rowContent)
+
+    if rowSettings = invalid
+      rowSettings = ListMixin.createRowSettings()
+    end if
+
+    if focusSettings = invalid
+      focusSettings = ListMixin.createFocusSettings()
+    end if
+
+    content.update({
+      rowSettings: rowSettings
+      focusSettings: focusSettings
+    })
+
+    return content
+  end function
+  
+  function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
     settings = createObject("roSGNode", "RowSettings")
 
     if cellSettings = invalid
@@ -21,6 +41,7 @@ namespace ListMixin
       space: space
       cellSettings: cellSettings
       headerSettings: headerSettings
+      focusSettings: focusSettings
     })
 
     return settings
@@ -94,29 +115,37 @@ namespace ListMixin
   function setTileSettings(compName = "Cell", cellSize = [300, 500])
   end function
 
-  function getRowSettings(list, row = invalid)
-    if row <> invalid and row.settings <> invalid
-      return row.settings
+  function getRowSettings(listContent, rowContent = invalid)
+    if rowContent <> invalid and rowContent.settings <> invalid
+      return rowContent.settings
+    else if listContent <> invalid and listContent.rowSettings <> invalid
+      return listContent.rowSettings
     else
-      return list.rowSettings
+      'THIS SHOULD NOT BE POSSIBLE
+      m.logError("no listCotnent for list - this should not have been called!")
+      return invalid
     end if
   end function
 
-  function getCellSettings(list, row = invalid, item = invalid)
-    if item <> invalid and item.settings <> invalid
+  function getCellSettings(listContent, rowContent = invalid, itemContent = invalid)
+    if itemContent <> invalid and itemContent.settings <> invalid
       return item.settings
-    else if row <> invalid and row.settings <> invalid
-      return row.settings.cellSettings
-    else
-      return list.rowSettings.cellSettings
+    else if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.cellSettings <> invalid
+      return rowContent.settings.cellSettings
+    else if listContent <> invalid and listContent.rowSettings <> invalid
+      return listContent.rowSettings.cellSettings
+    else 
+      m.logError("no listCotnent for list - this should not have been called!")
+      return invalid
     end if
   end function
 
-  function getFocusSettings(list, row = invalid)
-    if row <> invalid and row.settings <> invalid
-      return row.settings.focusSettings
-    else
-      return list.focusSettings
+  function getFocusSettings(listContent, rowContent = invalid)
+    if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
+      return rowContent.settings.focusSettings
+    else if listContent <> invalid and listContent.focusSettings <> invalid
+      return listContent.focusSettings
+      m.logError("no listCotnent for list - this should not have been called!")
     end if
   end function
 
