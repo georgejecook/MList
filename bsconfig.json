@@ -20,5 +20,6 @@
         1001
       ]
     }
-  ]
+  ],
+  "emitDefinitions": false
 }

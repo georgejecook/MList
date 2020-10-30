@@ -5,6 +5,6 @@
     <interface>
       <field id='animSpeed' type='float'/>
       <field id='fastAnimSpeed' type='float'/>
-      <field id='animStyle' type='floatarray'/>
+      <field id='animStyle' type='string'/>
     </interface>
 </component>

@@ -10,7 +10,7 @@
         id='headerSettings'
         type='node' />
     <field
-        id='focusSettngs'
+        id='focusSettings'
         type='node' />
     <field
         id='cellSettings'

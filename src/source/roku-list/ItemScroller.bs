@@ -38,11 +38,11 @@ class ItemScroller extends BaseClass
     if m.viewManager.delegate <> invalid
       m.delegates.push(m.viewManager.delegate)
     end if
-    m.settings = m.getSettings()
+    m.settings = m.getFocusSettings()
   end function
 
-  function getSettings()
-    return ListMixin.getFocusSettings(m.viewManager.content)
+  function getFocusSettings()
+    return m.viewManager.content.focusSettings
   end function
 
   public function reset()
@@ -126,6 +126,7 @@ class ItemScroller extends BaseClass
       m.animSpeed = m.settings.animSpeed
     end if
 
+    ? "m.settings " ; m.settings.animSpeed
 
     m.logInfo("moving to ", targetTranslation[m.axes], animated)
     if animated

@@ -18,7 +18,7 @@ namespace ListMixin
 
     return content
   end function
-  
+
   function createRowSettings(cellSettings = invalid, focusSettings = invalid, space = 30, headerSettings = invalid, screenPos = 0, headerSettings = invalid, compName = "HorizontalRow", height = -1)
     settings = createObject("roSGNode", "RowSettings")
 
@@ -142,11 +142,18 @@ namespace ListMixin
 
   function getFocusSettings(listContent, rowContent = invalid)
     if rowContent <> invalid and rowContent.settings <> invalid and rowContent.settings.focusSettings <> invalid
+      ? "use row content FOCUS SETTINGS"
       return rowContent.settings.focusSettings
+    else if listContent <> invalid and listContent.rowSettings <> invalid and listContent.rowSettings.focusSettings <> invalid
+      ? "use listContent ROW FOCUS SETTINGS"
+      return listContent.rowSettings.focusSettings
+      m.logError("no listCotnent for list - this should not have been called!")
     else if listContent <> invalid and listContent.focusSettings <> invalid
+      ? "use listContent FOCUS SETTINGS"
       return listContent.focusSettings
       m.logError("no listCotnent for list - this should not have been called!")
     end if
+    return invalid
   end function
 
   ' roku_list.setRowSettings(row, rowRenderer, offset, cellREnderr, cellSize)
