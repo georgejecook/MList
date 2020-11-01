@@ -46,6 +46,16 @@
         id='isHidden'
         type='boolean'
         value='false' />
+
+    <field
+        id='focusedCellIndex'
+        type='integer' />
+
+    <field
+        id='focusedCellPercent'
+        type='float' />
+
+
     <field
         id='isScrolling'
         type='boolean'
@@ -62,6 +72,8 @@
         type='integer' />
 
     <function name='getRenderer' />
+    <function name='getRect' />
+    <function name='getScreenRect' />
 
   </interface>
 
@@ -70,7 +82,7 @@
         id='bgRect'
         width='1920'
         color='#000000'
-        opacity = "0"
+        opacity='0'
         height='500' />
     <Group
         id='cellsGroup'

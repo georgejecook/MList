@@ -29,7 +29,8 @@ function createManagers()
   isAnimatorsCreated = true
   m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
-
+  m.focusManager.name = "ROW FM "
+  m.focusManager.isRow = true
   m.itemScroller = new RowItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
 end function
@@ -88,6 +89,13 @@ function getRenderer(index)
   return m.viewManager.getRenderer(index)
 end function
 
+function getRect(index, useScreenCoords = false)
+  return m.viewManager.getRect(index, useScreenCoords)
+end function
+
+function getScreenRect(index, screenPos = invalid, direction = 0)
+  return m.viewManager.getScreenRect(index, screenPos, direction)
+end function
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress

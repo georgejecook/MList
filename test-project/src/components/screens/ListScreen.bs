@@ -42,8 +42,8 @@ function onResetChange()
   m.list.content = ml_ListMixin_createListContent(rows, focusSettings, rowSettings)
 end function
 
-function makeRowSettings(speed, offset)
-  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480, 600], 100, 200)
+function makeRowSettings(speed, offset, size = [480, 600])
+  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", size, 100, 200)
   rowFocusSettings = ml_ListMixin_createFocusSettings(speed, 0.2)
   rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings, 100, invalid, offset)
   return rowSettings
@@ -59,16 +59,16 @@ function createData()
     row.title = "ROW " + str(i)
     if i <> 0
       if i = 1
-        row.settings = makeRowSettings(0.15, 350)
+        row.settings = makeRowSettings(0.15, 350, [200,300])
         row.title += " 350"
       else if i mod 5 = 0 or i = 6 or i = 7
-        row.settings = makeRowSettings(0.15, 600)
+        row.settings = makeRowSettings(0.15, 600, [400, 200])
         row.title += " 600"
       else if i mod 5 = 3
-        row.settings = makeRowSettings(0.5, 100)
+        row.settings = makeRowSettings(0.5, 100, [300, 800])
         row.title += " 100"
       else
-        row.settings = makeRowSettings(0.05, 0)
+        row.settings = makeRowSettings(0.05, 0, [500, 500])
         row.title += " 0"
       end if
     end if

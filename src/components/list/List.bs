@@ -8,6 +8,8 @@ function init()
   log_registerLogger("List")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToRow", "onAnimateToRowChange")
+  m.top.observeField("focusedRowPercent", "onFocusedRowPercentChange")
+  m.top.observeField("nextFocusIndex", "onNextFocusIndexChange")
   m.top.cellEvents = createEventsBroker("cells")
   m.top.rowEvents = createEventsBroker("rows")
   m.rowsGroup = m.top.findNode("rowsGroup") 
@@ -20,10 +22,9 @@ function init()
   m.focusManager = new ItemFocusManager(m.viewManager, m.top.focusMoveAnimation, m.top.focusMoveAnimationInterpolator, m.top.rowEvents)
   m.itemScroller = new ListItemScroller(m.viewManager, m.moveAnimation, m.moveAnimationInterpolator)
   m.itemScroller.focusManager = m.focusManager
-
+  m.focusManager.name = "LIST FM "
   ' m.top.clippingRect = [0,0,1920,550]
-  ' m.overlay = m.top.findNode("overlay") 
-  ' m.focusTimer = m.top.findNode("focusTimer") 
+  m.focusIndicator = m.top.findNode("focusIndicator") 
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   m.content = invalid
@@ -44,7 +45,7 @@ end function
 function onContentChange()
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
-  
+
     resetState()
   end if
 end function
@@ -70,6 +71,65 @@ function getCellRenderer(rowIndex, cellIndex)
   return invalid
 end function
 
+function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScreenPos = invalid)
+  rowScreenRect = getRowScreenRect(rowIndex, rowScreenPos)
+
+  if rowScreenRect <> invalid
+    row = getRowRenderer(rowIndex)
+
+    if row <> invalid
+      cellScreenRect = row@.getScreenRect(cellIndex, screenPos)
+
+      if cellScreenRect <> invalid
+        cellScreenRect.screenPos += rowScreenRect.screenPos
+        cellScreenRect.translation[1] += rowScreenRect.screenPos
+        return cellScreenRect
+      end if
+    end if
+  end if
+
+  return invalid
+end function
+
+function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
+
+  return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
+end function
+
+function onNextFocusIndexChange()
+  m.sourceFocusRect = {
+    translation: m.focusIndicator.translation 
+    size: [m.focusIndicator.width, m.focusIndicator.height]
+  }
+  m.targetFocusRect = getCellScreenRect(m.top.nextFocusIndex[0], m.top.nextFocusIndex[1])
+  ? " onNextFocusIndexChange SOURCE " ; m.sourceFocusRect
+  ? " onNextFocusIndexChange TARGET " ; m.targetFocusRect
+end function
+
+function onFocusedRowPercentChange(evt) as void
+  fraction = evt.getData()
+  if m.sourceFocusRect = invalid or m.targetFocusRect = invalid
+    ? "NO FOCUS RECTS! Ensure m.top.nextFocusIndex was set!"
+    return
+  end if
+
+  translation = interpolate(m.sourceFocusRect.translation, m.targetFocusRect.translation, fraction)
+  size = interpolate(m.sourceFocusRect.size, m.targetFocusRect.size, fraction)
+  ? "translation " ; translation
+  ? "size " ; size
+  m.focusIndicator.translation = translation
+  m.focusIndicator.width = size[0]
+  m.focusIndicator.height = size[1]
+  ? "onFocusedRowPercentChange " ; evt.getData() ; " " ; translation[1]; " " ; m.targetFocusRect.translation[1]
+end function
+
+function interpolate(a, b, fraction)
+  if a <> invalid and b <> invalid
+    return [a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction]
+  else
+    return [0, 0]
+  end if
+end function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '++ KeyPress
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

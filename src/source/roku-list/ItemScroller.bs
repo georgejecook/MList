@@ -119,7 +119,6 @@ class ItemScroller extends BaseClass
     end if
 
     m.setNextIndex(m.index + m.direction)
-
     if fast
       m.animSpeed = m.settings.fastAnimSpeed
     else 
@@ -131,6 +130,7 @@ class ItemScroller extends BaseClass
     m.logInfo("moving to ", targetTranslation[m.axes], animated)
     if animated
       m.toggleScrolling(true)
+      m.setFocusIndex(m.index, true, screenPos)
       m.viewManager.updateRenderedComponents(m.direction, m.index)
 
       'TODO count visible rows between oldIndex and newIndex

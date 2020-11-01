@@ -8,7 +8,7 @@
         type='node'
         value='invalid' />
 
-        <field
+    <field
         id='isScrolling'
         type='boolean' />
 
@@ -36,6 +36,23 @@
         id='animateToRow'
         type='integer'
         value='0' />
+    <field
+        id='focusedRowIndex'
+        type='integer' />
+    <field
+        id='focusedCellIndex'
+        type='integer' />
+    <field
+        id='focusedRowPercent'
+        type='float' />
+
+    <field
+        id='focusedCellPercent'
+        type='float' />
+
+    <field
+        id='nextFocusIndex'
+        type='array' />
 
     <!-- screen and selection state -->
     <field
@@ -72,8 +89,10 @@
         onChange='isHiddenChange' />
     <function name='getBoundsForIndex' />
     <function name='getFocusedBounds' />
-    <function name='getRowRenderer' />
+
+    <function name='getRowScreenRect' />
     <function name='getCellRenderer' />
+    <function name='getCellScreenRect' />
 
   </interface>
   <children>
@@ -85,7 +104,7 @@
     <Group id='rowsGroup' />
     <Rectangle id='focusPoint' />
     <Rectangle
-        id='overlay'
+        id='focusIndicator'
         color='#ff0000'
         visible='true'
         opacity='0.5' />

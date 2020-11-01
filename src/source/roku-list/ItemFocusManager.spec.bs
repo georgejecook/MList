@@ -23,7 +23,8 @@ namespace Tests
       m.scrollerAnimation = Tests.Utils.createSimpleMockNode("animation")
       m.scrollerInterpolator = Tests.Utils.createSimpleMockNode("interpolator")
 
-      m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.scrollerAnimation, m.scrollerInterpolator)
+      m.scroller = new ItemScroller(m.viewManager, 1, 0, 1080, m.scrollerAnimation, m.scrollerInterpolator
+      )
       m.configureScroller(1, 20)
 
       m.animation = Tests.Utils.createSimpleMockNode("animation")

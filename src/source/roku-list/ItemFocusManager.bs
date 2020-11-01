@@ -12,9 +12,11 @@ class ItemFocusManager extends BaseClass
   public direction = 0
   public didStart = false
   public didFinish = false
+  public isRow = false
 
   function new(viewManager, moveAnimation, moveAnimationInterpolator, ownerDelegate, rowIndex = -1)
     super("ItemFocusManager")
+    m.name = "ItemFocusManager"
     m.viewManager = viewManager
     m.container = viewManager.container
     m.delegate = viewManager.owner
@@ -32,9 +34,9 @@ class ItemFocusManager extends BaseClass
   end function
 
   function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
-    ' ? ">>>>>>>>>>>>>>>>>>>>>"
-    ' m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
-    ' ? ">>>>>>>>>>>>>>>>>>>>>"
+    ? ">>>>>>>>>>>>>>>>>>>>>"
+    m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
+    ? ">>>>>>>>>>>>>>>>>>>>>"
     m.index = index
     m.indexPosition = indexPosition
     m.nextIndex = nextIndex
@@ -42,9 +44,9 @@ class ItemFocusManager extends BaseClass
     m.direction = direction
     m.component = m.viewManager.getRenderer(m.index)
     m.nextComponent = m.viewManager.getRenderer(m.nextIndex)
-    m.onFocusUpdate(0)
     m.didStart = false
     m.didFinish = false
+    m.onFocusUpdate(0)
   end function
 
   function onFocusAnimationUpdate(fraction)
@@ -62,6 +64,7 @@ class ItemFocusManager extends BaseClass
       if m.direction = -1
         fraction = 1 - fraction
       end if
+      ' ? m.name + " UPDATE: " ; fraction
       m.onFocusUpdate(fraction)
     else
       ' ? "FIXME"
@@ -73,6 +76,7 @@ class ItemFocusManager extends BaseClass
       name = "willLoseFocus"
       nextName = "willGainFocus"
       m.didStart = true
+      m.setOwnerNextFocusIndex()
     else if fraction = 0
       return
     else if fraction = 1
@@ -82,9 +86,16 @@ class ItemFocusManager extends BaseClass
       m.didFinish = true
       name = "didLoseFocus"
       nextName = "didGainFocus"
+      m.setOwnerIndexes()
     else
       name = "losingFocus"
       nextName = "gainingFocus"
+    end if
+
+    if m.isRow 
+      m.viewManager.owner.focusedCellPercent = fraction
+    else
+      m.viewManager.owner.focusedRowPercent = fraction
     end if
 
     event = {
@@ -116,6 +127,31 @@ class ItemFocusManager extends BaseClass
       delegate.listEvent = event
       delegate.listEvent = nextEvent
     end for
+  end function
+
+  function setOwnerNextFocusIndex()
+    if m.isRow
+      m.viewManager.owner.nextFocusIndex = [m.viewManager.row.index, m.nextIndex]
+    else
+      comp = m.viewManager.getRenderer(m.nextIndex)
+      if comp <> invalid
+        m.viewManager.owner.nextFocusIndex = [comp.index, comp.focusedCellIndex]
+      end if
+    end if
+
+  end function
+
+  function setOwnerIndexes()
+    if m.isRow
+      m.viewManager.owner.focusedCellIndex = m.nextIndex
+    else
+      m.viewManager.owner.focusedRowIndex = m.nextIndex
+      comp = m.viewManager.getRenderer(m.nextIndex)
+      if comp <> invalid
+        m.viewManager.owner.focusedCellIndex = comp.focusedCellIndex
+      end if
+    end if
+
   end function
 
 end class

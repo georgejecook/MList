@@ -36,6 +36,7 @@ class RowItemViewManager extends ItemViewManager
         translation: translation, 
         size: settings.size 
         index: index
+        rowIndex: m.row.index
       })
       m.visibleItems.push(item)
 
@@ -49,7 +50,7 @@ class RowItemViewManager extends ItemViewManager
   override function shouldUpdateRenderedIndexes(direction, index)
     return true
   end function
-  
+
   override function applyRenderStateMap(renderStateMap)
     ' m.logInfo("applyRenderStateMap", m.row.index, m.row.isRendered)
     if m.row.isRendered
@@ -133,5 +134,6 @@ class RowItemViewManager extends ItemViewManager
       end if
     end for
   end function
+
 
 end class
