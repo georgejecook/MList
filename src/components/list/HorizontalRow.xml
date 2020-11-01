@@ -66,6 +66,12 @@
   </interface>
 
   <children>
+    <Rectangle
+        id='bgRect'
+        width='1920'
+        color='#000000'
+        opacity = "0"
+        height='500' />
     <Group
         id='cellsGroup'
         translation='[0,00]' />

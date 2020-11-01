@@ -33,13 +33,20 @@ function onResetChange()
   ? "resetting"
   m.list.content = invalid
 
-  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480,600], 100, 200)
-  rowFocusSettings = ml_ListMixin_createFocusSettings(0.2, 0.1)
-  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings)
-  focusSettings = ml_ListMixin_createFocusSettings(0.5)
+  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480, 600], 100, 200)
+  rowFocusSettings = ml_ListMixin_createFocusSettings(0.25, 0.1)
+  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings, 100, invalid, 200)
+  focusSettings = ml_ListMixin_createFocusSettings(0.3)
 
   rows = createData()
   m.list.content = ml_ListMixin_createListContent(rows, focusSettings, rowSettings)
+end function
+
+function makeRowSettings(speed, offset)
+  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480, 600], 100, 200)
+  rowFocusSettings = ml_ListMixin_createFocusSettings(speed, 0.2)
+  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings, 100, invalid, offset)
+  return rowSettings
 end function
 
 function createData()
@@ -51,24 +58,17 @@ function createData()
     rows.push(row)
     row.title = "ROW " + str(i)
     if i <> 0
-      if i mod 9 = 0
-        row.addFields({ "focusType": "floatingWrap" })
-        row.title += " floating"
-      else
-        row.addFields({ "focusType": "fixed" })
-        row.title += " fixed"
-      end if
       if i = 1
-        row.addFields({ "yOffset": 650 })
-        row.title += " post hero"
-      else if i mod 5 = 0
-        row.addFields({ "yOffset": 400 })
-        row.title += " 400"
+        row.settings = makeRowSettings(0.15, 350)
+        row.title += " 350"
+      else if i mod 5 = 0 or i = 6 or i = 7
+        row.settings = makeRowSettings(0.15, 600)
+        row.title += " 600"
       else if i mod 5 = 3
-        row.addFields({ "yOffset": 400 })
-        row.title += " 700"
+        row.settings = makeRowSettings(0.5, 100)
+        row.title += " 100"
       else
-        row.addFields({ "yOffset": 0 })
+        row.settings = makeRowSettings(0.05, 0)
         row.title += " 0"
       end if
     end if

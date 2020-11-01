@@ -238,7 +238,7 @@ class ItemViewManager extends BaseClass
 
     screenPos = m.getScreenPositionForItem(itemRect, direction)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
-    ' ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
+    ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
 
     if m.axes = 0
       return [- targetPos, m.container.translation[1]]
@@ -268,7 +268,7 @@ class ItemViewManager extends BaseClass
 
   function getOffsetForScreenPosition(itemRect, screenPos)
     if itemRect <> invalid
-      return itemRect.translation[m.axes] + screenPos
+      return itemRect.translation[m.axes] - screenPos
     else
       return m.minPos
     end if
@@ -305,6 +305,14 @@ class ItemViewManager extends BaseClass
 
   function getRenderer(index)
     return invalid
+  end function
+
+  function getFocusSettings()
+    return m.content.focusSettings
+  end function
+
+  function getItemSettings()
+    return m.content.settings
   end function
 
 end class

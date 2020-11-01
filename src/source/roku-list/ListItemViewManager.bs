@@ -82,11 +82,12 @@ class ListItemViewManager extends ItemViewManager
         'TODO better handle the whole visibility
 
         y += component.height + settings.space
-
+        ? " SCREEN POS "; settings.screenPos
         m.rects.push({ 
           translation: component.translation
           size: [w, component.height] 
           index: component.index
+          screenPos: settings.screenPos
         })
         m.visibleComponents.push(component)
         m.visibleItems.push(component.content)
@@ -116,28 +117,8 @@ class ListItemViewManager extends ItemViewManager
 
   end function
 
-  ' override function getRenderedIndexes(direction, index)
-  '   ' return {
-  '   '   startIndex: 0
-  '   '   endIndex: m.visibleItems.count()
-  '   ' }
-  '   return {
-  '     startIndex: index
-  '     endIndex: index + 10
-  '   }
-  ' end function
-
-
-  ' override function shouldUpdateRenderedIndexes(direction, index)
-  '   return true
-  ' end function
-
-  ' override function getRenderedIndexes(direction, index)
-  '   return {
-  '     startIndex: 0
-  '     endIndex: 20
-  '   }
-  ' end function
-
+  override function getFocusSettings()
+    return m.content.focusSettings
+  end function
 
 end class

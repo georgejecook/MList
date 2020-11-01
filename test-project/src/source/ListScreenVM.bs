@@ -66,37 +66,37 @@ class ListScreenVM
     ' m.top.opacity = 0
   end function
 
-  function onRowGainingFocus(index, direction, fraction)
-    row = m.list@.getRowRenderer(index)
-    if direction = -1 and row.opacity < 1
-      row = m.list@.getRowRenderer(index)
-      row.opacity = fraction
-    end if
-  end function
+  ' function onRowGainingFocus(index, direction, fraction)
+  '   row = m.list@.getRowRenderer(index)
+  '   if direction = -1 and row.opacity < 1
+  '     row = m.list@.getRowRenderer(index)
+  '     row.opacity = fraction
+  '   end if
+  ' end function
 
-  function onRowLosingFocus(index, direction, fraction)
-    if direction = 1
-      row = m.list@.getRowRenderer(index)
-      row.opacity = 1 - (fraction * 1.5)
-    end if
-  end function
+  ' function onRowLosingFocus(index, direction, fraction)
+  '   if direction = 1
+  '     row = m.list@.getRowRenderer(index)
+  '     row.opacity = 1 - (fraction * 1.5)
+  '   end if
+  ' end function
 
-  function onCellGainingFocus(rowIndex, index, direction, fraction)
-    ' cell = m.list@.getCellRenderer(rowIndex, index)
-    ' x = index * 510
-    ' cell.translation = [x + (fraction * 510), cell.translation[1]]
-    ' width = ((1 + fraction) * 510) + 80
-    ' for i = 0 to 3
-    '   x += width
-    '   cell = m.list@.getCellRenderer(rowIndex, index + i)
-    '   if cell <> invalid
-    '     cell.translation = [x, cell.translation[1]]
-    '   end if
-    ' end for
-  end function
+  ' function onCellGainingFocus(rowIndex, index, direction, fraction)
+  ' cell = m.list@.getCellRenderer(rowIndex, index)
+  ' x = index * 510
+  ' cell.translation = [x + (fraction * 510), cell.translation[1]]
+  ' width = ((1 + fraction) * 510) + 80
+  ' for i = 0 to 3
+  '   x += width
+  '   cell = m.list@.getCellRenderer(rowIndex, index + i)
+  '   if cell <> invalid
+  '     cell.translation = [x, cell.translation[1]]
+  '   end if
+  ' end for
+  ' end function
 
-  function onCellLosingFocus(rowIndex, index, direction, fraction)
-  end function
+  ' function onCellLosingFocus(rowIndex, index, direction, fraction)
+  ' end function
 
 
 end class

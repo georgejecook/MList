@@ -17,6 +17,7 @@ function init()
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
   m.moveAnimation = m.top.findNode("moveAnimation")
   m.header = m.top.findNode("header")
+  m.bgRect = m.top.findNode("bgRect")
   m.cellProvider = m.global.cellProvider
   m.cellTracker = m.global.cellTracker
   ListItemDelegateMixin.setDelegate()
@@ -37,7 +38,7 @@ function onContentChange(evt)
   ' m.logInfo("onContentChange", evt.getField())
   if m.content = invalid or not m.content.isSameNode(m.top.content)
     m.content = m.top.content
-    m.header.text = "ROW " + m.top.id
+    m.header.text = "ROW " + m.top.content.title
     calculateHeight()
     createManagers()
     m.viewManager.setContent(m.top.content)
@@ -173,26 +174,22 @@ end function
 '   ? "onWillLoseFocus " ; index ; " " ; direction
 ' end function
 
-' function onDidGainFocus(index, direction)
-'   ? "onDidGainFocus " ; index ; " " ; direction
-'   ' m.top.opacity = 1
-' end function
+function onDidGainFocus(index, direction)
+  '   ? "onDidGainFocus " ; index ; " " ; direction
+  '   ' m.top.opacity = 1
+  m.bgRect.opacity = 1
+end function
 
-' function onDidLoseFocus(index, direction)
-'   ? "onDidLoseFocus " ; index ; " " ; direction
-'   ' m.top.opacity = 0
-' end function
+function onDidLoseFocus(index, direction)
+  '   ? "onDidLoseFocus " ; index ; " " ; direction
+  '   ' m.top.opacity = 0
+  m.bgRect.opacity = 0
+end function
 
-' function onGainingFocus(index, direction, fraction)
-'   if direction = -1 and m.top.opacity < 1
-'     ? " ROW GAINING " ; fraction
-'     m.top.opacity = fraction
-'   end if
-' end function
+function onGainingFocus(index, direction, fraction)
+  m.bgRect.opacity = fraction
+end function
 
-' function onLosingFocus(index, direction, fraction)
-'   ' ? " ROW LOSING " ; direction ; " " ; fraction
-'   if direction = 1
-'     m.top.opacity = 1 - fraction
-'   end if
-' end function
+function onLosingFocus(index, direction, fraction)
+  m.bgRect.opacity = 1 - fraction
+end function
