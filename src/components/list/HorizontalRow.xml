@@ -85,8 +85,12 @@
         opacity='0'
         height='500' />
     <Group
-        id='cellsGroup'
-        translation='[0,00]' />
+        id='contentGroup'
+        translation='[0,0]'>
+      <Group
+          id='cellsGroup'
+          translation='[0,0]' />
+    </Group>
 
     <Rectangle
         width='1920'

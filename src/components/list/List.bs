@@ -92,7 +92,6 @@ function getCellScreenRect(rowIndex, cellIndex, rowScreenPos = invalid, cellScre
 end function
 
 function getRowScreenRect(rowIndex, screenPos = invalid, direction = 0)
-
   return m.viewManager.getScreenRect(rowIndex, screenPos, direction)
 end function
 

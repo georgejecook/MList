@@ -16,6 +16,9 @@
         id='cellSettings'
         type='node' />
     <field
+        id='contentOffset'
+        type='floatarray' />
+    <field
         id='space'
         type='integer' />
     <field

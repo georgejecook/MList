@@ -8,8 +8,9 @@ class RowItemViewManager extends ItemViewManager
   public isScrolling = false
   public lastRowIsRendered = "none"
 
-  function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
+  function new(list, row, container, contentGroup, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
     super("RowItemViewManager", list, container, 0, minPos, maxPos)
+    m.contentGroup = contentGroup
     m.cellProvider = cellProvider
     m.cellTracker = cellTracker
     m.row = row
@@ -30,6 +31,9 @@ class RowItemViewManager extends ItemViewManager
   override function updateLayout()
     translation = [0, 0]
     index = 0
+    settings = ListMixin.getRowSettings(m.owner.content, m.content)
+    m.contentGroup.translation = settings.contentOffset
+
     for each item in m.content.getChildren(-1, 0)
       settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
       m.rects.push({ 
@@ -133,6 +137,18 @@ class RowItemViewManager extends ItemViewManager
         comp.listEvent = { name: "scrollStop" }
       end if
     end for
+  end function
+
+
+  override function getScreenRect(index, screenPos = invalid, direction = 0)
+    rect = super.getScreenRect(index, screenPos, direction)
+
+    if rect <> invalid
+      settings = ListMixin.getRowSettings(m.owner.content, m.content)
+      rect.translation[0] += settings.contentOffset[0]
+      rect.translation[1] += settings.contentOffset[1]
+    end if
+    return rect
   end function
 
 

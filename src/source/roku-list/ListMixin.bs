@@ -40,6 +40,7 @@ namespace ListMixin
       height: height
       space: space
       cellSettings: cellSettings
+      contentOffset: [0, 0]
       headerSettings: headerSettings
       focusSettings: focusSettings
     })

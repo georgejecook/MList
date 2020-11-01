@@ -12,6 +12,7 @@ function init()
   m.top.observeField("isRendered", "onIsRenderedChange")
   m.top.observeField("animateToItem", "onAnimateToItemChange")
   m.cellsGroup = m.top.findNode("cellsGroup")
+  m.contentGroup = m.top.findNode("contentGroup")
   m.focusMoveAnimationInterpolator = m.top.findNode("focusMoveAnimationInterpolator") 
   m.focusMoveAnimation = m.top.findNode("focusMoveAnimation")
   m.moveAnimationInterpolator = m.top.findNode("moveAnimationInterpolator") 
@@ -27,7 +28,7 @@ end function
 function createManagers()
   m.logInfo("createManagers")
   isAnimatorsCreated = true
-  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
+  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.contentGroup, m.cellProvider, m.cellTracker)
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
   m.focusManager.name = "ROW FM "
   m.focusManager.isRow = true
@@ -52,7 +53,7 @@ function calculateHeight()
   if settings.height <> -1
     m.top.height = settings.height
   else
-    m.top.height = settings.cellSettings.size[1]
+    m.top.height = settings.cellSettings.size[1] + settings.contentOffset[1]
   end if
 end function
 
