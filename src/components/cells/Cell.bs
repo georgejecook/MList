@@ -2,11 +2,11 @@ import "pkg:/source/roku_modules/mc/Utils.brs"
 import "pkg:/source/roku-list/ListItemDelegateMixin.bs"
 
 function init()
-  m.backgroundRect = m.top.findNode("backgroundRect")
   m.poster = m.top.findNode("poster")
   m.poster2 = m.top.findNode("poster2")
   m.label = m.top.findNode("label")
   m.label2 = m.top.findNode("label2")
+  m.size = [480,320]
   m.scale = 1
   ' m.top.observeField("content", "onContentChange")
   ' m.top.observeField("listEvent", "onListEvent")
@@ -17,6 +17,8 @@ end function
 
 function onContentChange()
   if m.content = invalid or not m.content.isSamenode(m.top.content)
+    m.poster.width = m.size[0]
+    m.poster.height = m.size[1]
     setScale(0, true)
     m.content = m.top.content
 
@@ -36,9 +38,11 @@ function onScrollChange()
   m.label2.visible = not isScrolling
 end function
 
-function onInitialStateChange()
-  m.list = m.top.initialState.list
-  m.row = m.top.initialState.row
+function onInitialStateChange(evt)
+  state = evt.getData()
+  m.list = state.list
+  m.row = state.row
+  m.size = state.size
 end function
 
 ' function onListEvent(evt)

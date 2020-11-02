@@ -31,8 +31,7 @@ class RowItemViewManager extends ItemViewManager
   override function updateLayout()
     translation = [0, 0]
     index = 0
-    settings = ListMixin.getRowSettings(m.owner.content, m.content)
-    m.contentGroup.translation = settings.contentOffset
+    m.contentGroup.translation = m.settings.contentOffset
 
     for each item in m.content.getChildren(-1, 0)
       settings = ListMixin.getCellSettings(m.owner.content, m.content, item)
@@ -87,6 +86,7 @@ class RowItemViewManager extends ItemViewManager
             cell.initialState = {
               row: m.row
               list: m.owner
+              size: m.rects[index].size
             } 
 
             cell.visible = true
@@ -144,9 +144,8 @@ class RowItemViewManager extends ItemViewManager
     rect = super.getScreenRect(index, screenPos, direction)
 
     if rect <> invalid
-      settings = ListMixin.getRowSettings(m.owner.content, m.content)
-      rect.translation[0] += settings.contentOffset[0]
-      rect.translation[1] += settings.contentOffset[1]
+      rect.translation[0] += m.settings.contentOffset[0]
+      rect.translation[1] += m.settings.contentOffset[1]
     end if
     return rect
   end function

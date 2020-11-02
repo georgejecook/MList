@@ -104,13 +104,13 @@ end function
 
 function onKeyPressLeft() as boolean
   m.logMethod("onKeyPressLeft")
-  m.itemScroller.move(-1)
+  m.itemScroller.move(-1, 500)
   return true
 end function
 
 function onKeyPressRight() as boolean
   m.logMethod("onKeyPressRight")
-  m.itemScroller.move(1)
+  m.itemScroller.move(1, 500)
   return true
 end function
 

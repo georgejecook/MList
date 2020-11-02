@@ -3,6 +3,7 @@ import "pkg:/source/roku-list/ItemScroller.bs"
 class RowItemScroller extends ItemScroller
   function new(viewManager, moveAnimation, moveAnimationInterpolator)
     super(viewManager, 0, moveAnimation, moveAnimationInterpolator)
+    m.screenPos = 500
   end function
 
   override function setFocusOnRenderer(isMoving)

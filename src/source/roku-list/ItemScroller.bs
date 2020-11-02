@@ -18,6 +18,7 @@ class ItemScroller extends BaseClass
   public container = invalid
   public direction = 0
   public axes = 0 'x = 0, y =1
+  public screenPos = 0 
 
   function new(viewManager, axes, moveAnimation, moveAnimationInterpolator)
     super("ItemScroller")
@@ -110,6 +111,11 @@ class ItemScroller extends BaseClass
       return false
     end if
 
+    itemRect = m.viewManager.rects[index]
+    if screenPos = invalid
+      screenPos = m.screenPos
+    end if
+    m.screenPos = m.viewManager.getScreenPositionForItem(itemRect, direction, screenPos)
     m.targetIndex = index
 
     if m.targetIndex < m.index
@@ -295,7 +301,7 @@ class ItemScroller extends BaseClass
 
     'notify what WILL come into view
     if isMoving and m.nextIndex <> m.index
-      nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, screenPos)
+      nextTranslation = m.viewManager.getTargetTranslation(m.nextIndex, m.direction, m.screenPos)
       nextrenderedCompMap = m.viewManager.getComoponentsInViewPort(nextTranslation[m.axes])
       ' m.logInfo("nextrenderedCompMap", nextrenderedCompMap)
       for each id in nextrenderedCompMap

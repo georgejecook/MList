@@ -14,6 +14,7 @@ class ItemViewManager extends BaseClass
   public content = invalid
   public components = []
   public rects = []
+  public settings = invalid 
 
   'tracking
   public visibleItems = []
@@ -48,6 +49,7 @@ class ItemViewManager extends BaseClass
 
   function setContent(content)
     m.content = content
+    m.settings = ListMixin.getRowSettings(m.owner.content, m.content)
 
     m.container.removeChildren(m.container.getChildren(-1, 0))
     m._createRenderers(content)
@@ -236,7 +238,7 @@ class ItemViewManager extends BaseClass
       return [-1, -1]
     end if
 
-    screenPos = m.getScreenPositionForItem(itemRect, direction)
+    screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
     targetPos = m.getOffsetForScreenPosition(itemRect, screenPos)
     ? " POS " ; targetPos ; " dir " ; m.direction ; " sp " ; screenPos ; " it " ; itemRect.translation[m.axes]
 
@@ -249,20 +251,22 @@ class ItemViewManager extends BaseClass
   end function
 
   function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)
+    screenPos = m.minPos
     if itemRect <> invalid
       if screenPos <> invalid
-        return screenPos
+        ? " USING SCREEN POS" ; screenPos
+        screenPos = screenPos
       else if itemRect.screenPos <> invalid
-        return itemRect.screenPos
+        screenPos = itemRect.screenPos
       else if m.direction = -1
-        return m.minPos
+        screenPos = m.minPos
       else if m.direction = 1
         'TODO - calculate position that can fit on screen
-        return m.minPos ' fixed focus
+        screenPos = m.minPos ' fixed focus
         ' return m.maxPos - itemRect.width
       end if
     end if
-    return m.minPos
+    return screenPos + m.settings.contentOffset[m.axes]
   end function
 
   function getOffsetForScreenPosition(itemRect, screenPos)
