@@ -101,7 +101,9 @@
         duration='0.01'
         control='start'
         repeat='true' />
-    <Group id='rowsGroup' />
+    <Group id='contentGroup'>
+      <Group id='rowsGroup' />
+    </Group>
     <Rectangle id='focusPoint' />
     <Rectangle
         id='focusIndicator'

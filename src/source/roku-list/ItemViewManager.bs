@@ -9,6 +9,7 @@ class ItemViewManager extends BaseClass
   public container = invalid
   public owner = invalid
   public delegate = invalid
+  public contentGroup = invalid
 
   'content
   public content = invalid
@@ -33,6 +34,7 @@ class ItemViewManager extends BaseClass
   function new(name, owner, container, axes, minPos, maxPos)
     super(name)
     m.container = container
+    m.contentGroup = container.getParent()
     m.owner = owner
     m.axes = axes
     m.minPos = minPos
@@ -248,6 +250,23 @@ class ItemViewManager extends BaseClass
       return [m.container.translation[0], - targetPos]
     end if
 
+  end function
+
+  function getNextFlowScreenPosition(index, direction)
+    itemRect = m.rects[index]
+
+    if itemRect = invalid
+      m.logWarn("no itemRect for index", index)
+      return invalid
+    end if
+    ' screenPos = m.getScreenPositionForItem(itemRect, direction)
+    itemScreenPos = - itemRect.translation[m.axes] + m.container.translation[m.axes]
+
+    if itemScreenPos > m.minPos and itemScreenPos + itemRect.size.width < m.maxPos
+      return itemScreenPos
+    end if
+
+    return invalid
   end function
 
   function getScreenPositionForItem(itemRect, direction = 0, screenPos = invalid)

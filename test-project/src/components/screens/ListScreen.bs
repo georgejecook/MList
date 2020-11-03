@@ -63,7 +63,7 @@ function createData()
         row.settings.contentOffset = [200, 0]
         row.title += " 350"
       else if i mod 5 = 0 or i = 6 or i = 7
-        row.settings = makeRowSettings(0.15, 0, [100, 100])
+        row.settings = makeRowSettings(0.15, 0, [200, 100])
         row.title += " 600"
       else if i mod 5 = 3
         row.settings = makeRowSettings(0.5, 100, [300, 800])

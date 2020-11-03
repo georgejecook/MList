@@ -34,9 +34,9 @@ class ItemFocusManager extends BaseClass
   end function
 
   function setFocusPosition(index, indexPosition, nextIndex, nextPosition, direction)
-    ? ">>>>>>>>>>>>>>>>>>>>>"
-    m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
-    ? ">>>>>>>>>>>>>>>>>>>>>"
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
+    ' m.logInfo(index, indexPosition, nextIndex, nextPosition, direction)
+    ' ? ">>>>>>>>>>>>>>>>>>>>>"
     m.index = index
     m.indexPosition = indexPosition
     m.nextIndex = nextIndex

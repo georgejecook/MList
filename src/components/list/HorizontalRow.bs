@@ -28,7 +28,7 @@ end function
 function createManagers()
   m.logInfo("createManagers")
   isAnimatorsCreated = true
-  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.contentGroup, m.cellProvider, m.cellTracker)
+  m.viewManager = new RowItemViewManager(m.top.owner, m.top, m.cellsGroup, m.cellProvider, m.cellTracker)
   m.focusManager = new ItemFocusManager(m.viewManager, m.focusMoveAnimation, m.focusMoveAnimationInterpolator, m.top.owner.cellEvents, m.top.index)
   m.focusManager.name = "ROW FM "
   m.focusManager.isRow = true

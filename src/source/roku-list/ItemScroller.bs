@@ -105,7 +105,8 @@ class ItemScroller extends BaseClass
     m.logInfo("moveToIndex", index, screenPos, animated)
 
     targetTranslation = m.viewManager.getTargetTranslation(index, m.direction, screenPos)
-
+    
+    return invalid
     if targetTranslation = invalid
       m.logError("cannot move! translation invalid for index", index)
       return false

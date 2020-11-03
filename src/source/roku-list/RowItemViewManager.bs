@@ -8,9 +8,8 @@ class RowItemViewManager extends ItemViewManager
   public isScrolling = false
   public lastRowIsRendered = "none"
 
-  function new(list, row, container, contentGroup, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
+  function new(list, row, container, cellProvider, cellTracker, minPos = 0, maxPos = 1920)
     super("RowItemViewManager", list, container, 0, minPos, maxPos)
-    m.contentGroup = contentGroup
     m.cellProvider = cellProvider
     m.cellTracker = cellTracker
     m.row = row
@@ -148,6 +147,21 @@ class RowItemViewManager extends ItemViewManager
       rect.translation[1] += m.settings.contentOffset[1]
     end if
     return rect
+  end function
+
+  override function getNextFlowScreenPosition(index, direction, screenPos)
+    if m.isFlowSupported = true
+      itemRect = m.rects[index]
+      if itemRect <> invalid
+        screenPos = m.getScreenPositionForItem(itemRect, direction, screenPos)
+        if 
+      end if
+      if direction = -1
+        return m.get
+      end if
+    end if
+
+    return invalid
   end function
 
 
