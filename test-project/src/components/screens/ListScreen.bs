@@ -1,6 +1,8 @@
 import "pkg:/source/roku_modules/ml/roku-list/ListDelegateMixin.brs"
 import "pkg:/source/roku_modules/ml/roku-list/ListMixin.brs"
 import "pkg:/source/ListScreenVM.bs"
+import "pkg:/source/roku_modules/mv/ViewUtils.brs"
+' import "pkg:/components/roku_modules/mv/core/BaseView.brs"
 
 function init()
   print "in FocusTestScene init"
@@ -18,7 +20,6 @@ function init()
   onResetChange()
   mv_initializeView(m.list)
 
-
   'delegate functions are implemented on m.listVM class
   ml_ListDelegateMixin_setListDelegate(m.list, m.listVM)
 
@@ -33,19 +34,19 @@ function onResetChange()
   ? "resetting"
   m.list.content = invalid
 
-  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", [480, 600], 100, 200)
-  rowFocusSettings = ml_ListMixin_createFocusSettings(0.25, 0.1)
-  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings, 100, invalid, 200)
-  focusSettings = ml_ListMixin_createFocusSettings(0.3)
+  cellSettings = ml.ListMixin.createCellSettings("ml_Cell", [480, 600], 100, 200)
+  rowFocusSettings = ml.ListMixin.createFocusSettings(0.25, 0.1)
+  rowSettings = ml.ListMixin.createRowSettings(cellSettings, rowFocusSettings, 100, invalid, 200)
+  focusSettings = ml.ListMixin.createFocusSettings(0.3)
 
   rows = createData()
-  m.list.content = ml_ListMixin_createListContent(rows, focusSettings, rowSettings)
+  m.list.content = ml.ListMixin.createListContent(rows, focusSettings, rowSettings)
 end function
 
 function makeRowSettings(speed, offset, size = [480, 600])
-  cellSettings = ml_ListMixin_createCellSettings("ml_Cell", size, 100, 200)
-  rowFocusSettings = ml_ListMixin_createFocusSettings(speed, 0.2)
-  rowSettings = ml_ListMixin_createRowSettings(cellSettings, rowFocusSettings, 100, invalid, offset)
+  cellSettings = ml.ListMixin.createCellSettings("ml_Cell", size, 100, 200)
+  rowFocusSettings = ml.ListMixin.createFocusSettings(speed, 0.2)
+  rowSettings = ml.ListMixin.createRowSettings(cellSettings, rowFocusSettings, 100, invalid, offset)
   return rowSettings
 end function
 
@@ -59,7 +60,7 @@ function createData()
     row.title = "ROW " + str(i)
     if i <> 0
       if i = 1
-        row.settings = makeRowSettings(0.15, 0, [200,300])
+        row.settings = makeRowSettings(0.15, 0, [200, 300])
         row.settings.contentOffset = [200, 0]
         row.title += " 350"
       else if i mod 5 = 0 or i = 6 or i = 7
@@ -98,7 +99,7 @@ function itemSelcetedChanged()
   print "itemFocused changed to: "; m.list.itemFocused
   newScreen = createObject("roSGNode", "ListScreen")
   push(newScreen)
-  mv_setFocus(newScreen)
+  mv.setFocus(newScreen)
 end function
 
 function itemUnfocusedChanged()
@@ -131,6 +132,7 @@ end function
 
 function onAddTypeTwoPrebakes()
   m.cellProvider.callfunc("addPreBakedCells", m.top._addTypeTwoPrebakes, "ml_SimpleCell2")
+
 end function
 
 function addItems(cellType, number)
@@ -260,7 +262,7 @@ end function
 
 function onShow()
   m.list.isHidden = false
-  mv_setFocus(m.list)
+  mv.setFocus(m.list)
 end function
 
 function onHide()
@@ -270,6 +272,6 @@ end function
 function onGainedFocus(isSelfFocused)
   m.logInfo("onGainedFocus", isSelfFocused)
   if isSelfFocused
-    mv_setFocus(m.list)
+    mv.setFocus(m.list)
   end if
 end function

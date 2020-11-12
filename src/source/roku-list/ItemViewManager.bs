@@ -259,13 +259,15 @@ class ItemViewManager extends BaseClass
       m.logWarn("no itemRect for index", index)
       return invalid
     end if
-    ' screenPos = m.getScreenPositionForItem(itemRect, direction)
+    
     itemScreenPos = - itemRect.translation[m.axes] + m.container.translation[m.axes]
 
     if itemScreenPos > m.minPos and itemScreenPos + itemRect.size.width < m.maxPos
+      'we can simply move the focus to this position
       return itemScreenPos
     end if
 
+    'if part or all of the view is off the viewport, then a scroll is required
     return invalid
   end function
 

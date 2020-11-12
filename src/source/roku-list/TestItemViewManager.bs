@@ -5,7 +5,7 @@ class TestItemViewManager extends ItemViewManager
   public space = 0
 
   function new(owner, container, axes, itemSize = [100, 100], space = 0)
-    super("TestItemViewManager", owner, container)
+    super("TestItemViewManager", owner, container, axes, 0, 1920)
     m.container = container
     m.owner = owner
     m.itemSize = itemSize
